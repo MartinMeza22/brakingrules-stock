@@ -1,25 +1,42 @@
-# Braking Rules Stock
+# Breaking Rules Stock
 
-Backend desarrollado con Spring Boot para la gestión básica de stock de productos.
+API REST desarrollada con Spring Boot para la gestión básica de stock de productos.  
+Proyecto orientado a practicar buenas prácticas de backend con arquitectura en capas.
 
-## Stack
-- Java
+---
+
+## Tecnologías
+- Java 21
 - Spring Boot
+- Spring Web
 - Spring Data JPA
-- H2 Database
+- H2 Database (entorno local)
 - Maven
 
-## Features
-- CRUD de productos
+---
+
+## Funcionalidades
+- CRUD completo de productos
 - Persistencia con JPA
 - Consola H2 para testing
-- Arquitectura en capas (Controller + Service + Repository)
+- Arquitectura en capas:
+  - Controller
+  - Service
+  - Repository
 
-Proyecto en evolución (próximamente DTOs, validaciones, testing y base de datos real).
+---
 
-## Próximos pasos
-- DTOs y separación de responsabilidades
-- Validaciones con Bean Validation
-- Manejo global de excepciones
-- Tests unitarios
-- Integración con MySQL/PostgreSQL
+## Conceptos aplicados
+- Inyección de dependencias
+- Separación de responsabilidades
+- API RESTful
+- Manejo de entidades JPA
+
+---
+
+## ▶️ ¿Cómo ejecutar el proyecto?
+
+```bash
+git clone https://github.com/MartinMeza22/breaking-rules-stock.git
+cd breaking-rules-stock
+mvn spring-boot:run
