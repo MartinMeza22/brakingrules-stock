@@ -9,9 +9,9 @@
 		<relativePath/> <!-- lookup parent from repository -->
 	</parent>
 	<groupId>com.brakingrules</groupId>
-	<artifactId>stock</artifactId>
+	<artifactId>breaking-rules-stock</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
-	<name>brakingrules-stock</name>
+	<name>breaking-rules-stock</name>
 	<description>Sistema de gestión de indumentaria Braking Rules</description>
 	<url/>
 	<licenses>

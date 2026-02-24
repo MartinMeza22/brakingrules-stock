@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Stock Braking Rules</title>
+    <meta charset="UTF-8">
+</head>
+<body>
+
+<h1>Stock de Productos</h1>
+
+<h2>Agregar producto</h2>
+<form th:action="@{/web/productos}" th:object="${productoNuevo}" method="post">
+    Nombre: <input type="text" th:field="*{nombre}" required><br>
+    Categoría: <input type="text" th:field="*{categoria}"><br>
+    Talle: <input type="text" th:field="*{talle}"><br>
+    Color: <input type="text" th:field="*{color}"><br>
+    Precio: <input type="number" step="0.01" th:field="*{precio}"><br>
+    Stock: <input type="number" th:field="*{stock}"><br>
+    <button type="submit">Guardar</button>
+</form>
+
+<hr>
+
+<h2>Lista de productos</h2>
+<table border="1">
+    <tr>
+        <th>ID</th>
+        <th>Nombre</th>
+        <th>Talle</th>
+        <th>Color</th>
+        <th>Precio</th>
+        <th>Stock</th>
+        <th>Acción</th>
+    </tr>
+
+    <tr th:each="p : ${productos}">
+        <td th:text="${p.id}"></td>
+        <td th:text="${p.nombre}"></td>
+        <td th:text="${p.talle}"></td>
+        <td th:text="${p.color}"></td>
+        <td th:text="${p.precio}"></td>
+        <td th:text="${p.stock}"></td>
+        <td>
+            <a th:href="@{/web/productos/eliminar/{id}(id=${p.id})}">Eliminar</a>
+        </td>
+    </tr>
+</table>
+
+</body>
+</html>

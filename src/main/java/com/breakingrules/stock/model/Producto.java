@@ -1,7 +1,9 @@
-package com.brakingrules.stock.model;
+package com.breakingrules.stock.model;
 
 import jakarta.persistence.*;
 import lombok.*;
+
+import java.math.BigDecimal;
 
 @Entity
 @Getter
@@ -17,12 +19,12 @@ public class Producto {
     private String categoria;
     private String talle;
     private String color;
-    private Double precio;
+    private BigDecimal precio;
     private Integer stock;
 
     public Producto(){ }
 
-    public Producto(Integer id, String nombre, String categoria, String talle, String color, Double precio, Integer stock) {
+    public Producto(Integer id, String nombre, String categoria, String talle, String color, BigDecimal precio, Integer stock) {
         this.id = id;
         this.nombre = nombre;
         this.categoria = categoria;
