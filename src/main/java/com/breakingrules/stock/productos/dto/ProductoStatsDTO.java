@@ -1,4 +1,4 @@
-package com.breakingrules.stock.dto;
+package com.breakingrules.stock.productos.dto;
 
 import java.math.BigDecimal;
 

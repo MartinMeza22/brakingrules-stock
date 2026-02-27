@@ -1,6 +1,6 @@
-package com.breakingrules.stock.dto;
+package com.breakingrules.stock.productos.dto;
 
-import com.breakingrules.stock.model.Talle;
+import com.breakingrules.stock.productos.entity.Talle;
 
 public class ProductoFiltroDTO {
     private String nombre;

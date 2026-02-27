@@ -1,4 +1,4 @@
-package com.breakingrules.stock.model;
+package com.breakingrules.stock.productos.entity;
 
 import jakarta.persistence.*;
 import lombok.*;

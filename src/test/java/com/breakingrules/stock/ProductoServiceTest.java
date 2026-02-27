@@ -1,9 +1,9 @@
 package com.breakingrules.stock;
 
-import com.breakingrules.stock.model.Producto;
-import com.breakingrules.stock.model.Talle;
-import com.breakingrules.stock.repository.ProductoRepository;
-import com.breakingrules.stock.service.ProductoService;
+import com.breakingrules.stock.productos.entity.Producto;
+import com.breakingrules.stock.productos.entity.Talle;
+import com.breakingrules.stock.productos.repository.ProductoRepository;
+import com.breakingrules.stock.productos.service.ProductoService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;

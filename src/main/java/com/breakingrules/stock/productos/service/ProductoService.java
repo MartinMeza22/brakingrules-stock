@@ -1,10 +1,10 @@
-package com.breakingrules.stock.service;
+package com.breakingrules.stock.productos.service;
 
-import com.breakingrules.stock.dto.ProductoDTO;
-import com.breakingrules.stock.dto.ProductoStatsDTO;
-import com.breakingrules.stock.model.Producto;
-import com.breakingrules.stock.model.Talle;
-import com.breakingrules.stock.repository.ProductoRepository;
+import com.breakingrules.stock.productos.dto.ProductoDTO;
+import com.breakingrules.stock.productos.dto.ProductoStatsDTO;
+import com.breakingrules.stock.productos.entity.Producto;
+import com.breakingrules.stock.productos.entity.Talle;
+import com.breakingrules.stock.productos.repository.ProductoRepository;
 import java.io.ByteArrayOutputStream;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;

@@ -1,7 +1,7 @@
-package com.breakingrules.stock.repository;
+package com.breakingrules.stock.productos.repository;
 
-import com.breakingrules.stock.model.Producto;
-import com.breakingrules.stock.model.Talle;
+import com.breakingrules.stock.productos.entity.Producto;
+import com.breakingrules.stock.productos.entity.Talle;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 

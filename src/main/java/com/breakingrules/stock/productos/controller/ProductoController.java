@@ -1,10 +1,10 @@
-package com.breakingrules.stock.controller;
+package com.breakingrules.stock.productos.controller;
 
-import com.breakingrules.stock.dto.ProductoDTO;
-import com.breakingrules.stock.dto.ProductoStatsDTO;
-import com.breakingrules.stock.model.Producto;
-import com.breakingrules.stock.model.Talle;
-import com.breakingrules.stock.service.ProductoService;
+import com.breakingrules.stock.productos.dto.ProductoDTO;
+import com.breakingrules.stock.productos.dto.ProductoStatsDTO;
+import com.breakingrules.stock.productos.entity.Producto;
+import com.breakingrules.stock.productos.entity.Talle;
+import com.breakingrules.stock.productos.service.ProductoService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
@@ -17,8 +17,7 @@ import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+
 @Tag(name = "Productos", description = "Operaciones relacionadas a productos de indumentaria")
 @RestController
 @RequestMapping("/productos")

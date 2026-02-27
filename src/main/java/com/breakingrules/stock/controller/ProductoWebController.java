@@ -1,8 +1,8 @@
 package com.breakingrules.stock.controller;
 
-import com.breakingrules.stock.dto.ProductoDTO;
-import com.breakingrules.stock.model.Producto;
-import com.breakingrules.stock.service.ProductoService;
+import com.breakingrules.stock.productos.dto.ProductoDTO;
+import com.breakingrules.stock.productos.entity.Producto;
+import com.breakingrules.stock.productos.service.ProductoService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -57,4 +57,10 @@ public class ProductoWebController {
         service.guardar(producto); // save = update si tiene ID
         return "redirect:/web/productos";
     }
+
+//    @GetMapping("/exportarCSV")
+//    public String exportarCSV() {
+//        service.exportarCSV();
+//        return "redirect:/web/productos";
+//    }
 }
