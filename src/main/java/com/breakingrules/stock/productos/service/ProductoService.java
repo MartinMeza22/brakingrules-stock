@@ -98,13 +98,13 @@ public class ProductoService {
             throw new IllegalArgumentException("La categoría es obligatoria");
         }
 
-        if (producto.getPrecio() == null) {
+        if (producto.getPrecioVenta() == null) {
             log.warn("Validación fallida: precio null");
             throw new IllegalArgumentException("El precio es obligatorio");
         }
 
-        if (producto.getPrecio().compareTo(BigDecimal.ZERO) <= 0) {
-            log.warn("Validación fallida: precio inválido {}", producto.getPrecio());
+        if (producto.getPrecioVenta().compareTo(BigDecimal.ZERO) <= 0) {
+            log.warn("Validación fallida: precio inválido {}", producto.getPrecioVenta());
             throw new IllegalArgumentException("El precio debe ser mayor a 0");
         }
 
@@ -187,7 +187,7 @@ public class ProductoService {
                         .append(p.getCategoria()).append(",")
                         .append(p.getTalle()).append(",")
                         .append(p.getColor()).append(",")
-                        .append(p.getPrecio()).append(",")
+                        .append(p.getPrecioVenta()).append(",")
                         .append(p.getStock()).append("\n");
             }
 
@@ -207,7 +207,7 @@ public class ProductoService {
              ByteArrayOutputStream out = new ByteArrayOutputStream()) {
 
             List<Producto> productos = repository.findAll();
-            log.info("Cantidad de productos a exportar: {}", productos.size());
+            log.info("La cantidad de productos a exportar es de: {}", productos.size());
 
             Sheet sheet = workbook.createSheet("Productos");
 
@@ -238,7 +238,7 @@ public class ProductoService {
                 row.createCell(2).setCellValue(p.getCategoria());
                 row.createCell(3).setCellValue(p.getTalle().name());
                 row.createCell(4).setCellValue(p.getColor());
-                row.createCell(5).setCellValue(p.getPrecio().doubleValue());
+                row.createCell(5).setCellValue(p.getPrecioVenta().doubleValue());
                 row.createCell(6).setCellValue(p.getStock());
             }
 
@@ -330,7 +330,7 @@ public class ProductoService {
                 .sum();
 
         BigDecimal precioPromedio = productos.stream()
-                .map(Producto::getPrecio)
+                .map(Producto::getPrecioVenta)
                 .reduce(BigDecimal.ZERO, BigDecimal::add)
                 .divide(BigDecimal.valueOf(total == 0 ? 1 : total), 2, RoundingMode.HALF_UP);
 
@@ -344,12 +344,22 @@ public class ProductoService {
     private ProductoDTO toDTO(Producto p) {
         return new ProductoDTO(
                 p.getId(),
+                p.getSku(),
                 p.getNombre(),
                 p.getCategoria(),
                 p.getTalle(),
                 p.getColor(),
-                p.getPrecio(),
-                p.getStock()
+                p.getCodigoBarras(),
+                p.getCosto(),
+                p.getPrecioVenta(),
+                p.getStock(),
+                p.getStockMinimo(),
+                p.getActivo()
         );
     }
 }
+
+//        Integer id, String nombre, String categoria, Talle talle,
+//        String color, String codigoBarras,
+//        BigDecimal costo, BigDecimal precioVenta,
+//        Integer stock, Integer stockMinimo, Boolean activo

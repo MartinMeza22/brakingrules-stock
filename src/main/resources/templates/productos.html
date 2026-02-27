@@ -154,7 +154,7 @@
                 <option value="XXXL">XXXL</option>
             </select>
 
-            <input type="number" step="0.01" th:field="*{precio}" placeholder="Precio" required>
+            <input type="number" step="0.01" th:field="*{precioVenta}" placeholder="Precio" required>
             <input type="number" th:field="*{stock}" placeholder="Stock" required>
 
             <button type="submit">Guardar</button>
@@ -190,7 +190,7 @@
                     th:classappend="${p.stock <= 5} ? 'stock-bajo'">
                     <td th:text="${p.id}"></td>
                     <td th:text="${p.nombre}"></td>
-                    <td th:text="${p.precio}"></td>
+                    <td th:text="${p.precioVenta}"></td>
                     <td>
                         <span th:text="${p.stock}"></span>
                         <span th:if="${p.stock <= 5}" class="badge badge-danger">Bajo</span>

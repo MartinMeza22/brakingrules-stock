@@ -7,24 +7,40 @@ import java.math.BigDecimal;
 public class ProductoDTO {
 
     private Integer id;
+    private String sku;
     private String nombre;
-    private Talle talle;
     private String categoria;
+    private Talle talle;
     private String color;
-    private BigDecimal precio;
+
+    private String codigoBarras;
+
+    private BigDecimal costo;
+    private BigDecimal precioVenta;
+
     private Integer stock;
+    private Integer stockMinimo;
+
+    private Boolean activo;
 
     public ProductoDTO() {}
 
-    public ProductoDTO(Integer id, String nombre, String categoria, Talle talle,
-                       String color, BigDecimal precio, Integer stock) {
+    public ProductoDTO(Integer id, String sku, String nombre, String categoria, Talle talle,
+                       String color, String codigoBarras,
+                       BigDecimal costo, BigDecimal precioVenta,
+                       Integer stock, Integer stockMinimo, Boolean activo) {
         this.id = id;
+        this.sku = sku;
         this.nombre = nombre;
         this.categoria = categoria;
         this.talle = talle;
         this.color = color;
-        this.precio = precio;
+        this.codigoBarras = codigoBarras;
+        this.costo = costo;
+        this.precioVenta = precioVenta;
         this.stock = stock;
+        this.stockMinimo = stockMinimo;
+        this.activo = activo;
     }
 
     public Integer getId() {
@@ -33,6 +49,14 @@ public class ProductoDTO {
 
     public void setId(Integer id) {
         this.id = id;
+    }
+
+    public String getSku() {
+        return sku;
+    }
+
+    public void setSku(String sku) {
+        this.sku = sku;
     }
 
     public String getNombre() {
@@ -47,7 +71,7 @@ public class ProductoDTO {
         return categoria;
     }
 
-    public void setCategoria(String marca) {
+    public void setCategoria(String categoria) {
         this.categoria = categoria;
     }
 
@@ -67,12 +91,28 @@ public class ProductoDTO {
         this.color = color;
     }
 
-    public BigDecimal getPrecio() {
-        return precio;
+    public String getCodigoBarras() {
+        return codigoBarras;
     }
 
-    public void setPrecio(BigDecimal precio) {
-        this.precio = precio;
+    public void setCodigoBarras(String codigoBarras) {
+        this.codigoBarras = codigoBarras;
+    }
+
+    public BigDecimal getCosto() {
+        return costo;
+    }
+
+    public void setCosto(BigDecimal costo) {
+        this.costo = costo;
+    }
+
+    public BigDecimal getPrecioVenta() {
+        return precioVenta;
+    }
+
+    public void setPrecioVenta(BigDecimal precioVenta) {
+        this.precioVenta = precioVenta;
     }
 
     public Integer getStock() {
@@ -81,5 +121,21 @@ public class ProductoDTO {
 
     public void setStock(Integer stock) {
         this.stock = stock;
+    }
+
+    public Integer getStockMinimo() {
+        return stockMinimo;
+    }
+
+    public void setStockMinimo(Integer stockMinimo) {
+        this.stockMinimo = stockMinimo;
+    }
+
+    public Boolean getActivo() {
+        return activo;
+    }
+
+    public void setActivo(Boolean activo) {
+        this.activo = activo;
     }
 }

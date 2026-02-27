@@ -1,4 +1,4 @@
-package com.breakingrules.stock.controller;
+package com.breakingrules.stock.productos.controller;
 
 import com.breakingrules.stock.productos.dto.ProductoDTO;
 import com.breakingrules.stock.productos.entity.Producto;
