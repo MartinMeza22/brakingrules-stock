@@ -3,6 +3,7 @@ package com.breakingrules.stock.controller;
 import com.breakingrules.stock.dto.ProductoDTO;
 import com.breakingrules.stock.model.Producto;
 import com.breakingrules.stock.service.ProductoService;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
@@ -11,21 +12,28 @@ import java.util.List;
 
 @Controller
 @RequestMapping("/web/productos")
+@RequiredArgsConstructor
+
 public class ProductoWebController {
 
     private final ProductoService service;
 
-    public ProductoWebController(ProductoService service) {
-        this.service = service;
-    }
-
     @GetMapping
-    public String listar(Model model) {
-        model.addAttribute("productos", service.listar());
+    public String listar(@RequestParam(required = false) String nombre, Model model) {
+
+        List<ProductoDTO> productos;
+
+        if (nombre != null && !nombre.isEmpty()) {
+            productos = service.buscarPorNombre(nombre);
+        } else {
+            productos = service.listarTodosSinPaginacion();
+        }
+
+        model.addAttribute("productos", productos);
         model.addAttribute("productoNuevo", new Producto());
+
         return "productos";
     }
-
     @PostMapping
     public String crear(@ModelAttribute Producto producto) {
         service.guardar(producto);
@@ -38,4 +46,15 @@ public class ProductoWebController {
         return "redirect:/web/productos";
     }
 
+    @GetMapping("/editar/{id}")
+    public String editar(@PathVariable Integer id, Model model) {
+        model.addAttribute("producto", service.buscarPorId(id));
+        return "editar";
+    }
+
+    @PostMapping("/editar")
+    public String actualizar(@ModelAttribute Producto producto) {
+        service.guardar(producto); // save = update si tiene ID
+        return "redirect:/web/productos";
+    }
 }

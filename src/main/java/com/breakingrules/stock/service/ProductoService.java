@@ -36,7 +36,7 @@ public class ProductoService {
         this.repository = repository;
     }
 
-    public List<ProductoDTO> listar() {
+    public List<ProductoDTO> listarTodosSinPaginacion() {
         log.info("Listando todos los productos");
 
         List<ProductoDTO> productos = repository.findAll()
@@ -136,6 +136,29 @@ public class ProductoService {
         return resultados;
     }
 
+    public ProductoDTO buscarPorId(Integer id) {
+        log.info("Buscando producto por ID: {}", id);
+
+        if (id == null) {
+            log.warn("Búsqueda fallida: ID null");
+            throw new IllegalArgumentException("El ID no puede ser null");
+        }
+
+        Producto producto = repository.findById(id)
+                .orElseThrow(() -> {
+                    log.warn("Producto no encontrado. ID: {}", id);
+                    return new IllegalArgumentException("Producto no encontrado");
+                });
+
+        log.info("Producto encontrado: {}", producto.getNombre());
+        return toDTO(producto);
+    }
+
+    public Producto obtenerEntidadPorId(Integer id) {
+        return repository.findById(id)
+                .orElseThrow(() -> new IllegalArgumentException("Producto no encontrado"));
+    }
+
     public List<ProductoDTO> obtenerStockBajo() {
         log.info("Obteniendo productos con stock bajo (<= {})", STOCK_BAJO_LIMITE);
 
@@ -219,7 +242,6 @@ public class ProductoService {
                 row.createCell(6).setCellValue(p.getStock());
             }
 
-            // Auto size columnas
             for (int i = 0; i < columnas.length; i++) {
                 sheet.autoSizeColumn(i);
             }
