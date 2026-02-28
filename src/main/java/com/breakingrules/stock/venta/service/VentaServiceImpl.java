@@ -1,5 +1,6 @@
 package com.breakingrules.stock.venta.service;
 
+import com.breakingrules.stock.clientes.entity.Cliente;
 import com.breakingrules.stock.clientes.repository.ClienteRepository;
 import com.breakingrules.stock.productos.entity.Producto;
 import com.breakingrules.stock.productos.repository.ProductoRepository;
@@ -15,12 +16,14 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.util.List;
+import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
 public class VentaServiceImpl implements VentaService {
 
-    private final VentaRepository ventaRepo;
+    private final VentaRepository ventaRepository;
     private final VentaDetalleRepository ventaDetalleRepo;
     private final ProductoRepository productoRepo;
     private final ClienteRepository clienteRepo;
@@ -34,32 +37,62 @@ public class VentaServiceImpl implements VentaService {
         venta.setFormaPago(dto.getFormaPago());
         venta.setCliente(clienteRepo.findById(dto.getClienteId()).orElseThrow());
 
-        ventaRepo.save(venta);
+
+        ventaRepository.save(venta);
 
         BigDecimal total = BigDecimal.ZERO;
 
         for (ItemVentaDTO item : dto.getItems()) {
-            Producto producto = productoRepo.findById(item.getProductoId()).orElseThrow();
+            Producto producto = productoRepo.findById(item.getProductoId())
+                    .orElseThrow();
 
-            if (producto.getStock() < item.getCantidad()) throw new RuntimeException("Stock insuficiente");
+            if (producto.getStock() < item.getCantidad()) {
+                throw new RuntimeException("Stock insuficiente");
+            }
 
             VentaDetalle det = new VentaDetalle();
             det.setVenta(venta);
             det.setProducto(producto);
             det.setCantidad(item.getCantidad());
-            det.setPrecioUnitario(item.getPrecioUnitario());
+            det.setPrecioUnitario(producto.getPrecioVenta());
 
-            BigDecimal subtotal = item.getPrecioUnitario().multiply(BigDecimal.valueOf(item.getCantidad()));
+            BigDecimal subtotal = producto.getPrecioVenta()
+                    .multiply(BigDecimal.valueOf(item.getCantidad()));
+
             det.setSubtotal(subtotal);
-
             ventaDetalleRepo.save(det);
 
             producto.setStock(producto.getStock() - item.getCantidad());
-
             total = total.add(subtotal);
         }
+
         venta.setTotal(total);
         venta.setVuelto(dto.getMontoPagado().subtract(total));
-        ventaRepo.save(venta);
+        ventaRepository.save(venta);
+    }
+
+    @Override
+    public List<Cliente> obtenerClientes() {
+        return clienteRepo.findAll();
+    }
+
+    @Override
+    public List<Producto> obtenerProductos() {
+        return productoRepo.findAll();
+    }
+
+    @Override
+    public List<Venta> obtenerVentas() {
+        return ventaRepository.findAll(); // devolvemos entidades directamente
+    }
+
+    @Override
+    public Optional<Venta> findById(Integer id) {
+        return ventaRepository.findById(id);
+    }
+
+    @Override
+    public List<VentaDetalle> obtenerDetallesVenta(Integer ventaId) {
+        return ventaDetalleRepo.findByVentaId(ventaId);
     }
 }

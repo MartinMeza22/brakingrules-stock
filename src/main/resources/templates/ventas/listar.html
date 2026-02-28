@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Listado de Ventas - Breaking Rules</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <style>
+        :root {
+            --bg: #0f172a;
+            --card: #1e293b;
+            --primary: #e5e7eb;
+            --accent: #9ca3af;
+            --border: #334155;
+            --success: #22c55e;
+            --danger: #ef4444;
+        }
+        body {
+            margin: 0;
+            font-family: Inter, system-ui, sans-serif;
+            background: var(--bg);
+            color: var(--primary);
+        }
+        .container {
+            max-width: 900px;
+            margin: 40px auto;
+            padding: 0 20px;
+        }
+        .card {
+            background: var(--card);
+            border-radius: 14px;
+            padding: 24px;
+            box-shadow: 0 10px 30px rgba(0,0,0,.35);
+            border: 1px solid var(--border);
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 10px;
+        }
+        th, td {
+            padding: 8px 12px;
+            border-bottom: 1px solid var(--border);
+            text-align: left;
+        }
+        a.button {
+            display: inline-block;
+            background: white;
+            color: var(--card);
+            text-decoration: none;
+            padding: 6px 10px;
+            border-radius: 6px;
+            font-weight: 600;
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <div class="card">
+        <h3>Listado de Ventas</h3>
+        <table>
+            <thead>
+            <tr>
+                <th>ID</th>
+                <th>Cliente</th>
+                <th>Fecha</th>
+                <th>Total</th>
+                <th>Acciones</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr th:each="v : ${ventas}">
+                <td th:text="${v.id}"></td>
+                <td th:text="${v.cliente.nombre + ' ' + v.cliente.apellido}"></td>
+                <td><span th:text="${v.fecha.format(formatter)}"></span></td>
+                <td th:text="${v.total}"></td>
+                <td>
+                    <a th:href="@{/web/ventas/detalle/{id}(id=${v.id})}">Ver detalle</a>
+                </td>
+            </tr>
+            </tbody>
+        </table>
+        <a th:href="@{/web/ventas/nueva}" class="button">Crear comprar</a>
+    </div>
+</div>
+</body>
+</html>

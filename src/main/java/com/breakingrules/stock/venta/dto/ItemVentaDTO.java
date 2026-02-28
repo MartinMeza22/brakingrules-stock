@@ -1,10 +1,19 @@
 package com.breakingrules.stock.venta.dto;
 
+import jakarta.validation.constraints.Min;
+import jakarta.validation.constraints.NotNull;
+
 import java.math.BigDecimal;
 
 public class ItemVentaDTO {
+
+    @NotNull(message = "Debe seleccionar un producto")
     private Integer productoId;
+
+    @NotNull(message = "Cantidad requerida")
+    @Min(value = 1, message = "Mínimo 1 unidad")
     private Integer cantidad;
+
     private BigDecimal precioUnitario;
     private String observaciones;
     private BigDecimal subtotal;
