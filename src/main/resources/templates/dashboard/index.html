@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      th:replace="layout/base :: layout(~{::section}, 'Dashboard')">
+
+<section>
+    <h2>📊 Dashboard</h2>
+
+    <div class="card">
+        <h3>Ventas y caja</h3>
+        <p>Total ventas hoy: <strong th:text="${totalVentasHoy}"></strong></p>
+        <p>Total ingresos hoy: <strong th:text="${totalIngresosHoy}"></strong></p>
+    </div>
+
+    <div class="card">
+        <h3>Cuentas corrientes</h3>
+        <p>Total deuda: <strong th:text="${totalDeuda}"></strong></p>
+        <p>Total a favor: <strong th:text="${totalAFavor}"></strong></p>
+        <p>Clientes con deuda: <strong th:text="${clientesConDeuda}"></strong></p>
+    </div>
+
+    <div class="card">
+        <h3>Productos críticos (stock <= 5)</h3>
+        <ul>
+            <li th:each="p : ${productosCriticos}" th:text="${p.nombre + ' (' + p.stock + ')'}"></li>
+        </ul>
+    </div>
+</section>
+</html>
