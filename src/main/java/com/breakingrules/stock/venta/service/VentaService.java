@@ -25,4 +25,6 @@ public interface VentaService {
     List<VentaDetalle> obtenerDetallesVenta(Integer ventaId);
 
     List<MovimientoCaja> listarMovimientos();
+
+    Venta crearVenta(Venta venta);
 }

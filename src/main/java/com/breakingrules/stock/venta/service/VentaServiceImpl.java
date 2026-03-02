@@ -4,6 +4,8 @@ import com.breakingrules.stock.caja.entity.MovimientoCaja;
 import com.breakingrules.stock.caja.entity.TipoMovimiento;
 import com.breakingrules.stock.clientes.entity.Cliente;
 import com.breakingrules.stock.clientes.repository.ClienteRepository;
+import com.breakingrules.stock.cuentaCorriente.entity.CuentaCorriente;
+import com.breakingrules.stock.cuentaCorriente.service.CuentaCorrienteService;
 import com.breakingrules.stock.productos.entity.Producto;
 import com.breakingrules.stock.productos.repository.ProductoRepository;
 import com.breakingrules.stock.venta.dto.ItemVentaDTO;
@@ -30,6 +32,7 @@ public class VentaServiceImpl implements VentaService {
     private final ProductoRepository productoRepo;
     private final ClienteRepository clienteRepo;
     private final MovimientoCajaRepository movimientoCajaRepo;
+    private final CuentaCorrienteService cuentaCorrienteService;
 
     @Override
     @Transactional
@@ -39,7 +42,6 @@ public class VentaServiceImpl implements VentaService {
         venta.setFecha(LocalDateTime.now());
         venta.setFormaPago(dto.getFormaPago());
         venta.setCliente(clienteRepo.findById(dto.getClienteId()).orElseThrow());
-
         ventaRepository.save(venta);
 
         BigDecimal total = BigDecimal.ZERO;
@@ -79,27 +81,52 @@ public class VentaServiceImpl implements VentaService {
         BigDecimal vuelto = pagado.subtract(total);
         venta.setVuelto(vuelto.compareTo(BigDecimal.ZERO) > 0 ? vuelto : BigDecimal.ZERO);
 
-        if (pagado.compareTo(BigDecimal.ZERO) == 0) {
-            venta.setEstado(EstadoVenta.PENDIENTE);
-        } else if (pagado.compareTo(total) >= 0) {
+        CuentaCorriente cuenta = cuentaCorrienteService.obtenerOCrearCuenta(venta.getCliente());
+        BigDecimal saldoAFavor = cuenta.getSaldo().compareTo(BigDecimal.ZERO) < 0
+                ? cuenta.getSaldo().abs()
+                : BigDecimal.ZERO;
+
+        BigDecimal efectivoDisponible = pagado.add(saldoAFavor);
+
+        if (efectivoDisponible.compareTo(total) >= 0) {
             venta.setEstado(EstadoVenta.PAGADA);
-        } else {
+        } else if (efectivoDisponible.compareTo(BigDecimal.ZERO) > 0) {
             venta.setEstado(EstadoVenta.PARCIAL);
+        } else {
+            venta.setEstado(EstadoVenta.PENDIENTE);
         }
 
         ventaRepository.save(venta);
-        if (pagado.compareTo(BigDecimal.ZERO) > 0) {
 
+        BigDecimal diferencia = total.subtract(pagado); // positivo = debe, negativo = a favor
+
+        if (diferencia.compareTo(BigDecimal.ZERO) != 0) {
+            if (diferencia.compareTo(BigDecimal.ZERO) > 0) {
+                cuentaCorrienteService.registrarDeuda(
+                        venta.getCliente().getId(),
+                        diferencia,
+                        "Venta #" + venta.getId()
+                );
+            } else {
+                cuentaCorrienteService.registrarPago(
+                        venta.getCliente().getId(),
+                        diferencia.abs(),
+                        "Pago extra Venta #" + venta.getId()
+                );
+            }
+        }
+
+        if (pagado.compareTo(BigDecimal.ZERO) > 0) {
             MovimientoCaja mov = new MovimientoCaja();
             mov.setFecha(LocalDateTime.now());
             mov.setTipo(TipoMovimiento.INGRESO);
             mov.setMonto(pagado);
-            mov.setReferencia("VENTA " + venta.getId());
+            mov.setReferencia("Venta #" + venta.getId() + " - $" + diferencia);
 
             movimientoCajaRepo.save(mov);
         }
     }
-
+ 
     @Override
     public List<Cliente> obtenerClientes() {
         return clienteRepo.findAll();
@@ -127,5 +154,37 @@ public class VentaServiceImpl implements VentaService {
 
     public List<MovimientoCaja> listarMovimientos() {
         return movimientoCajaRepo.findAll();
+    }
+
+    @Transactional
+    public Venta crearVenta(Venta venta) {
+
+        Venta guardada = ventaRepository.save(venta);
+
+        if (guardada.getCliente() != null) {
+
+            BigDecimal total = guardada.getTotal();
+            BigDecimal pagado = guardada.getMontoPagado() != null ? guardada.getMontoPagado() : BigDecimal.ZERO;
+
+            BigDecimal diferencia = pagado.subtract(total);
+
+            if (guardada.getFiado()) {
+                cuentaCorrienteService.registrarDeuda(
+                        guardada.getCliente().getId(),
+                        total,
+                        "Venta #" + guardada.getId()
+                );
+            }
+
+            else if (diferencia.compareTo(BigDecimal.ZERO) > 0) {
+                cuentaCorrienteService.registrarPago(
+                        guardada.getCliente().getId(),
+                        diferencia,
+                        "Saldo a favor - Venta #" + guardada.getId()
+                );
+            }
+        }
+
+        return guardada;
     }
 }

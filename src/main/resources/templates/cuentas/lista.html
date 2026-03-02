@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      th:replace="layout/base :: layout(~{::section}, 'Cuentas Corrientes')">
+
+<section>
+
+    <div class="card">
+        <h3>📋 Cuentas Corrientes</h3>
+
+        <table>
+            <thead>
+            <tr>
+                <th>Cliente</th>
+                <th>-</th>
+                <th>Saldo</th>
+                <th>Estado</th>
+                <th>Acciones</th>
+            </tr>
+            </thead>
+
+            <tbody>
+            <tr th:each="c : ${cuentas}">
+                <td th:text="${c.cliente != null ? c.cliente.nombre : 'Sin cliente'}"></td>
+
+                <td th:text="${c.cliente != null ? c.cliente.apellido : 'Sin cliente'}"></td>
+
+                <td th:text="${#numbers.formatDecimal(c.saldo.abs(), 1, 2)}"
+                    th:style="${c.saldo > 0} ? 'color:red;' : 'color:green;'">
+                </td>
+                <td th:text="${c.saldo > 0 ? 'Deuda' : (c.saldo < 0 ? 'A favor' : 'Saldo cero')}"></td>
+                <td>
+                    <a th:href="@{'/web/cuentas/' + ${c.id}}">Ver detalle</a>
+                </td>
+            </tr>
+            </tbody>
+        </table>
+    </div>
+
+</section>
+</html>

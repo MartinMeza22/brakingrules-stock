@@ -34,10 +34,12 @@ public class VentaDTO {
     private BigDecimal vuelto;
     private LocalDateTime fecha;
 
+    private Boolean fiado = false;
+
     public VentaDTO() {
     }
 
-    public VentaDTO(Integer id, EstadoVenta estado, Integer clienteId, BigDecimal montoPagado, BigDecimal vuelto, List<ItemVentaDTO> items, String formaPago, LocalDateTime fecha) {
+    public VentaDTO(Integer id, EstadoVenta estado, Integer clienteId, BigDecimal montoPagado, BigDecimal vuelto, List<ItemVentaDTO> items, String formaPago, LocalDateTime fecha, Boolean fiado) {
         this.id = id;
         this.estado = estado;
         this.clienteId = clienteId;
@@ -46,6 +48,7 @@ public class VentaDTO {
         this.items = items;
         this.formaPago = formaPago;
         this.fecha = fecha;
+        this.fiado = fiado;
     }
 
     public Integer getId() {
@@ -110,5 +113,13 @@ public class VentaDTO {
 
     public void setFecha(LocalDateTime fecha) {
         this.fecha = fecha;
+    }
+
+    public Boolean getFiado() {
+        return fiado;
+    }
+
+    public void setFiado(Boolean fiado) {
+        this.fiado = fiado;
     }
 }

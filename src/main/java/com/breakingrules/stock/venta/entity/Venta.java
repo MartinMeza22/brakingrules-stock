@@ -38,4 +38,7 @@ public class Venta {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "cliente_id")
     private Cliente cliente;
+
+    @Column(nullable = false)
+    private Boolean fiado = false;
 }
