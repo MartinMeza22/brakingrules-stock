@@ -14,6 +14,7 @@ public class ProveedorDTO {
 
     private Integer id;
     private String nombre;
+    private String descripcion;
     private String cuit;
     private String email;
     private String telefono;
@@ -23,9 +24,10 @@ public class ProveedorDTO {
     public ProveedorDTO() {
     }
 
-    public ProveedorDTO(Integer id, String nombre, String cuit, String email, String telefono, String direccion, Boolean activo) {
+    public ProveedorDTO(Integer id, String nombre, String descripcion, String cuit, String email, String telefono, String direccion, Boolean activo) {
         this.id = id;
         this.nombre = nombre;
+        this. descripcion = descripcion;
         this.cuit = cuit;
         this.email = email;
         this.telefono = telefono;
@@ -47,6 +49,14 @@ public class ProveedorDTO {
 
     public void setNombre(String nombre) {
         this.nombre = nombre;
+    }
+
+    public String getDescripcion() {
+        return descripcion;
+    }
+
+    public void setDescripcion(String descripcion) {
+        this.descripcion = descripcion;
     }
 
     public String getCuit() {

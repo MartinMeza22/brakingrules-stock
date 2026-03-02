@@ -10,6 +10,7 @@ public class ClienteDTO {
     private Integer id;
     private String nombre;
     private String apellido;
+    private String descripcion;
     private String documento;
     private String cuil;
     private String email;
@@ -21,7 +22,7 @@ public class ClienteDTO {
 
     private Boolean activo = true;
 
-    public ClienteDTO(Integer id, Boolean activo, String direccion, String telefono, String email, String cuil, String documento, String apellido, String nombre) {
+    public ClienteDTO(Integer id, Boolean activo, String direccion, String telefono, String email, String cuil, String documento, String apellido, String nombre, String descripcion) {
         this.id = id;
         this.activo = activo;
         this.direccion = direccion;
@@ -31,6 +32,7 @@ public class ClienteDTO {
         this.documento = documento;
         this.apellido = apellido;
         this.nombre = nombre;
+        this.descripcion = descripcion;
     }
 
     public Integer getId() {
@@ -55,6 +57,14 @@ public class ClienteDTO {
 
     public void setApellido(String apellido) {
         this.apellido = apellido;
+    }
+
+    public String getDescripcion() {
+        return descripcion;
+    }
+
+    public void setDescripcion(String descripcion) {
+        this.descripcion = descripcion;
     }
 
     public String getDocumento() {

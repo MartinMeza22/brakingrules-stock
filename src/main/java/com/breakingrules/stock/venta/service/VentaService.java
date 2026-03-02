@@ -3,6 +3,7 @@ package com.breakingrules.stock.venta.service;
 import com.breakingrules.stock.clientes.entity.Cliente;
 import com.breakingrules.stock.productos.entity.Producto;
 import com.breakingrules.stock.venta.dto.VentaDTO;
+import com.breakingrules.stock.caja.entity.MovimientoCaja;
 import com.breakingrules.stock.venta.entity.Venta;
 import com.breakingrules.stock.venta.entity.VentaDetalle;
 
@@ -22,4 +23,6 @@ public interface VentaService {
     Optional<Venta> findById(Integer id);
 
     List<VentaDetalle> obtenerDetallesVenta(Integer ventaId);
+
+    List<MovimientoCaja> listarMovimientos();
 }

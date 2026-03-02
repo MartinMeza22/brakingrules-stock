@@ -20,6 +20,9 @@ public class Proveedor {
     @Size(max = 100, message = "El nombre no puede superar los 100 caracteres")
     private String nombre;
 
+    @Size(max = 100, message = "La descripcion no puede superar los 100 caracteres")
+    private String descripcion;
+
     @NotBlank(message = "El CUIT es obligatorio")
     @Pattern(regexp = "\\d{11}", message = "El CUIT debe tener 11 dígitos numéricos")
     private String cuit;

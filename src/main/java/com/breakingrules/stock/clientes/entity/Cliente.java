@@ -24,6 +24,9 @@ public class Cliente {
     @Size(max = 100, message = "Máximo 100 caracteres")
     private String apellido;
 
+    @Size(max = 100, message = "Máximo 100 caracteres")
+    private String descripcion;
+
     @NotBlank(message = "El DNI o CUIT es obligatorio")
     @Size(max = 20, message = "Máximo 20 caracteres")
     private String documento;

@@ -1,13 +1,15 @@
 package com.breakingrules.stock.venta.service;
 
+import com.breakingrules.stock.caja.entity.MovimientoCaja;
+import com.breakingrules.stock.caja.entity.TipoMovimiento;
 import com.breakingrules.stock.clientes.entity.Cliente;
 import com.breakingrules.stock.clientes.repository.ClienteRepository;
 import com.breakingrules.stock.productos.entity.Producto;
 import com.breakingrules.stock.productos.repository.ProductoRepository;
 import com.breakingrules.stock.venta.dto.ItemVentaDTO;
 import com.breakingrules.stock.venta.dto.VentaDTO;
-import com.breakingrules.stock.venta.entity.Venta;
-import com.breakingrules.stock.venta.entity.VentaDetalle;
+import com.breakingrules.stock.venta.entity.*;
+import com.breakingrules.stock.caja.repository.MovimientoCajaRepository;
 import com.breakingrules.stock.venta.repository.VentaDetalleRepository;
 import com.breakingrules.stock.venta.repository.VentaRepository;
 import lombok.RequiredArgsConstructor;
@@ -27,6 +29,7 @@ public class VentaServiceImpl implements VentaService {
     private final VentaDetalleRepository ventaDetalleRepo;
     private final ProductoRepository productoRepo;
     private final ClienteRepository clienteRepo;
+    private final MovimientoCajaRepository movimientoCajaRepo;
 
     @Override
     @Transactional
@@ -36,7 +39,6 @@ public class VentaServiceImpl implements VentaService {
         venta.setFecha(LocalDateTime.now());
         venta.setFormaPago(dto.getFormaPago());
         venta.setCliente(clienteRepo.findById(dto.getClienteId()).orElseThrow());
-
 
         ventaRepository.save(venta);
 
@@ -67,8 +69,35 @@ public class VentaServiceImpl implements VentaService {
         }
 
         venta.setTotal(total);
-        venta.setVuelto(dto.getMontoPagado().subtract(total));
+
+        BigDecimal pagado = dto.getMontoPagado() != null
+                ? dto.getMontoPagado()
+                : BigDecimal.ZERO;
+
+        venta.setMontoPagado(pagado);
+
+        BigDecimal vuelto = pagado.subtract(total);
+        venta.setVuelto(vuelto.compareTo(BigDecimal.ZERO) > 0 ? vuelto : BigDecimal.ZERO);
+
+        if (pagado.compareTo(BigDecimal.ZERO) == 0) {
+            venta.setEstado(EstadoVenta.PENDIENTE);
+        } else if (pagado.compareTo(total) >= 0) {
+            venta.setEstado(EstadoVenta.PAGADA);
+        } else {
+            venta.setEstado(EstadoVenta.PARCIAL);
+        }
+
         ventaRepository.save(venta);
+        if (pagado.compareTo(BigDecimal.ZERO) > 0) {
+
+            MovimientoCaja mov = new MovimientoCaja();
+            mov.setFecha(LocalDateTime.now());
+            mov.setTipo(TipoMovimiento.INGRESO);
+            mov.setMonto(pagado);
+            mov.setReferencia("VENTA " + venta.getId());
+
+            movimientoCajaRepo.save(mov);
+        }
     }
 
     @Override
@@ -83,7 +112,7 @@ public class VentaServiceImpl implements VentaService {
 
     @Override
     public List<Venta> obtenerVentas() {
-        return ventaRepository.findAll(); // devolvemos entidades directamente
+        return ventaRepository.findAll();
     }
 
     @Override
@@ -94,5 +123,9 @@ public class VentaServiceImpl implements VentaService {
     @Override
     public List<VentaDetalle> obtenerDetallesVenta(Integer ventaId) {
         return ventaDetalleRepo.findByVentaId(ventaId);
+    }
+
+    public List<MovimientoCaja> listarMovimientos() {
+        return movimientoCajaRepo.findAll();
     }
 }

@@ -19,13 +19,14 @@ public class Venta {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @Enumerated(EnumType.STRING)
+    private EstadoVenta estado;
 
     private LocalDateTime fecha;
 
     @DecimalMin(value = "0.0", inclusive = false, message = "El total debe ser mayor a 0")
     private BigDecimal total;
-
-    @DecimalMin(value = "0.0", inclusive = false, message = "El monto pagado debe ser mayor a 0")
+    
     private BigDecimal montoPagado;
 
     private BigDecimal vuelto;

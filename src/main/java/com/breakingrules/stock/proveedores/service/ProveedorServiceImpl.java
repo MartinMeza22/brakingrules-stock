@@ -24,6 +24,7 @@ public class ProveedorServiceImpl implements ProveedorService {
         Proveedor existente = repository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Proveedor no encontrado"));
         existente.setNombre(proveedor.getNombre());
+        existente.setDescripcion(proveedor.getDescripcion());
         existente.setCuit(proveedor.getCuit());
         existente.setEmail(proveedor.getEmail());
         existente.setTelefono(proveedor.getTelefono());

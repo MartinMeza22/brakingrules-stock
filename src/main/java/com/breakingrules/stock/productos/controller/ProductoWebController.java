@@ -58,6 +58,7 @@ public class ProductoWebController {
         Producto producto = service.obtenerEntidadPorId(id);
         model.addAttribute("producto", producto);
         model.addAttribute("talles", Talle.values());
+        model.addAttribute("proveedores", proveedorService.listarTodos());
         return "productos/editar";
     }
 
@@ -69,18 +70,19 @@ public class ProductoWebController {
 
         if (result.hasErrors()) {
             model.addAttribute("talles", Talle.values());
-            return "productos/editar"; // volver al form de edición
+            model.addAttribute("proveedores", proveedorService.listarTodos());
+            return "productos/editar";
         }
 
         Producto existente = service.obtenerEntidadPorId(id);
 
         existente.setNombre(producto.getNombre());
-        existente.setSku(producto.getSku());
         existente.setCodigoBarras(producto.getCodigoBarras());
         existente.setPrecioVenta(producto.getPrecioVenta());
         existente.setStock(producto.getStock());
         existente.setCategoria(producto.getCategoria());
         existente.setColor(producto.getColor());
+        existente.setProveedor(producto.getProveedor());
 
         service.guardar(existente);
 

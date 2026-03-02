@@ -1,5 +1,6 @@
 package com.breakingrules.stock.venta.dto;
 
+import com.breakingrules.stock.venta.entity.EstadoVenta;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.DecimalMin;
 import jakarta.validation.constraints.NotBlank;
@@ -18,6 +19,8 @@ public class VentaDTO {
     @NotNull(message = "Debe seleccionar un cliente")
     private Integer clienteId;
 
+    private EstadoVenta estado;
+
     @NotBlank(message = "Debe elegir una forma de pago")
     private String formaPago;
 
@@ -34,8 +37,9 @@ public class VentaDTO {
     public VentaDTO() {
     }
 
-    public VentaDTO(Integer id, Integer clienteId, BigDecimal montoPagado, BigDecimal vuelto, List<ItemVentaDTO> items, String formaPago, LocalDateTime fecha) {
+    public VentaDTO(Integer id, EstadoVenta estado, Integer clienteId, BigDecimal montoPagado, BigDecimal vuelto, List<ItemVentaDTO> items, String formaPago, LocalDateTime fecha) {
         this.id = id;
+        this.estado = estado;
         this.clienteId = clienteId;
         this.montoPagado = montoPagado;
         this.vuelto = vuelto;
@@ -50,6 +54,14 @@ public class VentaDTO {
 
     public void setId(Integer id) {
         this.id = id;
+    }
+
+    public EstadoVenta getEstado() {
+        return estado;
+    }
+
+    public void setEstado(EstadoVenta estado) {
+        this.estado = estado;
     }
 
     public Integer getClienteId() {
