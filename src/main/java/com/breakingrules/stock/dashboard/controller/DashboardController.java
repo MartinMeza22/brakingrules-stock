@@ -23,4 +23,14 @@ public class DashboardController {
 
         return "dashboard/index";
     }
+
+    @GetMapping("/dashboard")
+    public String mostrarDashboard(Model model) {
+        model.addAttribute("ventasHoy", dashboardService.obtenerVentasDelDia());
+        model.addAttribute("ingresosHoy", dashboardService.obtenerIngresosDelDia());
+        model.addAttribute("deudaTotal", dashboardService.obtenerDeudaTotal());
+        model.addAttribute("saldoAFavor", dashboardService.obtenerSaldoAFavorTotal());
+        model.addAttribute("topProductos", dashboardService.topProductosVendidos(5));
+        return "dashboard/index";
+    }
 }

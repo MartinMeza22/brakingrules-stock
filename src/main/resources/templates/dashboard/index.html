@@ -6,6 +6,15 @@
     <h2>📊 Dashboard</h2>
 
     <div class="card">
+        <h3>🔥 Top Productos</h3>
+        <ul>
+            <li th:each="p : ${topProductos}"
+                th:text="${p.nombre + ' - ' + p.cantidad}">
+            </li>
+        </ul>
+    </div>
+
+    <div class="card">
         <h3>Ventas y caja</h3>
         <p>Total ventas hoy: <strong th:text="${totalVentasHoy}"></strong></p>
         <p>Total ingresos hoy: <strong th:text="${totalIngresosHoy}"></strong></p>

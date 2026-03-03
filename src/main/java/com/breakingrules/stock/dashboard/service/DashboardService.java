@@ -7,6 +7,18 @@ import java.util.List;
 
 public interface DashboardService {
 
+    BigDecimal obtenerVentasDelDia();
+
+    long cantidadVentasDelDia();
+
+    BigDecimal obtenerIngresosDelDia();
+
+    BigDecimal obtenerDeudaTotal();
+
+    BigDecimal obtenerSaldoAFavorTotal();
+
+    List<ProductoCantidadDTO> topProductosVendidos(Integer top);
+
     BigDecimal totalVentasHoy();
 
     BigDecimal totalIngresosHoy();
@@ -18,4 +30,6 @@ public interface DashboardService {
     long clientesConDeuda();
 
     List<Producto> productosCriticos(Integer limite);
+
+    BigDecimal totalVentasAyer();
 }

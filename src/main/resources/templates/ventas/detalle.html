@@ -37,7 +37,10 @@
             </tr>
             </tbody>
         </table>
-
+        <a th:href="@{/web/ventas/remito/{id}(id=${venta.id})}"
+           class="btn btn-primary">
+            🖨 Imprimir Remito
+        </a>
         <br>
         <a th:href="@{/web/ventas/listar}" class="button">← Volver</a>
     </div>

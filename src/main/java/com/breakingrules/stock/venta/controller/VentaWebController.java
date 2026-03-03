@@ -5,9 +5,13 @@ import com.breakingrules.stock.productos.entity.Talle;
 import com.breakingrules.stock.venta.dto.ItemVentaDTO;
 import com.breakingrules.stock.venta.dto.VentaDTO;
 import com.breakingrules.stock.venta.entity.Venta;
+import com.breakingrules.stock.venta.service.RemitoPdfService;
 import com.breakingrules.stock.venta.service.VentaService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
@@ -22,6 +26,7 @@ import java.time.format.DateTimeFormatter;
 public class VentaWebController {
 
     private final VentaService ventaService;
+    private final RemitoPdfService remitoPdfService;
 
     @GetMapping
     public String listar(Model model) {
@@ -82,6 +87,21 @@ public class VentaWebController {
         model.addAttribute("venta", venta);
         model.addAttribute("detalles", ventaService.obtenerDetallesVenta(id));
         return "ventas/detalle";
+    }
+
+    @GetMapping("/remito/{id}")
+    public ResponseEntity<byte[]> generarRemito(@PathVariable Integer id) {
+
+        Venta venta = ventaService.findById(id).orElseThrow();
+        var detalles = ventaService.obtenerDetallesVenta(id);
+
+        byte[] pdf = remitoPdfService.generarRemito(venta, detalles);
+
+        return ResponseEntity.ok()
+                .header(HttpHeaders.CONTENT_DISPOSITION,
+                        "attachment; filename=remito_" + venta.getId() + ".pdf")
+                .contentType(MediaType.APPLICATION_PDF)
+                .body(pdf);
     }
 
 }
