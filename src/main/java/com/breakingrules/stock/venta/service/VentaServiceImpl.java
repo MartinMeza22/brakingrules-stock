@@ -50,9 +50,6 @@ public class VentaServiceImpl implements VentaService {
             Producto producto = productoRepo.findById(item.getProductoId())
                     .orElseThrow();
 
-            if (producto.getStock() < item.getCantidad()) {
-                throw new RuntimeException("Stock insuficiente");
-            }
 
             VentaDetalle det = new VentaDetalle();
             det.setVenta(venta);
@@ -66,7 +63,7 @@ public class VentaServiceImpl implements VentaService {
             det.setSubtotal(subtotal);
             ventaDetalleRepo.save(det);
 
-            producto.setStock(producto.getStock() - item.getCantidad());
+        //    producto.setStock(producto.getStock() - item.getCantidad());
             total = total.add(subtotal);
         }
 

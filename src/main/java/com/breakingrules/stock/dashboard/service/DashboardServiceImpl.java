@@ -101,15 +101,15 @@ public class DashboardServiceImpl implements DashboardService {
                 .collect(Collectors.toList());
     }
 
-    @Override
-    public List<Producto> productosCriticos(Integer limite) {
-        return ventaDetalleRepository.findAll()
-                .stream()
-                .map(VentaDetalle::getProducto)
-                .distinct()
-                .filter(p -> p.getStock() <= limite)
-                .collect(Collectors.toList());
-    }
+//    @Override
+//    public List<Producto> productosCriticos(Integer limite) {
+//        return ventaDetalleRepository.findAll()
+//                .stream()
+//                .map(VentaDetalle::getProducto)
+//                .distinct()
+//                .filter(p -> p.getStock() <= limite)
+//                .collect(Collectors.toList());
+//    }
 
     @Override
     public BigDecimal totalVentasHoy() {

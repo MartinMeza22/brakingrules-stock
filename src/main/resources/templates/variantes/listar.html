@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      th:replace="layout/base :: layout(~{::section}, 'Variantes')">
+
+<section>
+
+    <div class="card">
+        <h3 th:text="'➕ Nueva variante para: ' + ${producto.nombre}"></h3>
+
+        <form th:action="@{'/web/variantes/guardar/' + ${producto.id}}"
+              th:object="${varianteNueva}"
+              method="post">
+
+            <select th:field="*{color}">
+                <option value="">Color</option>
+                <option th:each="c : ${colores}"
+                        th:value="${c}"
+                        th:text="${c}">
+                </option>
+            </select>
+
+            <select th:field="*{talle}">
+                <option value="">Talle</option>
+                <option th:each="t : ${talles}"
+                        th:value="${t}"
+                        th:text="${t}">
+                </option>
+            </select>
+
+            <input type="number" th:field="*{stock}" placeholder="Stock"/>
+
+            <button type="submit">Guardar</button>
+        </form>
+    </div>
+
+
+    <div class="card">
+        <h3>Variantes</h3>
+
+        <table th:if="${!variantes.isEmpty()}">
+            <thead>
+            <tr>
+                <th>Color</th>
+                <th>Talle</th>
+                <th>Stock</th>
+                <th></th>
+            </tr>
+            </thead>
+
+            <tbody>
+            <tr th:each="v : ${variantes}">
+                <td th:text="${v.color}"></td>
+                <td th:text="${v.talle}"></td>
+                <td th:text="${v.stock}"></td>
+                <td>
+                    <a th:href="@{'/web/variantes/eliminar/' + ${v.id} + '/' + ${producto.id}}">
+                        Eliminar
+                    </a>
+                </td>
+            </tr>
+            </tbody>
+        </table>
+
+        <a th:href="@{/web/productos}">
+            ← Volver a productos
+        </a>
+    </div>
+
+</section>
+</html>

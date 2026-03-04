@@ -4,6 +4,7 @@ import com.breakingrules.stock.productos.dto.ProductoDTO;
 import com.breakingrules.stock.productos.dto.ProductoStatsDTO;
 import com.breakingrules.stock.productos.entity.Producto;
 import com.breakingrules.stock.productos.entity.Talle;
+import com.breakingrules.stock.productos.entity.VarianteProducto;
 import com.breakingrules.stock.productos.repository.ProductoRepository;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
@@ -69,10 +70,6 @@ public class ProductoServiceImpl implements ProductoService {
 
         log.info("Producto guardado correctamente con ID: {}", guardado.getId());
 
-        if (guardado.getStock() <= STOCK_BAJO_LIMITE) {
-            log.warn("Producto con stock bajo guardado. ID: {}, Stock: {}", guardado.getId(), guardado.getStock());
-        }
-
         return guardado;
     }
 
@@ -124,14 +121,6 @@ public class ProductoServiceImpl implements ProductoService {
             throw new IllegalArgumentException("El costo no puede ser negativo");
         }
 
-        if (producto.getStock() == null || producto.getStock() < 0) {
-            throw new IllegalArgumentException("Stock inválido");
-        }
-
-        if (producto.getStockMinimo() != null && producto.getStockMinimo() < 0) {
-            throw new IllegalArgumentException("Stock mínimo inválido");
-        }
-
         if (producto.getActivo() == null) {
             producto.setActivo(true);
         }
@@ -154,7 +143,7 @@ public class ProductoServiceImpl implements ProductoService {
         return resultados;
     }
 
-    public ProductoDTO buscarPorId(Integer id) {
+    public Producto obtenerEntidadPorId(Integer id) {
         log.info("Buscando producto por ID: {}", id);
 
         if (id == null) {
@@ -169,24 +158,7 @@ public class ProductoServiceImpl implements ProductoService {
                 });
 
         log.info("Producto encontrado: {}", producto.getNombre());
-        return toDTO(producto);
-    }
-
-
-    public Producto obtenerEntidadPorId(Integer id) {
-        return repository.findById(id)
-                .orElseThrow(() -> new IllegalArgumentException("Producto no encontrado"));
-    }
-
-    public List<ProductoDTO> obtenerStockBajo() {
-        log.info("Obteniendo productos con stock bajo");
-
-        return repository.findAll()
-                .stream()
-                .filter(p -> p.getStockMinimo() != null)
-                .filter(p -> p.getStock() <= p.getStockMinimo())
-                .map(this::toDTO)
-                .toList();
+        return producto;
     }
 
     public String exportarCSV() {
@@ -203,15 +175,10 @@ public class ProductoServiceImpl implements ProductoService {
                 csv.append(p.getId()).append(",")
                         .append(p.getSku()).append(",")
                         .append(p.getNombre()).append(",")
-                        .append(p.getCategoria()).append(",")
-                        .append(p.getTalle()).append(",")
-                        .append(p.getColor()).append(",")
                         .append(p.getSku()).append(",")
                         .append(p.getCodigoBarras()).append(",")
                         .append(p.getCosto()).append(",")
                         .append(p.getPrecioVenta()).append(",")
-                        .append(p.getStock()).append(",")
-                        .append(p.getStockMinimo()).append(",")
                         .append(p.getActivo())
                         .append("\n");
             }
@@ -238,90 +205,14 @@ public class ProductoServiceImpl implements ProductoService {
         return productos.map(this::toDTO);
     }
 
-    public Page<ProductoDTO> filtrar(
-            String nombre,
-            Talle talle,
-            Integer stockMin,
-            Integer stockMax,
-            int page,
-            int size
-    ) {
-
-        log.info("Filtrando productos - nombre: {}, talle: {}, stockMin: {}, stockMax: {}",
-                nombre, talle, stockMin, stockMax);
-
-        Pageable pageable = PageRequest.of(page, size);
-
-        List<Producto> base = repository.findAll();
-
-        Stream<Producto> stream = base.stream();
-
-        if (nombre != null && !nombre.isBlank()) {
-            stream = stream.filter(p ->
-                    p.getNombre().toLowerCase().contains(nombre.toLowerCase()));
-        }
-
-        if (talle != null) {
-            stream = stream.filter(p -> p.getTalle() == talle);
-        }
-
-        if (stockMin != null) {
-            stream = stream.filter(p -> p.getStock() >= stockMin);
-        }
-
-        if (stockMax != null) {
-            stream = stream.filter(p -> p.getStock() <= stockMax);
-        }
-
-        List<ProductoDTO> filtrados = stream
-                .map(this::toDTO)
-                .toList();
-
-        int start = Math.min((int) pageable.getOffset(), filtrados.size());
-        int end = Math.min(start + pageable.getPageSize(), filtrados.size());
-
-        List<ProductoDTO> pageContent = filtrados.subList(start, end);
-
-        return new PageImpl<>(pageContent, pageable, filtrados.size());
-    }
-
-    public ProductoStatsDTO obtenerStats() {
-
-        log.info("Calculando estadísticas de productos");
-
-        List<Producto> productos = repository.findAll();
-
-        long total = productos.size();
-
-        int stockTotal = productos.stream()
-                .mapToInt(Producto::getStock)
-                .sum();
-
-        BigDecimal precioPromedio = productos.stream()
-                .map(Producto::getPrecioVenta)
-                .reduce(BigDecimal.ZERO, BigDecimal::add)
-                .divide(BigDecimal.valueOf(total == 0 ? 1 : total), 2, RoundingMode.HALF_UP);
-
-        long sinStock = productos.stream()
-                .filter(p -> p.getStock() == 0)
-                .count();
-
-        return new ProductoStatsDTO(total, stockTotal, precioPromedio, sinStock);
-    }
-
     private ProductoDTO toDTO(Producto p) {
         return new ProductoDTO(
                 p.getId(),
                 p.getSku(),
                 p.getNombre(),
-                p.getCategoria(),
-                p.getTalle(),
-                p.getColor(),
                 p.getCodigoBarras(),
                 p.getCosto(),
                 p.getPrecioVenta(),
-                p.getStock(),
-                p.getStockMinimo(),
                 p.getActivo(),
                 p.getProveedor().getNombre()
         );
@@ -355,67 +246,3 @@ public class ProductoServiceImpl implements ProductoService {
         return "BRK-" + sku + "-" + System.currentTimeMillis();
     }
 }
-//    public byte[] exportarExcel() {
-//        log.info("Iniciando exportación de productos a Excel");
-//        String[] columnas = {
-//                "ID", "SKU", "Nombre","Categoria","Talle","Color",
-//                "SKU","CodigoBarras","Costo","PrecioVenta",
-//                "Stock","StockMinimo","Activo"
-//        };
-//        try (Workbook workbook = new XSSFWorkbook();
-//             ByteArrayOutputStream out = new ByteArrayOutputStream()) {
-//
-//            List<Producto> productos = repository.findAll();
-//            log.info("La cantidad de productos a exportar es de: {}", productos.size());
-//
-//            Sheet sheet = workbook.createSheet("Productos");
-//
-//            // ===== Header style =====
-//            Font headerFont = workbook.createFont();
-//            headerFont.setBold(true);
-//
-//            CellStyle headerStyle = workbook.createCellStyle();
-//            headerStyle.setFont(headerFont);
-//
-//            // ===== Header =====
-//            Row header = sheet.createRow(13);
-//            String[] columnas = {
-//                    "ID","SKU", "Nombre","Categoria","Talle","Color",
-//                    "SKU","CodigoBarras","Costo","PrecioVenta",
-//                    "Stock","StockMinimo","Activo"
-//            };
-//
-//            for (int i = 0; i < columnas.length; i++) {
-//                Cell cell = header.createCell(i);
-//                cell.setCellValue(columnas[i]);
-//                cell.setCellStyle(headerStyle);
-//            }
-//
-//            // ===== Filas =====
-//            int rowIdx = 1;
-//            for (Producto p : productos) {
-//                Row row = sheet.createRow(rowIdx++);
-//
-//                row.createCell(0).setCellValue(p.getId());
-//                row.createCell(1).setCellValue(p.getNombre());
-//                row.createCell(2).setCellValue(p.getCategoria());
-//                row.createCell(3).setCellValue(p.getTalle().name());
-//                row.createCell(4).setCellValue(p.getColor());
-//                row.createCell(5).setCellValue(p.getPrecioVenta().doubleValue());
-//                row.createCell(6).setCellValue(p.getStock());
-//            }
-//
-//            for (int i = 0; i < columnas.length; i++) {
-//                sheet.autoSizeColumn(i);
-//            }
-//
-//            workbook.write(out);
-//            log.info("Exportación Excel completada correctamente");
-//
-//            return out.toByteArray();
-//
-//        } catch (Exception e) {
-//            log.error("Error al exportar productos a Excel", e);
-//            throw new RuntimeException("Error generando Excel", e);
-//        }
-//    }

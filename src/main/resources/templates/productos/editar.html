@@ -14,16 +14,7 @@
             <input type="hidden" th:field="*{id}"/>
             <input th:field="*{sku}" readonly/>
             <input th:field="*{nombre}" placeholder="Nombre"/>
-            <input th:field="*{categoria}" placeholder="Categoría"/>
-            <input th:field="*{color}" placeholder="Color"/>
-            <select th:field="*{talle}">
-                <option th:each="t : ${talles}"
-                        th:value="${t}"
-                        th:text="${t}">
-                </option>
-            </select>
             <input type="number" th:field="*{precioVenta}" placeholder="Precio"/>
-            <input type="number" th:field="*{stock}" placeholder="Stock"/>
             <select th:field="*{proveedor}">
                 <option value="">Proveedor</option>
                 <option th:each="prov : ${proveedores}"

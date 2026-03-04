@@ -13,16 +13,8 @@
 
             <input th:field="*{sku}" placeholder="SKU"/>
             <input th:field="*{nombre}" placeholder="Nombre"/>
-            <input th:field="*{categoria}" placeholder="Categoría"/>
-            <input th:field="*{color}" placeholder="Color"/>
-
-            <select th:field="*{talle}">
-                <option value="">Talle</option>
-                <option th:each="t : ${talles}" th:value="${t}" th:text="${t}"></option>
-            </select>
 
             <input type="number" th:field="*{precioVenta}" placeholder="Precio"/>
-            <input type="number" th:field="*{stock}" placeholder="Stock"/>
             <select th:field="*{proveedor}">
                 <option value="">Proveedor</option>
                 <option th:each="prov : ${proveedores}"
@@ -41,7 +33,7 @@
         <table th:if="${!productos.isEmpty()}">
             <thead>
             <tr>
-                <th>SKU</th>
+                <th>Articulo</th>
                 <th>Nombre</th>
                 <th>Precio</th>
                 <th>Stock</th>
@@ -54,8 +46,8 @@
                 <td th:text="${p.sku}"></td>
                 <td th:text="${p.nombre}"></td>
                 <td th:text="${p.precioVenta}"></td>
-                <td th:text="${p.stock}"></td>
                 <td>
+                    <a th:href="@{'/web/variantes/' + ${p.id}}">Ver variantes</a>
                     <a th:href="@{'/web/productos/editar/' + ${p.id}}">Editar</a>
                     <a th:href="@{'/web/productos/eliminar/' + ${p.id}}">Eliminar</a>
                 </td>

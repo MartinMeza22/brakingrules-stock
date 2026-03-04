@@ -24,7 +24,6 @@ public class ProductoWebController {
     public String listar(Model model) {
         model.addAttribute("productos", service.listarTodosSinPaginacion());
         model.addAttribute("productoNuevo", new Producto());
-        model.addAttribute("talles", Talle.values());
         model.addAttribute("proveedores", proveedorService.listarTodos());
         return "productos/listar";
     }
@@ -44,8 +43,6 @@ public class ProductoWebController {
             model.addAttribute("productos", service.listarTodosSinPaginacion());
             model.addAttribute("proveedores", proveedorService.listarTodos());
             model.addAttribute("productoNuevo", producto);
-            model.addAttribute("talles", Talle.values());
-
             return "productos/listar";
         }
 
@@ -57,7 +54,6 @@ public class ProductoWebController {
     public String editar(@PathVariable Integer id, Model model) {
         Producto producto = service.obtenerEntidadPorId(id);
         model.addAttribute("producto", producto);
-        model.addAttribute("talles", Talle.values());
         model.addAttribute("proveedores", proveedorService.listarTodos());
         return "productos/editar";
     }
@@ -69,7 +65,6 @@ public class ProductoWebController {
                              Model model) {
 
         if (result.hasErrors()) {
-            model.addAttribute("talles", Talle.values());
             model.addAttribute("proveedores", proveedorService.listarTodos());
             return "productos/editar";
         }
@@ -79,9 +74,6 @@ public class ProductoWebController {
         existente.setNombre(producto.getNombre());
         existente.setCodigoBarras(producto.getCodigoBarras());
         existente.setPrecioVenta(producto.getPrecioVenta());
-        existente.setStock(producto.getStock());
-        existente.setCategoria(producto.getCategoria());
-        existente.setColor(producto.getColor());
         existente.setProveedor(producto.getProveedor());
 
         service.guardar(existente);

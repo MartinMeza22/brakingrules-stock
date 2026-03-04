@@ -29,7 +29,7 @@ public interface DashboardService {
 
     long clientesConDeuda();
 
-    List<Producto> productosCriticos(Integer limite);
+    //List<Producto> productosCriticos(Integer limite);
 
     BigDecimal totalVentasAyer();
 }

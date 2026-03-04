@@ -9,37 +9,23 @@ public class ProductoDTO {
     private Integer id;
     private String sku;
     private String nombre;
-    private String categoria;
-    private Talle talle;
-    private String color;
-
     private String codigoBarras;
 
     private BigDecimal costo;
     private BigDecimal precioVenta;
 
-    private Integer stock;
-    private Integer stockMinimo;
-
     private Boolean activo;
     private String proveedorNombre;
     public ProductoDTO() {}
 
-    public ProductoDTO(Integer id, String sku, String nombre, String categoria, Talle talle,
-                       String color, String codigoBarras,
-                       BigDecimal costo, BigDecimal precioVenta,
-                       Integer stock, Integer stockMinimo, Boolean activo, String proveedorNombre) {
+    public ProductoDTO(Integer id, String sku, String nombre, String codigoBarras,
+                       BigDecimal costo, BigDecimal precioVenta, Boolean activo, String proveedorNombre) {
         this.id = id;
         this.sku = sku;
         this.nombre = nombre;
-        this.categoria = categoria;
-        this.talle = talle;
-        this.color = color;
         this.codigoBarras = codigoBarras;
         this.costo = costo;
         this.precioVenta = precioVenta;
-        this.stock = stock;
-        this.stockMinimo = stockMinimo;
         this.activo = activo;
         this.proveedorNombre = proveedorNombre;
     }
@@ -68,30 +54,6 @@ public class ProductoDTO {
         this.nombre = nombre;
     }
 
-    public String getCategoria() {
-        return categoria;
-    }
-
-    public void setCategoria(String categoria) {
-        this.categoria = categoria;
-    }
-
-    public Talle getTalle() {
-        return talle;
-    }
-
-    public void setTalle(Talle talle) {
-        this.talle = talle;
-    }
-
-    public String getColor() {
-        return color;
-    }
-
-    public void setColor(String color) {
-        this.color = color;
-    }
-
     public String getCodigoBarras() {
         return codigoBarras;
     }
@@ -114,22 +76,6 @@ public class ProductoDTO {
 
     public void setPrecioVenta(BigDecimal precioVenta) {
         this.precioVenta = precioVenta;
-    }
-
-    public Integer getStock() {
-        return stock;
-    }
-
-    public void setStock(Integer stock) {
-        this.stock = stock;
-    }
-
-    public Integer getStockMinimo() {
-        return stockMinimo;
-    }
-
-    public void setStockMinimo(Integer stockMinimo) {
-        this.stockMinimo = stockMinimo;
     }
 
     public Boolean getActivo() {

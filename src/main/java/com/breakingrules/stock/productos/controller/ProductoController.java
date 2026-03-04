@@ -42,23 +42,23 @@ public class ProductoController {
         return service.listarPaginado(page, size);
     }
 
-    @Operation(summary = "Buscar productos por nombre", description = "Filtra productos que contengan el texto indicado en el nombre")
-    @GetMapping("/buscar")
-    public Page<ProductoDTO> buscar(
-            @RequestParam(required = false) String nombre,
-            @RequestParam(required = false) Talle talle,
-            @RequestParam(required = false) Integer stockMin,
-            @RequestParam(required = false) Integer stockMax,
-            @RequestParam(defaultValue = "0") int page,
-            @RequestParam(defaultValue = "10") int size
-    ) {
-        return service.filtrar(nombre, talle, stockMin, stockMax, page, size);
-    }
-    @Operation(summary = "Productos con stock bajo", description = "Devuelve productos cuyo stock es menor o igual al mínimo indicado")
-    @GetMapping("/stock-bajo")
-    public List<ProductoDTO> stockBajo() {
-        return service.obtenerStockBajo();
-    }
+//    @Operation(summary = "Buscar productos por nombre", description = "Filtra productos que contengan el texto indicado en el nombre")
+//    @GetMapping("/buscar")
+//    public Page<ProductoDTO> buscar(
+//            @RequestParam(required = false) String nombre,
+//            @RequestParam(required = false) Talle talle,
+//            @RequestParam(required = false) Integer stockMin,
+//            @RequestParam(required = false) Integer stockMax,
+//            @RequestParam(defaultValue = "0") int page,
+//            @RequestParam(defaultValue = "10") int size
+//    ) {
+//        return service.filtrar(nombre, talle, stockMin, stockMax, page, size);
+//    }
+//    @Operation(summary = "Productos con stock bajo", description = "Devuelve productos cuyo stock es menor o igual al mínimo indicado")
+//    @GetMapping("/stock-bajo")
+//    public List<ProductoDTO> stockBajo() {
+//        return service.obtenerStockBajo();
+//    }
 
     @Operation(summary = "Exportar SCV - Excel", description = "Descarga de archivo SCV con todos los articulos - Excel")
     @GetMapping("/exportar")
@@ -83,25 +83,4 @@ public class ProductoController {
                 .body(contenido);
     }
 
-//    @Operation(summary = "Exportar productos a Excel", description = "Descarga archivo XLSX con todos los productos")
-//    @GetMapping("/exportar/excel")
-//    public ResponseEntity<byte[]> exportarExcel() {
-//
-//        byte[] excel = service.exportarExcel();
-//
-//        String fecha = LocalDate.now()
-//                .format(DateTimeFormatter.ofPattern("yyyy-MM-dd"));
-//
-//        String nombreArchivo = "productos-" + fecha + ".xlsx";
-//
-//        return ResponseEntity.ok()
-//                .header("Content-Disposition", "attachment; filename=" + nombreArchivo)
-//                .header("Content-Type", "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet")
-//                .body(excel);
-//    }
-
-    @GetMapping("/stats")
-    public ProductoStatsDTO stats() {
-        return service.obtenerStats();
-    }
 }

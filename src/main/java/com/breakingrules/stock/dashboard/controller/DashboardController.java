@@ -19,7 +19,7 @@ public class DashboardController {
         model.addAttribute("totalDeuda", dashboardService.totalDeuda());
         model.addAttribute("totalAFavor", dashboardService.totalAFavor());
         model.addAttribute("clientesConDeuda", dashboardService.clientesConDeuda());
-        model.addAttribute("productosCriticos", dashboardService.productosCriticos(5));
+        //model.addAttribute("productosCriticos", dashboardService.productosCriticos(5));
 
         return "dashboard/index";
     }
