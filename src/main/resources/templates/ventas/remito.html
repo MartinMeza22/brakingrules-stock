@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+
+    <style>
+
+        body{
+        font-family: Arial;
+        }
+
+        .remito{
+
+        width:17cm;
+        height:10.5cm;
+
+        border:1px solid black;
+
+        padding:10px;
+
+        }
+
+        table{
+
+        width:100%;
+        border-collapse: collapse;
+
+        }
+
+        td,th{
+
+        border:1px solid black;
+        padding:4px;
+
+        }
+
+    </style>
+
+</head>
+
+<body onload="window.print()">
+
+<div class="remito">
+
+    <h3>Remito Venta #<span th:text="${venta.id}"></span></h3>
+
+    <p>
+        Cliente:
+        <span th:text="${venta.cliente.nombre + ' ' + venta.cliente.apellido}"></span>
+    </p>
+
+    <p>
+        Fecha:
+        <span th:text="${#temporals.format(venta.fecha,'dd/MM/yyyy')}"></span>
+    </p>
+
+    <table>
+
+        <thead>
+        <tr>
+            <th>Producto</th>
+            <th>Cant</th>
+            <th>Precio</th>
+            <th>Subtotal</th>
+        </tr>
+        </thead>
+
+        <tbody>
+
+        <tr th:each="d : ${detalles}">
+
+            <td th:text="${d.variante.producto.nombre}"></td>
+
+            <td th:text="${d.cantidad}"></td>
+
+            <td th:text="${d.precioUnitario}"></td>
+
+            <td th:text="${d.subtotal}"></td>
+
+        </tr>
+
+        </tbody>
+
+    </table>
+
+    <h3>Total: $<span th:text="${venta.total}"></span></h3>
+
+</div>
+
+</body>
+
+</html>

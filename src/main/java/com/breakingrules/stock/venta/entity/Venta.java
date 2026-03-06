@@ -15,30 +15,25 @@ import java.time.LocalDateTime;
 @Entity
 public class Venta {
 
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+        @Id
+        @GeneratedValue(strategy = GenerationType.IDENTITY)
+        private Integer id;
 
-    @Enumerated(EnumType.STRING)
-    private EstadoVenta estado;
+        private LocalDateTime fecha;
 
-    private LocalDateTime fecha;
+        @Enumerated(EnumType.STRING)
+        private EstadoVenta estado;
 
-    @DecimalMin(value = "0.0", inclusive = false, message = "El total debe ser mayor a 0")
-    private BigDecimal total;
-    
-    private BigDecimal montoPagado;
+        private BigDecimal total;
 
-    private BigDecimal vuelto;
+        private BigDecimal descuento;
 
-    @NotBlank(message = "La forma de pago es obligatoria")
-    private String formaPago;
+        @ManyToOne(fetch = FetchType.LAZY)
+        @JoinColumn(name = "cliente_id")
+        private Cliente cliente;
 
-    @NotNull(message = "Debe seleccionar un cliente")
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "cliente_id")
-    private Cliente cliente;
-
-    @Column(nullable = false)
-    private Boolean fiado = false;
-}
+        @PrePersist
+        public void prePersist() {
+            this.fecha = LocalDateTime.now();
+        }
+    }

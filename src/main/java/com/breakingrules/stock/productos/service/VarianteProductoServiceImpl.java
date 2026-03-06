@@ -101,10 +101,20 @@ public class VarianteProductoServiceImpl implements VarianteProductoService {
     }
 
     @Override
-    public void guardar(VarianteProducto variableProducto) {
-        varianteRepository.save(variableProducto);
-    }
+    public void guardar(VarianteProducto variante) {
 
+        boolean existe = varianteRepository.existsByProductoIdAndColorAndTalle(
+                variante.getProducto().getId(),
+                variante.getColor(),
+                variante.getTalle()
+        );
+
+        if (existe) {
+            throw new RuntimeException("Ya existe una variante con ese color y talle");
+        }
+
+        varianteRepository.save(variante);
+    }
     @Override
     public void eliminar(Integer id) {
         varianteRepository.deleteById(id);

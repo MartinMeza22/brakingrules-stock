@@ -39,8 +39,8 @@
 
     <div class="card">
         <h3>Clientes</h3>
-
-        <table th:if="${!clientes.isEmpty()}">
+        <input class="buscador-tabla" placeholder="Buscar...">
+        <table class="tabla-buscable" th:if="${!clientes.isEmpty()}">
             <thead>
             <tr>
                 <th>Nombre</th>
@@ -71,6 +71,5 @@
             No hay clientes cargados.
         </div>
     </div>
-
 </section>
 </html>

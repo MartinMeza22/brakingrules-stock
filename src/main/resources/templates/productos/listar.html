@@ -29,8 +29,8 @@
 
     <div class="card">
         <h3>Productos</h3>
-
-        <table th:if="${!productos.isEmpty()}">
+        <input class="buscador-tabla" placeholder="Buscar...">
+        <table class="tabla-buscable" th:if="${!productos.isEmpty()}">
             <thead>
             <tr>
                 <th>Articulo</th>

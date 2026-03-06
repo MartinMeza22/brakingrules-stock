@@ -5,21 +5,57 @@
 <section>
 
     <div class="card">
-        <h3>Detalle Venta #<span th:text="${venta.id}"></span></h3>
 
-        <p><b>Cliente:</b>
-            <span th:text="${venta.cliente.nombre + ' ' + venta.cliente.apellido}"></span>
+        <h3 th:text="'Venta #' + ${venta.id}"></h3>
+
+        <p>
+            Cliente:
+            <span th:text="${venta.cliente.nombre}"></span>
         </p>
 
-        <p><b>Fecha:</b>
-            <span th:text="${venta.fecha.format(formatter)}"></span>
+        <p>
+            Total:
+            <span th:text="${venta.total}"></span>
         </p>
 
-        <p><b>Total:</b> $<span th:text="${venta.total}"></span></p>
+    </div>
 
-        <h4>Productos</h4>
+    <div class="card">
 
-        <table>
+        <h3>➕ Agregar Producto</h3>
+
+        <form th:action="@{/web/ventas/agregar-producto}" method="post">
+
+            <input type="hidden" name="ventaId" th:value="${venta.id}"/>
+
+            <select name="varianteId">
+
+                <option value="">Seleccionar producto</option>
+
+                <option th:each="v : ${variantes}"
+                        th:value="${v.id}"
+                        th:text="${v.producto.nombre + ' - ' + v.color + ' - ' + v.talle}">
+                </option>
+
+            </select>
+
+            <input type="number" name="cantidad" placeholder="Cantidad"/>
+
+            <button class="btn-accion" type="submit">
+                Agregar
+            </button>
+
+        </form>
+
+    </div>
+
+
+    <div class="card">
+
+        <h3>Productos en la venta</h3>
+
+        <table th:if="${!detalles.isEmpty()}">
+
             <thead>
             <tr>
                 <th>Producto</th>
@@ -28,22 +64,41 @@
                 <th>Subtotal</th>
             </tr>
             </thead>
+
             <tbody>
-            <tr th:each="item : ${detalles}">
-                <td th:text="${item.producto.nombre}"></td>
-                <td th:text="${item.cantidad}"></td>
-                <td th:text="${item.precioUnitario}"></td>
-                <td th:text="${item.subtotal}"></td>
+
+            <tr th:each="d : ${detalles}">
+
+                <td th:text="${d.variante.producto.nombre + ' ' + d.variante.color + ' ' + d.variante.talle}"></td>
+
+                <td th:text="${d.cantidad}"></td>
+
+                <td th:text="${d.precioUnitario}"></td>
+
+                <td th:text="${d.subtotal}"></td>
+
             </tr>
+
             </tbody>
+
         </table>
-        <a th:href="@{/web/ventas/remito/{id}(id=${venta.id})}"
-           class="btn btn-primary">
-            🖨 Imprimir Remito
-        </a>
-        <br>
-        <a th:href="@{/web/ventas/listar}" class="button">← Volver</a>
+
+    </div>
+
+    <div class="card">
+
+        <form th:action="@{/web/ventas/finalizar}" method="post">
+
+            <input type="hidden" name="ventaId" th:value="${venta.id}"/>
+
+            <button class="btn-finalizar">
+                Finalizar Venta
+            </button>
+
+        </form>
+
     </div>
 
 </section>
+
 </html>

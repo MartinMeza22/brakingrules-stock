@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      th:replace="layout/base :: layout(~{::section}, 'Ventas')">
+
+<section>
+
+    <div class="card">
+
+        <h3>🧾 Nueva Venta</h3>
+
+        <form th:action="@{/web/ventas/crear}" method="post">
+
+            <select name="clienteId">
+
+                <option value="">Seleccionar cliente</option>
+
+                <option th:each="c : ${clientes}"
+                        th:value="${c.id}"
+                        th:text="${c.nombre + ' ' + c.apellido}">
+                </option>
+
+            </select>
+
+            <button class="btn-accion" type="submit">
+                Crear Venta
+            </button>
+
+            <a th:href="@{/web/ventas/historial}" style="margin-right:15px;color:#9ca3af;text-decoration:none;">Ir al historial</a>
+
+        </form>
+
+    </div>
+
+</section>
+
+</html>

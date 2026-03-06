@@ -1,0 +1,21 @@
+<form th:action="@{'/web/variantes/actualizar/' + ${variante.id}}"
+      th:object="${variante}"
+      method="post">
+
+    <select th:field="*{color}">
+        <option th:each="c : ${colores}"
+                th:value="${c}"
+                th:text="${c}">
+        </option>
+    </select>
+
+    <select th:field="*{talle}">
+        <option th:each="t : ${talles}"
+                th:value="${t}"
+                th:text="${t}">
+        </option>
+    </select>
+
+    <button type="submit">Guardar</button>
+
+</form>

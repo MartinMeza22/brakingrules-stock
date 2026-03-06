@@ -7,7 +7,10 @@ import com.breakingrules.stock.clientes.repository.ClienteRepository;
 import com.breakingrules.stock.cuentaCorriente.entity.CuentaCorriente;
 import com.breakingrules.stock.cuentaCorriente.service.CuentaCorrienteService;
 import com.breakingrules.stock.productos.entity.Producto;
+import com.breakingrules.stock.productos.entity.VarianteProducto;
 import com.breakingrules.stock.productos.repository.ProductoRepository;
+import com.breakingrules.stock.productos.repository.VarianteProductoRepository;
+import com.breakingrules.stock.productos.service.VarianteProductoService;
 import com.breakingrules.stock.venta.dto.ItemVentaDTO;
 import com.breakingrules.stock.venta.dto.VentaDTO;
 import com.breakingrules.stock.venta.entity.*;
@@ -24,164 +27,93 @@ import java.util.List;
 import java.util.Optional;
 
 @Service
-@RequiredArgsConstructor
+@Transactional
 public class VentaServiceImpl implements VentaService {
 
     private final VentaRepository ventaRepository;
-    private final VentaDetalleRepository ventaDetalleRepo;
-    private final ProductoRepository productoRepo;
-    private final ClienteRepository clienteRepo;
-    private final MovimientoCajaRepository movimientoCajaRepo;
-    private final CuentaCorrienteService cuentaCorrienteService;
+    private final VentaDetalleRepository detalleRepository;
+    private final ClienteRepository clienteRepository;
+    private final VarianteProductoRepository varianteRepository;
+    private final VarianteProductoService varianteService;
+
+    public VentaServiceImpl(
+            VentaRepository ventaRepository,
+            VentaDetalleRepository detalleRepository,
+            ClienteRepository clienteRepository,
+            VarianteProductoRepository varianteRepository,
+            VarianteProductoService varianteService
+    ) {
+        this.ventaRepository = ventaRepository;
+        this.detalleRepository = detalleRepository;
+        this.clienteRepository = clienteRepository;
+        this.varianteRepository = varianteRepository;
+        this.varianteService = varianteService;
+    }
 
     @Override
-    @Transactional
-    public void confirmarVenta(VentaDTO dto) {
+    public Venta crearVenta(Integer clienteId) {
+
+        Cliente cliente = clienteRepository.findById(clienteId)
+                .orElseThrow(() -> new RuntimeException("Cliente no encontrado"));
 
         Venta venta = new Venta();
+        venta.setCliente(cliente);
         venta.setFecha(LocalDateTime.now());
-        venta.setFormaPago(dto.getFormaPago());
-        venta.setCliente(clienteRepo.findById(dto.getClienteId()).orElseThrow());
-        ventaRepository.save(venta);
+        venta.setEstado(EstadoVenta.ABIERTA);
+        venta.setTotal(BigDecimal.ZERO);
 
-        BigDecimal total = BigDecimal.ZERO;
-
-        for (ItemVentaDTO item : dto.getItems()) {
-            Producto producto = productoRepo.findById(item.getProductoId())
-                    .orElseThrow();
-
-
-            VentaDetalle det = new VentaDetalle();
-            det.setVenta(venta);
-            det.setProducto(producto);
-            det.setCantidad(item.getCantidad());
-            det.setPrecioUnitario(producto.getPrecioVenta());
-
-            BigDecimal subtotal = producto.getPrecioVenta()
-                    .multiply(BigDecimal.valueOf(item.getCantidad()));
-
-            det.setSubtotal(subtotal);
-            ventaDetalleRepo.save(det);
-
-        //    producto.setStock(producto.getStock() - item.getCantidad());
-            total = total.add(subtotal);
-        }
-
-        venta.setTotal(total);
-
-        BigDecimal pagado = dto.getMontoPagado() != null
-                ? dto.getMontoPagado()
-                : BigDecimal.ZERO;
-
-        venta.setMontoPagado(pagado);
-
-        BigDecimal vuelto = pagado.subtract(total);
-        venta.setVuelto(vuelto.compareTo(BigDecimal.ZERO) > 0 ? vuelto : BigDecimal.ZERO);
-
-        CuentaCorriente cuenta = cuentaCorrienteService.obtenerOCrearCuenta(venta.getCliente());
-        BigDecimal saldoAFavor = cuenta.getSaldo().compareTo(BigDecimal.ZERO) < 0
-                ? cuenta.getSaldo().abs()
-                : BigDecimal.ZERO;
-
-        BigDecimal efectivoDisponible = pagado.add(saldoAFavor);
-
-        if (efectivoDisponible.compareTo(total) >= 0) {
-            venta.setEstado(EstadoVenta.PAGADA);
-        } else if (efectivoDisponible.compareTo(BigDecimal.ZERO) > 0) {
-            venta.setEstado(EstadoVenta.PARCIAL);
-        } else {
-            venta.setEstado(EstadoVenta.PENDIENTE);
-        }
-
-        ventaRepository.save(venta);
-
-        BigDecimal diferencia = total.subtract(pagado); // positivo = debe, negativo = a favor
-
-        if (diferencia.compareTo(BigDecimal.ZERO) != 0) {
-            if (diferencia.compareTo(BigDecimal.ZERO) > 0) {
-                cuentaCorrienteService.registrarDeuda(
-                        venta.getCliente().getId(),
-                        diferencia,
-                        "Venta #" + venta.getId()
-                );
-            } else {
-                cuentaCorrienteService.registrarPago(
-                        venta.getCliente().getId(),
-                        diferencia.abs(),
-                        "Pago extra Venta #" + venta.getId()
-                );
-            }
-        }
-
-        if (pagado.compareTo(BigDecimal.ZERO) > 0) {
-            MovimientoCaja mov = new MovimientoCaja();
-            mov.setFecha(LocalDateTime.now());
-            mov.setTipo(TipoMovimiento.INGRESO);
-            mov.setMonto(pagado);
-            mov.setReferencia("Venta #" + venta.getId() + " - $" + diferencia);
-
-            movimientoCajaRepo.save(mov);
-        }
-    }
- 
-    @Override
-    public List<Cliente> obtenerClientes() {
-        return clienteRepo.findAll();
+        return ventaRepository.save(venta);
     }
 
     @Override
-    public List<Producto> obtenerProductos() {
-        return productoRepo.findAll();
+    public void agregarProducto(Integer ventaId, Integer varianteId, Integer cantidad) {
+
+        Venta venta = ventaRepository.findById(ventaId)
+                .orElseThrow(() -> new RuntimeException("Venta no encontrada"));
+
+        VarianteProducto variante = varianteRepository.findById(varianteId)
+                .orElseThrow(() -> new RuntimeException("Variante no encontrada"));
+
+        BigDecimal precio = variante.getProducto().getPrecioVenta();
+
+        VentaDetalle detalle = new VentaDetalle();
+        detalle.setVenta(venta);
+        detalle.setVariante(variante);
+        detalle.setCantidad(cantidad);
+        detalle.setPrecioUnitario(precio);
+        detalle.setSubtotal(precio.multiply(BigDecimal.valueOf(cantidad)));
+
+        detalleRepository.save(detalle);
+
+        BigDecimal nuevoTotal = venta.getTotal().add(detalle.getSubtotal());
+        venta.setTotal(nuevoTotal);
+
+        varianteService.descontarStock(varianteId, cantidad);
     }
 
     @Override
-    public List<Venta> obtenerVentas() {
+    public void finalizarVenta(Integer ventaId) {
+
+        Venta venta = ventaRepository.findById(ventaId)
+                .orElseThrow(() -> new RuntimeException("Venta no encontrada"));
+
+        venta.setEstado(EstadoVenta.FINALIZADA);
+    }
+
+    @Override
+    public Venta obtenerVenta(Integer ventaId) {
+
+        return ventaRepository.findById(ventaId)
+                .orElseThrow(() -> new RuntimeException("Venta no encontrada"));
+    }
+
+    @Override
+    public List<VentaDetalle> obtenerDetalles(Integer ventaId) {
+        return detalleRepository.findByVentaId(ventaId);
+    }
+
+    @Override
+    public List<Venta> listarVentas() {
         return ventaRepository.findAll();
-    }
-
-    @Override
-    public Optional<Venta> findById(Integer id) {
-        return ventaRepository.findById(id);
-    }
-
-    @Override
-    public List<VentaDetalle> obtenerDetallesVenta(Integer ventaId) {
-        return ventaDetalleRepo.findByVentaId(ventaId);
-    }
-
-    public List<MovimientoCaja> listarMovimientos() {
-        return movimientoCajaRepo.findAll();
-    }
-
-    @Transactional
-    public Venta crearVenta(Venta venta) {
-
-        Venta guardada = ventaRepository.save(venta);
-
-        if (guardada.getCliente() != null) {
-
-            BigDecimal total = guardada.getTotal();
-            BigDecimal pagado = guardada.getMontoPagado() != null ? guardada.getMontoPagado() : BigDecimal.ZERO;
-
-            BigDecimal diferencia = pagado.subtract(total);
-
-            if (guardada.getFiado()) {
-                cuentaCorrienteService.registrarDeuda(
-                        guardada.getCliente().getId(),
-                        total,
-                        "Venta #" + guardada.getId()
-                );
-            }
-
-            else if (diferencia.compareTo(BigDecimal.ZERO) > 0) {
-                cuentaCorrienteService.registrarPago(
-                        guardada.getCliente().getId(),
-                        diferencia,
-                        "Saldo a favor - Venta #" + guardada.getId()
-                );
-            }
-        }
-
-        return guardada;
     }
 }

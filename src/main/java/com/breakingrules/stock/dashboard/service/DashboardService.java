@@ -1,35 +1,22 @@
 package com.breakingrules.stock.dashboard.service;
 
 import com.breakingrules.stock.productos.entity.Producto;
+import com.breakingrules.stock.venta.entity.Venta;
 
 import java.math.BigDecimal;
 import java.util.List;
 
 public interface DashboardService {
 
-    BigDecimal obtenerVentasDelDia();
+    BigDecimal ventasHoy();
 
-    long cantidadVentasDelDia();
+    BigDecimal ventasMes();
 
-    BigDecimal obtenerIngresosDelDia();
+    long totalClientes();
 
-    BigDecimal obtenerDeudaTotal();
+    long totalProductos();
 
-    BigDecimal obtenerSaldoAFavorTotal();
+    Integer stockTotal();
 
-    List<ProductoCantidadDTO> topProductosVendidos(Integer top);
-
-    BigDecimal totalVentasHoy();
-
-    BigDecimal totalIngresosHoy();
-
-    BigDecimal totalDeuda();
-
-    BigDecimal totalAFavor();
-
-    long clientesConDeuda();
-
-    //List<Producto> productosCriticos(Integer limite);
-
-    BigDecimal totalVentasAyer();
+    List<Venta> ultimasVentas();
 }

@@ -1,37 +1,87 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org"
       th:replace="layout/base :: layout(~{::section}, 'Dashboard')">
+<style>
+    .dashboard-grid{
+        display:grid;
+        grid-template-columns: repeat(auto-fit,minmax(200px,1fr));
+        gap:20px;
+        margin-bottom:20px;
+    }
 
+    .dashboard-card{
+        text-align:center;
+        font-size:22px;
+        font-weight:bold;
+        transition:transform 0.2s;
+    }
+
+    .dashboard-card:hover{
+        transform:scale(1.05);
+    }
+</style>
 <section>
-    <h2>📊 Dashboard</h2>
 
-    <div class="card">
-        <h3>🔥 Top Productos</h3>
-        <ul>
-            <li th:each="p : ${topProductos}"
-                th:text="${p.nombre + ' - ' + p.cantidad}">
-            </li>
-        </ul>
+    <div class="dashboard-grid">
+
+        <div class="card dashboard-card">
+            <h3>💰 Ventas hoy</h3>
+            <p th:text="${ventasHoy}"></p>
+        </div>
+
+        <div class="card dashboard-card">
+            <h3>📈 Ventas del mes</h3>
+            <p th:text="${ventasMes}"></p>
+        </div>
+
+        <div class="card dashboard-card">
+            <h3>👤 Clientes</h3>
+            <p th:text="${clientes}"></p>
+        </div>
+
+        <div class="card dashboard-card">
+            <h3>📦 Productos</h3>
+            <p th:text="${productos}"></p>
+        </div>
+
+        <div class="card dashboard-card">
+            <h3>🏬 Stock total</h3>
+            <p th:text="${stockTotal}"></p>
+        </div>
+
     </div>
 
-    <div class="card">
-        <h3>Ventas y caja</h3>
-        <p>Total ventas hoy: <strong th:text="${totalVentasHoy}"></strong></p>
-        <p>Total ingresos hoy: <strong th:text="${totalIngresosHoy}"></strong></p>
-    </div>
 
     <div class="card">
-        <h3>Cuentas corrientes</h3>
-        <p>Total deuda: <strong th:text="${totalDeuda}"></strong></p>
-        <p>Total a favor: <strong th:text="${totalAFavor}"></strong></p>
-        <p>Clientes con deuda: <strong th:text="${clientesConDeuda}"></strong></p>
+
+        <h3>🧾 Últimas ventas</h3>
+
+        <table>
+
+            <thead>
+            <tr>
+                <th>ID</th>
+                <th>Cliente</th>
+                <th>Total</th>
+                <th>Fecha</th>
+            </tr>
+            </thead>
+
+            <tbody>
+
+            <tr th:each="v : ${ventas}">
+                <td th:text="${v.id}"></td>
+                <td th:text="${v.cliente.nombre}"></td>
+                <td th:text="${v.total}"></td>
+                <td th:text="${#temporals.format(v.fecha,'dd/MM/yyyy HH:mm')}"></td>
+            </tr>
+
+            </tbody>
+
+        </table>
+
     </div>
 
-    <div class="card">
-        <h3>Productos críticos (stock <= 5)</h3>
-        <ul>
-            <li th:each="p : ${productosCriticos}" th:text="${p.nombre + ' (' + p.stock + ')'}"></li>
-        </ul>
-    </div>
 </section>
+
 </html>

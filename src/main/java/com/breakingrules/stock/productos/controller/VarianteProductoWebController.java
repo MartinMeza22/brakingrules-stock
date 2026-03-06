@@ -10,6 +10,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 @Controller
 @RequestMapping("/web/variantes")
@@ -30,21 +31,6 @@ public class VarianteProductoWebController {
         return "redirect:/web/variantes/" + productoId;
     }
 
-    @PostMapping("/ingresar-stock")
-    public String ingresarStock(
-            @RequestParam Integer varianteId,
-            @RequestParam Integer cantidad
-    ) {
-        varianteService.ingresarStock(varianteId, cantidad);
-
-        Integer productoId = varianteService
-                .obtenerPorId(varianteId)
-                .getProducto()
-                .getId();
-
-        return "redirect:/web/variantes/" + productoId;
-    }
-
     @GetMapping("/{productoId}")
     public String listar(@PathVariable Integer productoId, Model model) {
 
@@ -61,13 +47,21 @@ public class VarianteProductoWebController {
 
     @PostMapping("/guardar/{productoId}")
     public String guardar(@PathVariable Integer productoId,
-                          @ModelAttribute VarianteProducto variante) {
+                          @ModelAttribute VarianteProducto variante,
+                          RedirectAttributes redirectAttributes) {
 
         Producto producto = productoService.obtenerEntidadPorId(productoId);
 
         variante.setProducto(producto);
 
-        varianteService.guardar(variante);
+        try {
+            varianteService.guardar(variante);
+        } catch (RuntimeException e) {
+
+            redirectAttributes.addFlashAttribute("error", e.getMessage());
+
+            return "redirect:/web/variantes/" + productoId;
+        }
 
         return "redirect:/web/variantes/" + productoId;
     }
@@ -77,6 +71,50 @@ public class VarianteProductoWebController {
                            @PathVariable Integer productoId) {
 
         varianteService.eliminar(varianteId);
+
+        return "redirect:/web/variantes/" + productoId;
+    }
+
+    @PostMapping("/ingresar-stock")
+    public String ingresarStock(
+            @RequestParam Integer varianteId,
+            @RequestParam Integer cantidad
+    ) {
+
+        varianteService.ingresarStock(varianteId, cantidad);
+
+        Integer productoId = varianteService
+                .obtenerPorId(varianteId)
+                .getProducto()
+                .getId();
+
+        return "redirect:/web/variantes/" + productoId;
+    }
+
+    @GetMapping("/editar/{id}")
+    public String editar(@PathVariable Integer id, Model model) {
+
+        VarianteProducto variante = varianteService.obtenerPorId(id);
+
+        model.addAttribute("variante", variante);
+        model.addAttribute("colores", Color.values());
+        model.addAttribute("talles", Talle.values());
+
+        return "variantes/editar";
+    }
+
+    @PostMapping("/actualizar/{id}")
+    public String actualizar(@PathVariable Integer id,
+                             @ModelAttribute VarianteProducto variante) {
+
+        VarianteProducto existente = varianteService.obtenerPorId(id);
+
+        existente.setColor(variante.getColor());
+        existente.setTalle(variante.getTalle());
+
+        varianteService.guardar(existente);
+
+        Integer productoId = existente.getProducto().getId();
 
         return "redirect:/web/variantes/" + productoId;
     }

@@ -28,4 +28,5 @@ public interface VarianteProductoService {
     void guardar(VarianteProducto variableProducto);
 
     void eliminar(Integer id);
+
 }

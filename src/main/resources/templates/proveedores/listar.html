@@ -36,7 +36,8 @@
     <div class="card">
         <h3>Proveedores</h3>
 
-        <table th:if="${!proveedores.isEmpty()}">
+        <input class="buscador-tabla" placeholder="Buscar...">
+        <table class="tabla-buscable" th:if="${!proveedores.isEmpty()}">
             <thead>
             <tr>
                 <th>Nombre</th>

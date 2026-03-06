@@ -12,19 +12,15 @@ import java.util.Optional;
 
 public interface VentaService {
 
-    void confirmarVenta(VentaDTO dto);
+    Venta crearVenta(Integer clienteId);
 
-    List<Cliente> obtenerClientes();
+    void agregarProducto(Integer ventaId, Integer varianteId, Integer cantidad);
 
-    List<Venta> obtenerVentas();
+    void finalizarVenta(Integer ventaId);
 
-    List<Producto> obtenerProductos();
+    Venta obtenerVenta(Integer ventaId);
 
-    Optional<Venta> findById(Integer id);
+    List<VentaDetalle> obtenerDetalles(Integer ventaId);
 
-    List<VentaDetalle> obtenerDetallesVenta(Integer ventaId);
-
-    List<MovimientoCaja> listarMovimientos();
-
-    Venta crearVenta(Venta venta);
+    List<Venta> listarVentas();
 }

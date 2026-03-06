@@ -1,107 +1,127 @@
 package com.breakingrules.stock.venta.controller;
 
-import com.breakingrules.stock.productos.entity.Producto;
-import com.breakingrules.stock.productos.entity.Talle;
-import com.breakingrules.stock.venta.dto.ItemVentaDTO;
-import com.breakingrules.stock.venta.dto.VentaDTO;
+import com.breakingrules.stock.clientes.repository.ClienteRepository;
+import com.breakingrules.stock.productos.entity.VarianteProducto;
+import com.breakingrules.stock.productos.repository.VarianteProductoRepository;
 import com.breakingrules.stock.venta.entity.Venta;
-import com.breakingrules.stock.venta.service.RemitoPdfService;
+import com.breakingrules.stock.venta.entity.VentaDetalle;
 import com.breakingrules.stock.venta.service.VentaService;
-import jakarta.validation.Valid;
-import lombok.RequiredArgsConstructor;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.MediaType;
-import org.springframework.http.ResponseEntity;
+import com.lowagie.text.Document;
+import com.lowagie.text.Paragraph;
+import com.lowagie.text.Rectangle;
+import com.lowagie.text.pdf.PdfPTable;
+import com.lowagie.text.pdf.PdfWriter;
+import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
-import java.time.format.DateTimeFormatter;
+import java.util.List;
 
 @Controller
 @RequestMapping("/web/ventas")
-@RequiredArgsConstructor
 public class VentaWebController {
 
     private final VentaService ventaService;
-    private final RemitoPdfService remitoPdfService;
+    private final ClienteRepository clienteRepository;
+    private final VarianteProductoRepository varianteRepository;
+
+    public VentaWebController(
+            VentaService ventaService,
+            ClienteRepository clienteRepository,
+            VarianteProductoRepository varianteRepository
+    ) {
+        this.ventaService = ventaService;
+        this.clienteRepository = clienteRepository;
+        this.varianteRepository = varianteRepository;
+    }
 
     @GetMapping
     public String listar(Model model) {
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm");
-        model.addAttribute("formatter", formatter);
-        model.addAttribute("ventas", ventaService.obtenerVentas());
-        return "ventas/listar";
+
+        model.addAttribute("clientes", clienteRepository.findAll());
+        model.addAttribute("variantes", varianteRepository.findAll());
+
+        return "ventas/crear";
     }
 
+    @PostMapping("/crear")
+    public String crearVenta(@RequestParam Integer clienteId) {
 
-    @GetMapping("/listar")
-    public String listarVentas(Model model) {
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm");
-        model.addAttribute("formatter", formatter);
-        model.addAttribute("ventas", ventaService.obtenerVentas());
-        return "ventas/listar";
+        var venta = ventaService.crearVenta(clienteId);
+
+        return "redirect:/web/ventas/" + venta.getId();
     }
 
-    @GetMapping("/nueva")
-    public String mostrarFormulario(Model model) {
-        VentaDTO venta = new VentaDTO();
-        venta.getItems().add(new ItemVentaDTO());
-        model.addAttribute("venta", venta);
-        model.addAttribute("clientes", ventaService.obtenerClientes());
-        model.addAttribute("productos", ventaService.obtenerProductos());
-        return "ventas/nueva";
-    }
+    @GetMapping("/{ventaId}")
+    public String verVenta(@PathVariable Integer ventaId, Model model) {
 
-    @PostMapping("/guardar")
-    public String guardarVenta(@Valid @ModelAttribute("venta") VentaDTO ventaDTO,
-                               BindingResult result,
-                               RedirectAttributes redirectAttributes,
-                               Model model) {
+        model.addAttribute("venta", ventaService.obtenerVenta(ventaId));
+        model.addAttribute("detalles", ventaService.obtenerDetalles(ventaId));
+        model.addAttribute("variantes", varianteRepository.findAll());
 
-        if (result.hasErrors()) {
-            model.addAttribute("clientes", ventaService.obtenerClientes());
-            model.addAttribute("productos", ventaService.obtenerProductos());
-            return "ventas/nueva";
-        }
-
-        try {
-            ventaService.confirmarVenta(ventaDTO);
-            redirectAttributes.addFlashAttribute("success", "Venta registrada correctamente");
-            return "redirect:/web/ventas/nueva";
-        } catch (Exception e) {
-            model.addAttribute("error", e.getMessage());
-            model.addAttribute("clientes", ventaService.obtenerClientes());
-            model.addAttribute("productos", ventaService.obtenerProductos());
-            return "ventas/nueva";
-        }
-    }
-
-    @GetMapping("/detalle/{id}")  // URL: /web/ventas/detalle/123
-    public String detalleVenta(@PathVariable Integer id, Model model) {
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm");
-        Venta venta = ventaService.findById(id).orElseThrow();
-        model.addAttribute("formatter", formatter);
-        model.addAttribute("venta", venta);
-        model.addAttribute("detalles", ventaService.obtenerDetallesVenta(id));
         return "ventas/detalle";
     }
 
-    @GetMapping("/remito/{id}")
-    public ResponseEntity<byte[]> generarRemito(@PathVariable Integer id) {
+    @PostMapping("/agregar-producto")
+    public String agregarProducto(
+            @RequestParam Integer ventaId,
+            @RequestParam Integer varianteId,
+            @RequestParam Integer cantidad
+    ) {
 
-        Venta venta = ventaService.findById(id).orElseThrow();
-        var detalles = ventaService.obtenerDetallesVenta(id);
+        ventaService.agregarProducto(ventaId, varianteId, cantidad);
 
-        byte[] pdf = remitoPdfService.generarRemito(venta, detalles);
-
-        return ResponseEntity.ok()
-                .header(HttpHeaders.CONTENT_DISPOSITION,
-                        "attachment; filename=remito_" + venta.getId() + ".pdf")
-                .contentType(MediaType.APPLICATION_PDF)
-                .body(pdf);
+        return "redirect:/web/ventas/" + ventaId;
     }
 
+    @PostMapping("/finalizar")
+    public String finalizarVenta(@RequestParam Integer ventaId) {
+
+        ventaService.finalizarVenta(ventaId);
+
+        return "redirect:/web/ventas";
+    }
+
+    @GetMapping("/historial")
+    public String historial(Model model) {
+
+        model.addAttribute("ventas", ventaService.listarVentas());
+
+        return "ventas/historial";
+    }
+
+    @GetMapping("/remito/{id}")
+    public String generarRemito(@PathVariable Integer id, Model model) {
+
+        Venta venta = ventaService.obtenerVenta(id);
+
+        List<VentaDetalle> detalles = ventaService.obtenerDetalles(id);
+
+        model.addAttribute("venta", venta);
+        model.addAttribute("detalles", detalles);
+
+        return "ventas/remito";
+    }
+
+    @GetMapping("/ventas")
+    public String listarVentas(Model model) {
+
+        model.addAttribute("ventas", ventaService.listarVentas());
+
+        return "ventas/listaVentas";
+    }
+
+    @GetMapping("/ventas/{id}")
+    public String verDetalleVenta(@PathVariable Integer id, Model model) {
+
+        Venta venta = ventaService.obtenerVenta(id);
+
+        List<VentaDetalle> detalles = ventaService.obtenerDetalles(id);
+
+        model.addAttribute("venta", venta);
+        model.addAttribute("detalles", detalles);
+
+        return "ventas/detalleVenta";
+    }
 }
