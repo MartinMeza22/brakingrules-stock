@@ -1,5 +1,6 @@
 package com.breakingrules.stock.productos.entity;
 
+import com.breakingrules.stock.clientes.entity.TipoCliente;
 import com.breakingrules.stock.proveedores.entity.Proveedor;
 import jakarta.persistence.*;
 import lombok.*;
@@ -37,7 +38,10 @@ public class Producto {
     private BigDecimal costo;
 
     @NotNull
-    private BigDecimal precioVenta;
+    private BigDecimal precioVentaPublico;
+
+    @NotNull
+    private BigDecimal precioVentaMayorista;
 
     private Boolean activo = true;
 

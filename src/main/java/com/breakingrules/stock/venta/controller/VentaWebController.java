@@ -1,21 +1,16 @@
 package com.breakingrules.stock.venta.controller;
 
-import com.breakingrules.stock.clientes.repository.ClienteRepository;
-import com.breakingrules.stock.productos.entity.VarianteProducto;
-import com.breakingrules.stock.productos.repository.VarianteProductoRepository;
+import com.breakingrules.stock.clientes.service.ClienteService;
+import com.breakingrules.stock.productos.entity.Producto;
+import com.breakingrules.stock.productos.service.VarianteProductoService;
 import com.breakingrules.stock.venta.entity.Venta;
 import com.breakingrules.stock.venta.entity.VentaDetalle;
 import com.breakingrules.stock.venta.service.VentaService;
-import com.lowagie.text.Document;
-import com.lowagie.text.Paragraph;
-import com.lowagie.text.Rectangle;
-import com.lowagie.text.pdf.PdfPTable;
-import com.lowagie.text.pdf.PdfWriter;
-import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
+import java.math.BigDecimal;
 import java.util.List;
 
 @Controller
@@ -23,32 +18,30 @@ import java.util.List;
 public class VentaWebController {
 
     private final VentaService ventaService;
-    private final ClienteRepository clienteRepository;
-    private final VarianteProductoRepository varianteRepository;
+    private final ClienteService clienteService;
+    private final VarianteProductoService varianteProductoService;
 
     public VentaWebController(
             VentaService ventaService,
-            ClienteRepository clienteRepository,
-            VarianteProductoRepository varianteRepository
+            ClienteService clienteService,
+            VarianteProductoService varianteProductoService
     ) {
         this.ventaService = ventaService;
-        this.clienteRepository = clienteRepository;
-        this.varianteRepository = varianteRepository;
+        this.clienteService = clienteService;
+        this.varianteProductoService = varianteProductoService;
     }
 
     @GetMapping
     public String listar(Model model) {
-
-        model.addAttribute("clientes", clienteRepository.findAll());
-        model.addAttribute("variantes", varianteRepository.findAll());
-
+        model.addAttribute("clientePublico", clienteService.obtenerClientePublico());
+        model.addAttribute("mayoristas", clienteService.obtenerMayoristas());
         return "ventas/crear";
     }
 
     @PostMapping("/crear")
     public String crearVenta(@RequestParam Integer clienteId) {
 
-        var venta = ventaService.crearVenta(clienteId);
+        Venta venta = ventaService.crearVenta(clienteId);
 
         return "redirect:/web/ventas/" + venta.getId();
     }
@@ -58,7 +51,7 @@ public class VentaWebController {
 
         model.addAttribute("venta", ventaService.obtenerVenta(ventaId));
         model.addAttribute("detalles", ventaService.obtenerDetalles(ventaId));
-        model.addAttribute("variantes", varianteRepository.findAll());
+        model.addAttribute("variantes", varianteProductoService.listarTodas());
 
         return "ventas/detalle";
     }
@@ -76,11 +69,14 @@ public class VentaWebController {
     }
 
     @PostMapping("/finalizar")
-    public String finalizarVenta(@RequestParam Integer ventaId) {
+    public String finalizarVenta(
+            @RequestParam Integer ventaId,
+            @RequestParam(required = false) BigDecimal descuento
+    ) {
 
-        ventaService.finalizarVenta(ventaId);
+        ventaService.finalizarVenta(ventaId, descuento);
 
-        return "redirect:/web/ventas";
+        return "redirect:/web/ventas/historial";
     }
 
     @GetMapping("/historial")
@@ -91,32 +87,10 @@ public class VentaWebController {
         return "ventas/historial";
     }
 
-    @GetMapping("/remito/{id}")
-    public String generarRemito(@PathVariable Integer id, Model model) {
-
-        Venta venta = ventaService.obtenerVenta(id);
-
-        List<VentaDetalle> detalles = ventaService.obtenerDetalles(id);
-
-        model.addAttribute("venta", venta);
-        model.addAttribute("detalles", detalles);
-
-        return "ventas/remito";
-    }
-
-    @GetMapping("/ventas")
-    public String listarVentas(Model model) {
-
-        model.addAttribute("ventas", ventaService.listarVentas());
-
-        return "ventas/listaVentas";
-    }
-
-    @GetMapping("/ventas/{id}")
+    @GetMapping("/detalle/{id}")
     public String verDetalleVenta(@PathVariable Integer id, Model model) {
 
         Venta venta = ventaService.obtenerVenta(id);
-
         List<VentaDetalle> detalles = ventaService.obtenerDetalles(id);
 
         model.addAttribute("venta", venta);
@@ -124,4 +98,11 @@ public class VentaWebController {
 
         return "ventas/detalleVenta";
     }
+
+    @GetMapping("/remito/{id}")
+    public String generarRemito(@PathVariable Integer id, Model model) {
+        Venta venta = ventaService.obtenerVenta(id); List<VentaDetalle> detalles = ventaService.obtenerDetalles(id);
+        model.addAttribute("venta", venta);
+        model.addAttribute("detalles", detalles);
+        return "ventas/remito"; }
 }

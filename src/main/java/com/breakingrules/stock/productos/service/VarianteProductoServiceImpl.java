@@ -27,6 +27,11 @@ public class VarianteProductoServiceImpl implements VarianteProductoService {
     }
 
     @Override
+    public List<VarianteProducto> listarTodas() {
+        return varianteRepository.findAll();
+    }
+
+    @Override
     public VarianteProducto obtenerPorId(Integer id) {
         return varianteRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Variante no encontrada"));
@@ -103,10 +108,11 @@ public class VarianteProductoServiceImpl implements VarianteProductoService {
     @Override
     public void guardar(VarianteProducto variante) {
 
-        boolean existe = varianteRepository.existsByProductoIdAndColorAndTalle(
+        boolean existe = varianteRepository.existsByProductoIdAndColorAndTalleAndIdNot(
                 variante.getProducto().getId(),
                 variante.getColor(),
-                variante.getTalle()
+                variante.getTalle(),
+                variante.getId() == null ? -1 : variante.getId()
         );
 
         if (existe) {

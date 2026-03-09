@@ -17,18 +17,18 @@ public class Cliente {
     private Integer id;
 
     @NotBlank(message = "El nombre es obligatorio")
-    @Size(max = 100, message = "Máximo 100 caracteres")
+    @Size(max = 100)
     private String nombre;
 
     @NotBlank(message = "El apellido es obligatorio")
-    @Size(max = 100, message = "Máximo 100 caracteres")
+    @Size(max = 100)
     private String apellido;
 
-    @Size(max = 100, message = "Máximo 100 caracteres")
+    @Size(max = 100)
     private String descripcion;
 
     @NotBlank(message = "El DNI o CUIT es obligatorio")
-    @Size(max = 20, message = "Máximo 20 caracteres")
+    @Size(max = 20)
     private String documento;
 
     @Size(max = 11)
@@ -36,14 +36,37 @@ public class Cliente {
     private String cuil;
 
     @Email(message = "Email inválido")
-    @Size(max = 150, message = "Máximo 150 caracteres")
+    @Size(max = 150)
     private String email;
 
     @Pattern(regexp = "\\d{6,15}", message = "Teléfono inválido")
     private String telefono;
 
-    @Size(max = 200, message = "Máximo 200 caracteres")
+    @Size(max = 200)
     private String direccion;
 
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
+    private TipoCliente tipoCliente;
+
+    private Boolean tieneCuentaCorriente = true;
+
     private Boolean activo = true;
+
+    @PrePersist
+    public void prePersist() {
+
+        if(tipoCliente == null){
+            tipoCliente = TipoCliente.MAYORISTA;
+        }
+
+        if(tieneCuentaCorriente == null){
+            tieneCuentaCorriente = true;
+        }
+
+        if(activo == null){
+            activo = true;
+        }
+    }
+
 }

@@ -7,6 +7,7 @@ import com.breakingrules.stock.caja.entity.MovimientoCaja;
 import com.breakingrules.stock.venta.entity.Venta;
 import com.breakingrules.stock.venta.entity.VentaDetalle;
 
+import java.math.BigDecimal;
 import java.util.List;
 import java.util.Optional;
 
@@ -16,7 +17,7 @@ public interface VentaService {
 
     void agregarProducto(Integer ventaId, Integer varianteId, Integer cantidad);
 
-    void finalizarVenta(Integer ventaId);
+    void finalizarVenta(Integer ventaId, BigDecimal descuento);
 
     Venta obtenerVenta(Integer ventaId);
 

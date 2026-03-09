@@ -14,9 +14,11 @@
             <input th:field="*{sku}" placeholder="SKU"/>
             <input th:field="*{nombre}" placeholder="Nombre"/>
 
-            <input type="number" th:field="*{precioVenta}" placeholder="Precio"/>
-            <select th:field="*{proveedor}">
-                <option value="">Proveedor</option>
+            <input type="number" th:field="*{precioVentaPublico}" placeholder="Precio Publico"/>
+            <input type="number" th:field="*{precioVentaMayorista}" placeholder="Precio Mayorista"/>
+            <select name="proveedorId">
+                <option value="">Sin proveedor</option>
+
                 <option th:each="prov : ${proveedores}"
                         th:value="${prov.id}"
                         th:text="${prov.nombre}">
@@ -35,9 +37,10 @@
             <tr>
                 <th>Articulo</th>
                 <th>Nombre</th>
-                <th>Precio</th>
+                <th>Precio Publico</th>
+                <th>Precio Mayorista</th>
                 <th>Stock</th>
-                <th></th>
+                <th>Acciones</th>
             </tr>
             </thead>
 
@@ -45,7 +48,8 @@
             <tr th:each="p : ${productos}">
                 <td th:text="${p.sku}"></td>
                 <td th:text="${p.nombre}"></td>
-                <td th:text="${p.precioVenta}"></td>
+                <td th:text="${p.precioVentaPublico}"></td>
+                <td th:text="${p.precioVentaMayorista}"></td>
                 <td>
                     <a th:href="@{'/web/variantes/' + ${p.id}}">Ver variantes</a>
                     <a th:href="@{'/web/productos/editar/' + ${p.id}}">Editar</a>

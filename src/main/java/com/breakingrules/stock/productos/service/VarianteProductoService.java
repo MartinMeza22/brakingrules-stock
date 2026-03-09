@@ -8,6 +8,8 @@ import java.util.List;
 
 public interface VarianteProductoService {
 
+    List<VarianteProducto> listarTodas();
+
     VarianteProducto obtenerPorId(Integer id);
 
     VarianteProducto crearVariante(

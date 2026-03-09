@@ -12,20 +12,23 @@ public class ProductoDTO {
     private String codigoBarras;
 
     private BigDecimal costo;
-    private BigDecimal precioVenta;
+    private BigDecimal precioVentaPublico;
+    private BigDecimal precioVentaMayorista;
+
 
     private Boolean activo;
     private String proveedorNombre;
     public ProductoDTO() {}
 
     public ProductoDTO(Integer id, String sku, String nombre, String codigoBarras,
-                       BigDecimal costo, BigDecimal precioVenta, Boolean activo, String proveedorNombre) {
+                       BigDecimal costo, BigDecimal precioVentaPublico, BigDecimal precioVentaMayorista, Boolean activo, String proveedorNombre) {
         this.id = id;
         this.sku = sku;
         this.nombre = nombre;
         this.codigoBarras = codigoBarras;
         this.costo = costo;
-        this.precioVenta = precioVenta;
+        this.precioVentaPublico = precioVentaPublico;
+        this.precioVentaMayorista = precioVentaMayorista;
         this.activo = activo;
         this.proveedorNombre = proveedorNombre;
     }
@@ -70,12 +73,20 @@ public class ProductoDTO {
         this.costo = costo;
     }
 
-    public BigDecimal getPrecioVenta() {
-        return precioVenta;
+    public BigDecimal getPrecioVentaPublico() {
+        return precioVentaPublico;
     }
 
-    public void setPrecioVenta(BigDecimal precioVenta) {
-        this.precioVenta = precioVenta;
+    public void setPrecioVentaPublico(BigDecimal precioVentaPublico) {
+        this.precioVentaPublico = precioVentaPublico;
+    }
+
+    public BigDecimal getPrecioVentaMayorista() {
+        return precioVentaMayorista;
+    }
+
+    public void setPrecioVentaMayorista(BigDecimal precioVentaMayorista) {
+        this.precioVentaMayorista = precioVentaMayorista;
     }
 
     public Boolean getActivo() {

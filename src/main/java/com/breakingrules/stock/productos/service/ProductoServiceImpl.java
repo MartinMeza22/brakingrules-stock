@@ -65,6 +65,8 @@ public class ProductoServiceImpl implements ProductoService {
             // Generar la imagen del código de barras
             generarImagenCodigoBarras(codigo, producto.getSku());
         }
+
+
         log.info("Producto ID antes de save: {}", producto.getId());
         Producto guardado = repository.save(producto);
 
@@ -111,10 +113,16 @@ public class ProductoServiceImpl implements ProductoService {
             throw new IllegalArgumentException("El nombre es obligatorio");
         }
 
-        if (producto.getPrecioVenta() == null ||
-                producto.getPrecioVenta().compareTo(BigDecimal.ZERO) <= 0) {
-            throw new IllegalArgumentException("El precio de venta debe ser mayor a 0");
+        if (producto.getPrecioVentaPublico() == null ||
+                producto.getPrecioVentaPublico().compareTo(BigDecimal.ZERO) <= 0) {
+            throw new IllegalArgumentException("El precio de venta publico debe ser mayor a 0");
         }
+
+        if (producto.getPrecioVentaMayorista() == null ||
+                producto.getPrecioVentaMayorista().compareTo(BigDecimal.ZERO) <= 0) {
+            throw new IllegalArgumentException("El precio de venta Mayorista debe ser mayor a 0");
+        }
+
 
         if (producto.getCosto() != null &&
                 producto.getCosto().compareTo(BigDecimal.ZERO) < 0) {
@@ -169,16 +177,18 @@ public class ProductoServiceImpl implements ProductoService {
             log.info("Cantidad de productos a exportar: {}", productos.size());
 
             StringBuilder csv = new StringBuilder();
-            csv.append("ID,Nombre,Categoria,Talle,Color,SKU,CodigoBarras,Costo,PrecioVenta,Stock,StockMinimo,Activo\n");
+
+            csv.append("ID,SKU,Nombre,CodigoBarras,Costo,PrecioPublico,PrecioMayorista,Activo\n");
 
             for (Producto p : productos) {
+
                 csv.append(p.getId()).append(",")
                         .append(p.getSku()).append(",")
                         .append(p.getNombre()).append(",")
-                        .append(p.getSku()).append(",")
                         .append(p.getCodigoBarras()).append(",")
                         .append(p.getCosto()).append(",")
-                        .append(p.getPrecioVenta()).append(",")
+                        .append(p.getPrecioVentaPublico()).append(",")
+                        .append(p.getPrecioVentaMayorista()).append(",")
                         .append(p.getActivo())
                         .append("\n");
             }
@@ -212,9 +222,12 @@ public class ProductoServiceImpl implements ProductoService {
                 p.getNombre(),
                 p.getCodigoBarras(),
                 p.getCosto(),
-                p.getPrecioVenta(),
+                p.getPrecioVentaPublico(),
+                p.getPrecioVentaMayorista(),
                 p.getActivo(),
-                p.getProveedor().getNombre()
+                p.getProveedor() != null
+                        ? p.getProveedor().getNombre()
+                        : "Sin proveedor"
         );
     }
 

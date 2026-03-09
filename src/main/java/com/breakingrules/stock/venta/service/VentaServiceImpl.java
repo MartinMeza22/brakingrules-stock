@@ -1,30 +1,23 @@
 package com.breakingrules.stock.venta.service;
 
-import com.breakingrules.stock.caja.entity.MovimientoCaja;
-import com.breakingrules.stock.caja.entity.TipoMovimiento;
 import com.breakingrules.stock.clientes.entity.Cliente;
 import com.breakingrules.stock.clientes.repository.ClienteRepository;
-import com.breakingrules.stock.cuentaCorriente.entity.CuentaCorriente;
 import com.breakingrules.stock.cuentaCorriente.service.CuentaCorrienteService;
+import com.breakingrules.stock.cuentaCorriente.service.CuentaCorrienteServiceImpl;
 import com.breakingrules.stock.productos.entity.Producto;
+import com.breakingrules.stock.clientes.entity.TipoCliente;
 import com.breakingrules.stock.productos.entity.VarianteProducto;
-import com.breakingrules.stock.productos.repository.ProductoRepository;
 import com.breakingrules.stock.productos.repository.VarianteProductoRepository;
 import com.breakingrules.stock.productos.service.VarianteProductoService;
-import com.breakingrules.stock.venta.dto.ItemVentaDTO;
-import com.breakingrules.stock.venta.dto.VentaDTO;
 import com.breakingrules.stock.venta.entity.*;
-import com.breakingrules.stock.caja.repository.MovimientoCajaRepository;
 import com.breakingrules.stock.venta.repository.VentaDetalleRepository;
 import com.breakingrules.stock.venta.repository.VentaRepository;
-import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.List;
-import java.util.Optional;
 
 @Service
 @Transactional
@@ -35,21 +28,23 @@ public class VentaServiceImpl implements VentaService {
     private final ClienteRepository clienteRepository;
     private final VarianteProductoRepository varianteRepository;
     private final VarianteProductoService varianteService;
+    private final CuentaCorrienteService cuentaCorrienteService;
 
     public VentaServiceImpl(
             VentaRepository ventaRepository,
             VentaDetalleRepository detalleRepository,
             ClienteRepository clienteRepository,
             VarianteProductoRepository varianteRepository,
-            VarianteProductoService varianteService
+            VarianteProductoService varianteService,
+            CuentaCorrienteService cuentaCorrienteService
     ) {
         this.ventaRepository = ventaRepository;
         this.detalleRepository = detalleRepository;
         this.clienteRepository = clienteRepository;
         this.varianteRepository = varianteRepository;
         this.varianteService = varianteService;
+        this.cuentaCorrienteService = cuentaCorrienteService;
     }
-
     @Override
     public Venta crearVenta(Integer clienteId) {
 
@@ -74,8 +69,16 @@ public class VentaServiceImpl implements VentaService {
         VarianteProducto variante = varianteRepository.findById(varianteId)
                 .orElseThrow(() -> new RuntimeException("Variante no encontrada"));
 
-        BigDecimal precio = variante.getProducto().getPrecioVenta();
+        Cliente cliente = venta.getCliente();
+        Producto producto = variante.getProducto();
 
+        BigDecimal precio;
+
+        if(cliente.getTipoCliente() == TipoCliente.MAYORISTA){
+            precio = producto.getPrecioVentaMayorista();
+        }else{
+            precio = producto.getPrecioVentaPublico();
+        }
         VentaDetalle detalle = new VentaDetalle();
         detalle.setVenta(venta);
         detalle.setVariante(variante);
@@ -92,12 +95,43 @@ public class VentaServiceImpl implements VentaService {
     }
 
     @Override
-    public void finalizarVenta(Integer ventaId) {
+    public void finalizarVenta(Integer ventaId, BigDecimal descuento) {
+
+        List<VentaDetalle> detalles = detalleRepository.findByVentaId(ventaId);
+
+        if(detalles.isEmpty()){
+            throw new RuntimeException("No se puede finalizar una venta sin productos");
+        }
 
         Venta venta = ventaRepository.findById(ventaId)
                 .orElseThrow(() -> new RuntimeException("Venta no encontrada"));
 
+        BigDecimal total = venta.getTotal();
+
+        if(descuento != null && descuento.compareTo(BigDecimal.ZERO) > 0){
+
+            BigDecimal descuentoMonto = total
+                    .multiply(descuento)
+                    .divide(BigDecimal.valueOf(100));
+
+            total = total.subtract(descuentoMonto);
+
+            venta.setDescuento(descuento);
+        }
+
+        venta.setTotal(total);
         venta.setEstado(EstadoVenta.FINALIZADA);
+
+        Cliente cliente = venta.getCliente();
+
+        if(cliente.getTipoCliente() == TipoCliente.MAYORISTA){
+
+            cuentaCorrienteService.registrarDeuda(
+                    cliente.getId(),
+                    total,
+                    "Venta #" + venta.getId()
+            );
+        }
     }
 
     @Override

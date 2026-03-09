@@ -31,22 +31,26 @@ public class ProductoWebController {
     @PostMapping("/guardar")
     public String guardar(@Valid @ModelAttribute Producto producto,
                           BindingResult result,
+                          @RequestParam(required = false) Integer proveedorId,
                           Model model) {
 
-        System.out.println("ENTRÓ A GUARDAR");
-
         if (result.hasErrors()) {
-            System.out.println("TIENE ERRORES");
-            result.getAllErrors().forEach(error ->
-                    System.out.println(error.toString())
-            );
+
             model.addAttribute("productos", service.listarTodosSinPaginacion());
             model.addAttribute("proveedores", proveedorService.listarTodos());
             model.addAttribute("productoNuevo", producto);
+
             return "productos/listar";
         }
 
+        if (proveedorId != null) {
+            producto.setProveedor(proveedorService.obtenerPorId(proveedorId));
+        } else {
+            producto.setProveedor(null);
+        }
+
         service.guardar(producto);
+
         return "redirect:/web/productos";
     }
 
@@ -62,6 +66,7 @@ public class ProductoWebController {
     public String actualizar(@PathVariable Integer id,
                              @Valid @ModelAttribute("producto") Producto producto,
                              BindingResult result,
+                             @RequestParam(required = false) Integer proveedorId,
                              Model model) {
 
         if (result.hasErrors()) {
@@ -73,8 +78,14 @@ public class ProductoWebController {
 
         existente.setNombre(producto.getNombre());
         existente.setCodigoBarras(producto.getCodigoBarras());
-        existente.setPrecioVenta(producto.getPrecioVenta());
-        existente.setProveedor(producto.getProveedor());
+        existente.setPrecioVentaPublico(producto.getPrecioVentaPublico());
+        existente.setPrecioVentaMayorista(producto.getPrecioVentaMayorista());
+
+        if (proveedorId != null) {
+            existente.setProveedor(proveedorService.obtenerPorId(proveedorId));
+        } else {
+            existente.setProveedor(null);
+        }
 
         service.guardar(existente);
 

@@ -14,4 +14,8 @@ public interface ClienteService {
     Cliente actualizar(Integer id, Cliente cliente);
 
     void eliminar(Integer id);
+
+    Cliente obtenerClientePublico();
+
+    List<Cliente> obtenerMayoristas();
 }

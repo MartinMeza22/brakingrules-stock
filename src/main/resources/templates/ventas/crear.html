@@ -12,9 +12,13 @@
 
             <select name="clienteId">
 
-                <option value="">Seleccionar cliente</option>
+                <option th:value="${clientePublico.id}" selected>
+                    Consumidor Final
+                </option>
 
-                <option th:each="c : ${clientes}"
+                <option disabled>------------------------</option>
+
+                <option th:each="c : ${mayoristas}"
                         th:value="${c.id}"
                         th:text="${c.nombre + ' ' + c.apellido}">
                 </option>

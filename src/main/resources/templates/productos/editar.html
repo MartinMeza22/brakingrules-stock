@@ -14,7 +14,8 @@
             <input type="hidden" th:field="*{id}"/>
             <input th:field="*{sku}" readonly/>
             <input th:field="*{nombre}" placeholder="Nombre"/>
-            <input type="number" th:field="*{precioVenta}" placeholder="Precio"/>
+            <input type="number" th:field="*{precioVentaPublico}" placeholder="Precio Publico"/>
+            <input type="number" th:field="*{precioVentaMayorista}" placeholder="Precio Mayorista"/>
             <select th:field="*{proveedor}">
                 <option value="">Proveedor</option>
                 <option th:each="prov : ${proveedores}"

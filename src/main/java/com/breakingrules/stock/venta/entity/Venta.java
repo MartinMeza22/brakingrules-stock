@@ -2,7 +2,6 @@ package com.breakingrules.stock.venta.entity;
 
 import com.breakingrules.stock.clientes.entity.Cliente;
 import jakarta.persistence.*;
-import jakarta.validation.constraints.*;
 import lombok.*;
 
 import java.math.BigDecimal;
@@ -19,21 +18,38 @@ public class Venta {
         @GeneratedValue(strategy = GenerationType.IDENTITY)
         private Integer id;
 
+        @Column(nullable = false)
         private LocalDateTime fecha;
 
         @Enumerated(EnumType.STRING)
+        @Column(nullable = false)
         private EstadoVenta estado;
 
+        @Column(nullable = false)
         private BigDecimal total;
 
+        @Column(nullable = false)
         private BigDecimal descuento;
 
         @ManyToOne(fetch = FetchType.LAZY)
-        @JoinColumn(name = "cliente_id")
+        @JoinColumn(name = "cliente_id", nullable = false)
         private Cliente cliente;
 
         @PrePersist
         public void prePersist() {
-            this.fecha = LocalDateTime.now();
+
+                this.fecha = LocalDateTime.now();
+
+                if (this.estado == null) {
+                        this.estado = EstadoVenta.ABIERTA;
+                }
+
+                if (this.total == null) {
+                        this.total = BigDecimal.ZERO;
+                }
+
+                if (this.descuento == null) {
+                        this.descuento = BigDecimal.ZERO;
+                }
         }
-    }
+}
