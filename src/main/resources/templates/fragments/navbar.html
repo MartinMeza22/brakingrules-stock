@@ -1,11 +1,25 @@
 <div th:fragment="navbar">
-    <nav style="padding:12px 28px;border-bottom:1px solid #334155;background:#0b1220;">
-        <a th:href="@{/web/productos}" style="margin-right:15px;color:#9ca3af;text-decoration:none;">Productos</a>
-        <a th:href="@{/web/proveedores}" style="margin-right:15px;color:#9ca3af;text-decoration:none;">Proveedores</a>
-        <a th:href="@{/web/clientes}" style="margin-right:15px;color:#9ca3af;text-decoration:none;">Clientes</a>
-        <a th:href="@{/web/ventas}" style="margin-right:15px;color:#9ca3af;text-decoration:none;">Ventas</a>
-        <a th:href="@{/web/caja}" style="color:#9ca3af;text-decoration:none;">Caja</a>
-        <a th:href="@{/web/cuentas}" style="color:#9ca3af;text-decoration:none;">Cuentas</a>
-        <a th:href="@{/web/dashboard}" style="color:#9ca3af;text-decoration:none;">Dashboard</a>
+
+    <nav class="navbar">
+
+        <div class="navbar-container">
+
+            <a th:href="@{/web/productos}" class="nav-item">Productos</a>
+
+            <a th:href="@{/web/proveedores}" class="nav-item">Proveedores</a>
+
+            <a th:href="@{/web/clientes}" class="nav-item">Clientes</a>
+
+            <a th:href="@{/web/ventas}" class="nav-item">Ventas</a>
+
+            <a th:href="@{/web/caja}" class="nav-item">Caja</a>
+
+            <a th:href="@{/web/cuentas}" class="nav-item">Cuentas</a>
+
+            <a th:href="@{/web/dashboard}" class="nav-item nav-dashboard">Dashboard</a>
+
+        </div>
+
     </nav>
+
 </div>

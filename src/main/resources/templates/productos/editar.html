@@ -11,11 +11,38 @@
               th:object="${producto}"
               method="post">
 
+            <div th:if="${#fields.hasErrors('*')}" class="alert-error">
+                Hay errores en el formulario. Revisá los campos.
+            </div>
+
+            <div class="error"
+                 th:if="${#fields.hasGlobalErrors()}"
+                 th:each="err : ${#fields.globalErrors()}"
+                 th:text="${err}">
+            </div>
+
             <input type="hidden" th:field="*{id}"/>
             <input th:field="*{sku}" readonly/>
             <input th:field="*{nombre}" placeholder="Nombre"/>
+            <div class="error"
+                 th:if="${#fields.hasErrors('nombre')}"
+                 th:errors="*{nombre}">
+            </div>
             <input type="number" th:field="*{precioVentaPublico}" placeholder="Precio Publico"/>
+
+            <div class="error"
+                 th:if="${#fields.hasErrors('precioVentaPublico')}"
+                 th:errors="*{precioVentaPublico}">
+            </div>
+
             <input type="number" th:field="*{precioVentaMayorista}" placeholder="Precio Mayorista"/>
+
+            <div class="error"
+                 th:if="${#fields.hasErrors('precioVentaMayorista')}"
+                 th:errors="*{precioVentaMayorista}">
+            </div>
+
+
             <select th:field="*{proveedor}">
                 <option value="">Proveedor</option>
                 <option th:each="prov : ${proveedores}"

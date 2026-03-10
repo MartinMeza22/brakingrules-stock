@@ -46,14 +46,46 @@
             font-size:18px;
             font-weight:600;
         }
-        input, select {
-            width: 100%;
-            padding: 10px;
-            margin-bottom: 10px;
-            background: #020617;
-            border: 1px solid var(--border);
-            border-radius: 8px;
-            color: white;
+
+        input,
+        select,
+        textarea {
+
+            width:100%;
+            padding:10px 14px;
+
+            margin-bottom:12px;
+
+            background:#020617;
+
+            border:1px solid var(--border);
+
+            border-radius:8px;
+
+            color:white;
+
+            font-size:14px;
+
+            transition:all .2s ease;
+
+        }
+
+        input:focus,
+        select:focus,
+        textarea:focus{
+
+            outline:none;
+
+            border-color:#3b82f6;
+
+            box-shadow:0 0 0 2px rgba(59,130,246,0.25);
+
+        }
+
+        select{
+
+            cursor:pointer;
+
         }
 
         button{
@@ -211,6 +243,191 @@
         tbody tr:hover{
             background: rgba(255,255,255,0.04);
         }
+
+        .error{
+            color:#ff4d4d;
+            font-size:13px;
+            margin-top:4px;
+        }
+
+        .alert-error{
+            background:#2a1a1a;
+            border:1px solid #ff4d4d;
+            color:#ff8080;
+            padding:10px;
+            margin-bottom:10px;
+        }
+
+        .navbar{
+
+            width:100%;
+
+            background:#0b1220;
+
+            border-bottom:1px solid var(--border);
+
+        }
+
+        .navbar-container{
+
+            max-width:1200px;
+
+            margin:auto;
+
+            padding:12px 20px;
+
+            display:flex;
+
+            gap:18px;
+
+            align-items:center;
+
+        }
+
+        .nav-item{
+
+            color:#9ca3af;
+
+            text-decoration:none;
+
+            font-weight:500;
+
+            padding:6px 10px;
+
+            border-radius:6px;
+
+            transition:all .2s ease;
+
+        }
+
+        .nav-item:hover{
+
+            background:rgba(59,130,246,0.15);
+
+            color:#e5e7eb;
+
+        }
+
+        .nav-dashboard{
+
+            margin-left:auto;
+
+            background:#3b82f6;
+
+            color:white;
+
+        }
+
+        .nav-dashboard:hover{
+
+            background:#2563eb;
+
+        }
+
+        .header{
+
+            background:#020617;
+
+            border-bottom:1px solid var(--border);
+
+        }
+
+        .header-container{
+
+            max-width:1200px;
+
+            margin:auto;
+
+            padding:18px 20px;
+
+            display:flex;
+
+            align-items:center;
+
+        }
+
+        .logo-link{
+
+            display:flex;
+
+            align-items:center;
+
+            gap:12px;
+
+            text-decoration:none;
+
+            color:white;
+
+        }
+
+        .logo{
+
+            height:42px;
+
+        }
+
+        .logo-link h2{
+
+            margin:0;
+
+            font-size:20px;
+
+            font-weight:600;
+
+        }
+        .dashboard-grid{
+
+            display:grid;
+
+            grid-template-columns:repeat(auto-fit,minmax(180px,1fr));
+
+            gap:16px;
+
+            margin-bottom:20px;
+
+            }
+
+            .stat-card{
+
+            background:#020617;
+
+            border:1px solid #334155;
+
+            border-radius:10px;
+
+            padding:16px;
+
+            transition:all .2s ease;
+
+            }
+
+            .stat-card:hover{
+
+            border-color:#3b82f6;
+
+            transform:translateY(-2px);
+
+            }
+
+            .stat-card h4{
+
+            margin:0;
+
+            font-size:13px;
+
+            color:#9ca3af;
+
+            }
+
+            .stat-card p{
+
+            font-size:22px;
+
+            margin-top:6px;
+
+            font-weight:bold;
+
+            }
     </style>
 </head>
 

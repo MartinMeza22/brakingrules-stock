@@ -1,78 +1,37 @@
 <!DOCTYPE html>
-<html lang="es" xmlns:th="http://www.thymeleaf.org">
-<head>
-    <meta charset="UTF-8">
-    <title>Caja - Breaking Rules</title>
-    <meta name="viewport" content="width=device-width, initial-scale=1">
+<html xmlns:th="http://www.thymeleaf.org"
+      th:replace="layout/base :: layout(~{::section}, 'Caja')">
 
-    <style>
-        :root {
-            --bg: #0f172a;
-            --card: #1e293b;
-            --primary: #e5e7eb;
-            --border: #334155;
-        }
+    <section>
 
-        body {
-            margin: 0;
-            font-family: Inter, system-ui, sans-serif;
-            background: var(--bg);
-            color: var(--primary);
-        }
+    <div th:replace="fragments/header :: header"></div>
+    <div th:replace="fragments/navbar :: navbar"></div>
 
-        .container {
-            max-width: 900px;
-            margin: 40px auto;
-            padding: 0 20px;
-        }
+    <div class="container">
+        <div class="card">
+            <h3>Movimientos de Caja</h3>
 
-        .card {
-            background: var(--card);
-            border-radius: 14px;
-            padding: 24px;
-            border: 1px solid var(--border);
-        }
-
-        table {
-            width: 100%;
-            border-collapse: collapse;
-        }
-
-        th, td {
-            padding: 8px 12px;
-            border-bottom: 1px solid var(--border);
-        }
-    </style>
-</head>
-<body>
-
-<div th:replace="fragments/header :: header"></div>
-<div th:replace="fragments/navbar :: navbar"></div>
-
-<div class="container">
-    <div class="card">
-        <h3>Movimientos de Caja</h3>
-
-        <table>
-            <thead>
-            <tr>
-                <th>Fecha</th>
-                <th>Tipo</th>
-                <th>Monto</th>
-                <th>Referencia</th>
-            </tr>
-            </thead>
-            <tbody>
-            <tr th:each="m : ${movimientos}">
-                <td th:text="${#temporals.format(m.fecha, 'dd/MM/yyyy HH:mm')}"></td>
-                <td th:text="${m.tipo}"></td>
-                <td th:text="${m.monto}"></td>
-                <td th:text="${m.referencia}"></td>
-            </tr>
-            </tbody>
-        </table>
+            <table>
+                <thead>
+                <tr>
+                    <th>Fecha</th>
+                    <th>Tipo</th>
+                    <th>Monto</th>
+                    <th>Referencia</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr th:each="m : ${movimientos}">
+                    <td th:text="${#temporals.format(m.fecha, 'dd/MM/yyyy HH:mm')}"></td>
+                    <td th:text="${m.tipo}"></td>
+                    <td th:text="${m.monto}"></td>
+                    <td th:text="${m.referencia}"></td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
     </div>
-</div>
 
-</body>
+    </section>
+
 </html>

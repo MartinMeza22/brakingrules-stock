@@ -27,4 +27,5 @@ public interface ProductoService {
 
     void generarImagenCodigoBarras(String codigo, String sku);
 
+    boolean existeSku(String sku);
 }

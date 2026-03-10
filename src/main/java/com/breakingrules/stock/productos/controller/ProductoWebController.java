@@ -29,10 +29,15 @@ public class ProductoWebController {
     }
 
     @PostMapping("/guardar")
-    public String guardar(@Valid @ModelAttribute Producto producto,
+    public String guardar(@Valid @ModelAttribute("productoNuevo") Producto producto,
                           BindingResult result,
                           @RequestParam(required = false) Integer proveedorId,
                           Model model) {
+
+        if(service.existeSku(producto.getSku())){
+            result.rejectValue("sku", "error.producto",
+                    "Ya existe un producto con ese articulo");
+        }
 
         if (result.hasErrors()) {
 
@@ -45,8 +50,6 @@ public class ProductoWebController {
 
         if (proveedorId != null) {
             producto.setProveedor(proveedorService.obtenerPorId(proveedorId));
-        } else {
-            producto.setProveedor(null);
         }
 
         service.guardar(producto);

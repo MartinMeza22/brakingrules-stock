@@ -86,6 +86,9 @@ public class VentaServiceImpl implements VentaService {
         detalle.setPrecioUnitario(precio);
         detalle.setSubtotal(precio.multiply(BigDecimal.valueOf(cantidad)));
 
+        detalle.setNombreProducto(variante.getProducto().getNombre());
+        detalle.setSkuProducto(variante.getProducto().getSku());
+
         detalleRepository.save(detalle);
 
         BigDecimal nuevoTotal = venta.getTotal().add(detalle.getSubtotal());

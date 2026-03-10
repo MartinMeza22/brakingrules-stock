@@ -41,14 +41,16 @@ public class ProductoServiceImpl implements ProductoService {
     }
 
     public List<ProductoDTO> listarTodosSinPaginacion() {
-        log.info("Listando todos los productos");
 
-        List<ProductoDTO> productos = repository.findAll()
+        log.info("Listando productos activos");
+
+        List<ProductoDTO> productos = repository.findByActivoTrue()
                 .stream()
                 .map(this::toDTO)
                 .toList();
 
         log.info("Total productos obtenidos: {}", productos.size());
+
         return productos;
     }
 
@@ -85,20 +87,26 @@ public class ProductoServiceImpl implements ProductoService {
     }
 
     public void eliminar(Integer id) {
-        log.info("Intentando eliminar producto con ID: {}", id);
+
+        log.info("Intentando desactivar producto con ID: {}", id);
 
         if (id == null) {
             log.warn("Intento de eliminación con ID null");
             throw new IllegalArgumentException("El ID no puede ser null");
         }
 
-        if (!repository.existsById(id)) {
-            log.warn("Intento de eliminar producto inexistente. ID: {}", id);
-            throw new IllegalArgumentException("El producto no existe");
+        Producto producto = repository.findById(id)
+                .orElseThrow(() -> new IllegalArgumentException("El producto no existe"));
+
+        producto.setActivo(false);
+
+        if (producto.getVariantes() != null) {
+            producto.getVariantes().forEach(variante -> variante.setActivo(false));
         }
 
-        repository.deleteById(id);
-        log.info("Producto eliminado correctamente. ID: {}", id);
+        repository.save(producto);
+
+        log.info("Producto y variantes desactivados correctamente. ID: {}", id);
     }
 
     private void validarProducto(Producto producto) {
@@ -254,8 +262,12 @@ public class ProductoServiceImpl implements ProductoService {
         }
     }
 
+    @Override
+    public boolean existeSku(String sku) {
+        return repository.existsBySku(sku);
+    }
+
     private String generarCodigoBarrasParaProducto(String sku) {
-        // Lógica simple: prefijo + SKU + timestamp para que sea único
         return "BRK-" + sku + "-" + System.currentTimeMillis();
     }
 }

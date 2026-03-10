@@ -1,85 +1,87 @@
 package com.breakingrules.stock.dashboard.service;
 
-import com.breakingrules.stock.venta.entity.Venta;
-import com.breakingrules.stock.venta.entity.EstadoVenta;
-import com.breakingrules.stock.venta.repository.VentaRepository;
-import com.breakingrules.stock.productos.repository.VarianteProductoRepository;
 import com.breakingrules.stock.clientes.repository.ClienteRepository;
+import com.breakingrules.stock.dashboard.dto.DashboardDTO;
+import com.breakingrules.stock.dashboard.service.DashboardService;
+import com.breakingrules.stock.productos.entity.VarianteProducto;
+import com.breakingrules.stock.productos.repository.ProductoRepository;
+import com.breakingrules.stock.productos.repository.VarianteProductoRepository;
+import com.breakingrules.stock.venta.repository.VentaRepository;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
-import java.math.BigDecimal;
+import java.time.LocalDate;
+import java.util.List;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
-import java.util.List;
+
 
 @Service
-public class DashboardServiceImpl implements DashboardService{
+@RequiredArgsConstructor
+public class DashboardServiceImpl implements DashboardService {
 
     private final VentaRepository ventaRepository;
-    private final VarianteProductoRepository varianteRepository;
+    private final ProductoRepository productoRepository;
     private final ClienteRepository clienteRepository;
+    private final VarianteProductoRepository varianteProductoRepository;
 
-    public DashboardServiceImpl(
-            VentaRepository ventaRepository,
-            VarianteProductoRepository varianteRepository,
-            ClienteRepository clienteRepository
-    ) {
-        this.ventaRepository = ventaRepository;
-        this.varianteRepository = varianteRepository;
-        this.clienteRepository = clienteRepository;
-    }
+    public DashboardDTO obtenerEstadisticas(String filtro){
 
-    public BigDecimal ventasHoy() {
+        LocalDate inicio;
+        LocalDate fin = LocalDate.now();
 
-        LocalDateTime inicio = LocalDateTime.now().with(LocalTime.MIN);
-        LocalDateTime fin = LocalDateTime.now().with(LocalTime.MAX);
+        switch (filtro){
 
-        return ventaRepository.findByFechaBetween(inicio, fin)
-                .stream()
-                .filter(v -> v.getEstado() == EstadoVenta.FINALIZADA)
-                .map(Venta::getTotal)
-                .reduce(BigDecimal.ZERO, BigDecimal::add);
-    }
+            case "DIARIO":
+                inicio = LocalDate.now();
+                break;
 
-    public BigDecimal ventasMes() {
+            case "SEMANAL":
+                inicio = LocalDate.now().minusDays(7);
+                break;
 
-        LocalDateTime inicio = LocalDateTime.now()
-                .withDayOfMonth(1)
-                .with(LocalTime.MIN);
+            case "ANUAL":
+                inicio = LocalDate.now().minusYears(1);
+                break;
 
-        LocalDateTime fin = LocalDateTime.now()
-                .with(LocalTime.MAX);
+            default:
+                inicio = LocalDate.now().minusMonths(1);
+        }
 
-        return ventaRepository.findByFechaBetween(inicio, fin)
-                .stream()
-                .filter(v -> v.getEstado() == EstadoVenta.FINALIZADA)
-                .map(Venta::getTotal)
-                .reduce(BigDecimal.ZERO, BigDecimal::add);
-    }
+        LocalDateTime inicioDateTime = inicio.atStartOfDay();
+        LocalDateTime finDateTime = fin.atTime(LocalTime.MAX);
 
-    public long totalClientes() {
-        return clienteRepository.count();
-    }
+        List<VarianteProducto> productosStockBajoLista = varianteProductoRepository.productosStockBajo(10);
 
-    public long totalProductos() {
-        return varianteRepository.count();
-    }
+        Double totalVentas = ventaRepository.totalVentas(inicioDateTime, finDateTime);
+        Integer cantidadVentas = ventaRepository.cantidadVentas(inicioDateTime, finDateTime);
 
-    public Integer stockTotal() {
+        Double ticketPromedio = cantidadVentas == 0 ? 0 : totalVentas / cantidadVentas;
 
-        return varianteRepository.findAll()
-                .stream()
-                .mapToInt(v -> v.getStock())
-                .sum();
-    }
+        Integer productosVendidos = ventaRepository.productosVendidos(inicioDateTime, finDateTime);
 
-    public List<Venta> ultimasVentas() {
+        Integer clientesActivos = Math.toIntExact(clienteRepository.count());
 
-        return ventaRepository.findAll()
-                .stream()
-                .filter(v -> v.getEstado() == EstadoVenta.FINALIZADA)
-                .sorted((a,b) -> b.getFecha().compareTo(a.getFecha()))
-                .limit(5)
-                .toList();
+        Integer stockBajo = varianteProductoRepository.stockBajo(10);
+
+        List<String> labelsVentas = ventaRepository.labelsVentas(inicioDateTime, finDateTime);
+        List<Double> datosVentas = ventaRepository.datosVentas(inicioDateTime, finDateTime);
+
+        List<String> labelsProductos = productoRepository.productosMasVendidos();
+        List<Integer> datosProductos = productoRepository.cantidadProductosVendidos();
+
+        return DashboardDTO.builder()
+                .totalVentas(totalVentas)
+                .cantidadVentas(cantidadVentas)
+                .ticketPromedio(ticketPromedio)
+                .productosVendidos(productosVendidos)
+                .clientesActivos(clientesActivos)
+                .productosStockBajo(stockBajo)
+                .labelsVentas(labelsVentas)
+                .datosVentas(datosVentas)
+                .labelsProductos(labelsProductos)
+                .datosProductos(datosProductos)
+                .productosStockBajoLista(productosStockBajoLista)
+                .build();
     }
 }

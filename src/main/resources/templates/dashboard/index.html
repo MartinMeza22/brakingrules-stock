@@ -1,87 +1,156 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org"
       th:replace="layout/base :: layout(~{::section}, 'Dashboard')">
-<style>
-    .dashboard-grid{
-        display:grid;
-        grid-template-columns: repeat(auto-fit,minmax(200px,1fr));
-        gap:20px;
-        margin-bottom:20px;
-    }
 
-    .dashboard-card{
-        text-align:center;
-        font-size:22px;
-        font-weight:bold;
-        transition:transform 0.2s;
-    }
-
-    .dashboard-card:hover{
-        transform:scale(1.05);
-    }
-</style>
 <section>
+    <div class="card">
+
+        <h3>Dashboard</h3>
+
+        <form method="get">
+
+            <select name="filtro" onchange="this.form.submit()">
+
+                <option value="DIARIO" th:selected="${filtro=='DIARIO'}">Diario</option>
+                <option value="SEMANAL" th:selected="${filtro=='SEMANAL'}">Semanal</option>
+                <option value="MENSUAL" th:selected="${filtro=='MENSUAL'}">Mensual</option>
+                <option value="ANUAL" th:selected="${filtro=='ANUAL'}">Anual</option>
+
+            </select>
+
+        </form>
+
+    </div>
+
 
     <div class="dashboard-grid">
 
-        <div class="card dashboard-card">
-            <h3>💰 Ventas hoy</h3>
-            <p th:text="${ventasHoy}"></p>
+        <div class="stat-card">
+
+            <h4>Ventas Totales</h4>
+            <p th:text="${stats.totalVentas}"></p>
+
         </div>
 
-        <div class="card dashboard-card">
-            <h3>📈 Ventas del mes</h3>
-            <p th:text="${ventasMes}"></p>
+        <div class="stat-card">
+
+            <h4>Cantidad Ventas</h4>
+            <p th:text="${stats.cantidadVentas}"></p>
+
         </div>
 
-        <div class="card dashboard-card">
-            <h3>👤 Clientes</h3>
-            <p th:text="${clientes}"></p>
+        <div class="stat-card">
+
+            <h4>Ticket Promedio</h4>
+            <p th:text="${#numbers.formatDecimal(stats.ticketPromedio,1,2)}"></p>
+
         </div>
 
-        <div class="card dashboard-card">
-            <h3>📦 Productos</h3>
-            <p th:text="${productos}"></p>
+        <div class="stat-card">
+
+            <h4>Productos Vendidos</h4>
+            <p th:text="${stats.productosVendidos}"></p>
+
         </div>
 
-        <div class="card dashboard-card">
-            <h3>🏬 Stock total</h3>
-            <p th:text="${stockTotal}"></p>
+        <div class="stat-card">
+
+            <h4>Clientes</h4>
+            <p th:text="${stats.clientesActivos}"></p>
+
         </div>
+
+        <div class="stat-card">
+
+            <h4>Stock Bajo</h4>
+            <p th:text="${stats.productosStockBajo}"></p>
+
+        </div>
+
+    </div>
+    <div class="card">
+
+        <h3>Productos con stock bajo</h3>
+
+        <table>
+            <thead>
+            <tr>
+                <th>Producto</th>
+                <th>Stock</th>
+            </tr>
+            </thead>
+
+            <tbody>
+
+            <tr th:each="p : ${stats.productosStockBajoLista}">
+                <td th:text="${p.producto.nombre}"></td>
+                <td style="color:#ef4444;font-weight:bold"
+                    th:text="${p.stock}">
+                </td>
+            </tr>
+
+            </tbody>
+        </table>
+
+    </div>
+
+    <div class="card">
+
+        <h3>Ventas por período</h3>
+
+        <canvas id="ventasChart"></canvas>
 
     </div>
 
 
     <div class="card">
 
-        <h3>🧾 Últimas ventas</h3>
+        <h3>Productos más vendidos</h3>
 
-        <table>
-
-            <thead>
-            <tr>
-                <th>ID</th>
-                <th>Cliente</th>
-                <th>Total</th>
-                <th>Fecha</th>
-            </tr>
-            </thead>
-
-            <tbody>
-
-            <tr th:each="v : ${ventas}">
-                <td th:text="${v.id}"></td>
-                <td th:text="${v.cliente.nombre}"></td>
-                <td th:text="${v.total}"></td>
-                <td th:text="${#temporals.format(v.fecha,'dd/MM/yyyy HH:mm')}"></td>
-            </tr>
-
-            </tbody>
-
-        </table>
+        <canvas id="productosChart"></canvas>
 
     </div>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script th:inline="javascript">
 
+        const ventasLabels = [[${stats.labelsVentas}]];
+        const ventasData = [[${stats.datosVentas}]];
+
+        new Chart(document.getElementById("ventasChart"),{
+
+        type:"line",
+
+        data:{
+        labels:ventasLabels,
+        datasets:[{
+        label:"Ventas",
+        data:ventasData,
+        borderColor:"#3b82f6",
+        backgroundColor:"rgba(59,130,246,0.2)",
+        fill:true
+        }]
+        }
+
+        });
+
+
+        const productosLabels = [[${stats.labelsProductos}]];
+        const productosData = [[${stats.datosProductos}]];
+
+        new Chart(document.getElementById("productosChart"),{
+
+        type:"bar",
+
+        data:{
+        labels:productosLabels,
+        datasets:[{
+        label:"Cantidad vendida",
+        data:productosData,
+        backgroundColor:"#22c55e"
+        }]
+        }
+
+        });
+
+    </script>
 </section>
-
-</html>

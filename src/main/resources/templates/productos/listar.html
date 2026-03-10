@@ -7,15 +7,55 @@
     <div class="card">
         <h3>➕ Nuevo producto</h3>
 
+
         <form th:action="@{/web/productos/guardar}"
               th:object="${productoNuevo}"
               method="post">
 
-            <input th:field="*{sku}" placeholder="SKU"/>
+            <div th:if="${#fields.hasErrors('*')}" class="alert-error">
+                Hay errores en el formulario. Revisá los campos.
+            </div>
+
+            <div class="error"
+                 th:if="${#fields.hasGlobalErrors()}"
+                 th:each="err : ${#fields.globalErrors()}"
+                 th:text="${err}">
+            </div>
+
+            <input th:field="*{sku}" placeholder="Articulo"/>
+
+            <div class="error"
+                 th:if="${#fields.hasErrors('sku')}"
+                 th:errors="*{sku}">
+            </div>
+
             <input th:field="*{nombre}" placeholder="Nombre"/>
 
-            <input type="number" th:field="*{precioVentaPublico}" placeholder="Precio Publico"/>
-            <input type="number" th:field="*{precioVentaMayorista}" placeholder="Precio Mayorista"/>
+            <div class="error"
+                 th:if="${#fields.hasErrors('nombre')}"
+                 th:errors="*{nombre}">
+            </div>
+
+
+            <input type="number" step="0.01"
+                   th:field="*{precioVentaPublico}"
+                   placeholder="Precio Público"/>
+
+            <div class="error"
+                 th:if="${#fields.hasErrors('precioVentaPublico')}"
+                 th:errors="*{precioVentaPublico}">
+            </div>
+
+
+            <input type="number" step="0.01"
+                   th:field="*{precioVentaMayorista}"
+                   placeholder="Precio Mayorista"/>
+
+            <div class="error"
+                 th:if="${#fields.hasErrors('precioVentaMayorista')}"
+                 th:errors="*{precioVentaMayorista}">
+            </div>
+
             <select name="proveedorId">
                 <option value="">Sin proveedor</option>
 

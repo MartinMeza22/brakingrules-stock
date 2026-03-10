@@ -1,125 +1,53 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org">
-<head>
-    <title>Breaking Rules Stock</title>
+<html xmlns:th="http://www.thymeleaf.org"
+      th:replace="layout/base :: layout(~{::section}, 'Home')">
 
-    <style>
-        body {
-            background: #0f172a;
-            color: white;
-            font-family: Inter, sans-serif;
-            margin: 0;
-        }
+    <section>
 
-        header {
-            background: #020617;
-            padding: 20px;
-            border-bottom: 1px solid #334155;
-            display: flex;
-            align-items: center;
-            gap: 12px;
-        }
+        <div class="container">
 
-        header img {
-            height: 42px;
-        }
+            <div class="card">
+                <h3>📦 Productos</h3>
+                <p>Gestión de stock y catálogo</p>
+                <a th:href="@{/web/productos}">Ir al módulo</a>
+            </div>
 
-        .container {
-            max-width: 900px;
-            margin: 50px auto;
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-            gap: 20px;
-        }
+            <div class="card">
+                <h3>🚚 Proveedores</h3>
+                <p>Alta y administración de proveedores</p>
+                <a th:href="@{/web/proveedores}">Ir al módulo</a>
+            </div>
 
-        .card {
-            background: #1e293b;
-            padding: 25px;
-            border-radius: 12px;
-            text-align: center;
-            border: 1px solid #334155;
-            transition: .2s ease;
-        }
+            <div class="card">
+                <h3> Clientes</h3>
+                <p>Alta y administración de clientes</p>
+                <a th:href="@{/web/clientes}">Ir al módulo</a>
+            </div>
 
-        .card:hover {
-            transform: translateY(-4px);
-            box-shadow: 0 10px 25px rgba(0,0,0,.4);
-        }
+            <div class="card">
+                <h3>🧾 Ventas</h3>
+                <p>Administracion de ventas</p>
+                <a th:href="@{/web/ventas}">Ir al módulo</a>
+            </div>
 
-        .card h3 {
-            margin-bottom: 10px;
-        }
+            <div class="card">
+                <h3>🏦 Caja</h3>
+                <p>Administracion de caja</p>
+                <a th:href="@{/web/caja}">Ir al módulo</a>
+            </div>
 
-        .card a {
-            text-decoration: none;
-            color: white;
-            font-weight: bold;
-            display: inline-block;
-            margin-top: 10px;
-        }
+            <div class="card">
+                <h3>🏦 Cuentas Corrientes</h3>
+                <p>Administracion de cuentas corrientes</p>
+                <a th:href="@{/web/cuentas}">Ir al módulo</a>
+            </div>
 
-        footer {
-            text-align: center;
-            margin-top: 40px;
-            color: #9ca3af;
-            font-size: .8rem;
-        }
-    </style>
-</head>
-<body>
+            <div class="card">
+                <h3> Dashboard </h3>
+                <p>Administracion de estadisticas </p>
+                <a th:href="@{/web/dashboard}">Ir al módulo</a>
+            </div>
 
-<header>
-    <img src="/logo-br.jpeg" alt="Logo">
-    <h2>Breaking Rules Stock</h2>
-</header>
-
-<div class="container">
-
-    <div class="card">
-        <h3>📦 Productos</h3>
-        <p>Gestión de stock y catálogo</p>
-        <a th:href="@{/web/productos}">Ir al módulo</a>
-    </div>
-
-    <div class="card">
-        <h3>🚚 Proveedores</h3>
-        <p>Alta y administración de proveedores</p>
-        <a th:href="@{/web/proveedores}">Ir al módulo</a>
-    </div>
-
-    <div class="card">
-        <h3> Clientes</h3>
-        <p>Alta y administración de clientes</p>
-        <a th:href="@{/web/clientes}">Ir al módulo</a>
-    </div>
-
-    <div class="card">
-        <h3>🧾 Ventas</h3>
-        <p>Administracion de ventas</p>
-        <a th:href="@{/web/ventas}">Ir al módulo</a>
-    </div>
-
-    <div class="card">
-        <h3>🏦 Caja</h3>
-        <p>Administracion de caja</p>
-        <a th:href="@{/web/caja}">Ir al módulo</a>
-    </div>
-
-    <div class="card">
-        <h3>🏦 Cuentas Corrientes</h3>
-        <p>Administracion de cuentas corrientes</p>
-        <a th:href="@{/web/cuentas}">Ir al módulo</a>
-    </div>
-
-    <div class="card">
-        <h3> Dashboard </h3>
-        <p>Administracion de estadisticas </p>
-        <a th:href="@{/web/dashboard}">Ir al módulo</a>
-    </div>
-
-</div>
-
-<footer>© 2026 Breaking Rules — Portfolio</footer>
-
-</body>
+        </div>
+    </section>
 </html>

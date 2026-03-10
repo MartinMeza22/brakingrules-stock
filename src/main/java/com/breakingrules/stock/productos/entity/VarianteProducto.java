@@ -3,6 +3,7 @@ package com.breakingrules.stock.productos.entity;
 
 import jakarta.persistence.*;
 import lombok.*;
+import org.hibernate.annotations.Where;
 
 @Entity
 @Table(
@@ -16,6 +17,7 @@ import lombok.*;
 )
 @Getter
 @Setter
+@Where(clause = "activo = true")
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
@@ -35,4 +37,7 @@ public class VarianteProducto {
     private Talle talle;
 
     private Integer stock;
+
+    @Column(nullable = false)
+    private boolean activo = true;
 }

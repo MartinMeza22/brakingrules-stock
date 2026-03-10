@@ -59,9 +59,13 @@
                 <td th:text="${c.documento}"></td>
                 <td th:text="${c.email}"></td>
                 <td th:text="${c.telefono}"></td>
-                <td>
+                <td th:if="${c.id != 1}">
                     <a th:href="@{'/web/clientes/editar/' + ${c.id}}">Editar</a>
                     <a th:href="@{'/web/clientes/eliminar/' + ${c.id}}">Eliminar</a>
+                </td>
+
+                <td th:if="${c.id == 1}">
+                    Cliente por defecto
                 </td>
             </tr>
             </tbody>
