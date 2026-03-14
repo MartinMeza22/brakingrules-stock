@@ -34,8 +34,6 @@ public class Producto {
     @Column(nullable = false)
     private String nombre;
 
-    @Column(name = "codigo_barras", unique = true)
-    private String codigoBarras;
 
     @Positive(message = "El costo debe ser mayor a 0")
     private BigDecimal costo;

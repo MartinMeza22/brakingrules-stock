@@ -59,16 +59,6 @@ public class ProductoServiceImpl implements ProductoService {
 
         validarProducto(producto);
 
-        // Generar código de barras si no tiene
-        if (producto.getCodigoBarras() == null || producto.getCodigoBarras().isBlank()) {
-            String codigo = generarCodigoBarrasParaProducto(producto.getSku());
-            producto.setCodigoBarras(codigo);
-
-            // Generar la imagen del código de barras
-            generarImagenCodigoBarras(codigo, producto.getSku());
-        }
-
-
         log.info("Producto ID antes de save: {}", producto.getId());
         Producto guardado = repository.save(producto);
 
@@ -186,14 +176,13 @@ public class ProductoServiceImpl implements ProductoService {
 
             StringBuilder csv = new StringBuilder();
 
-            csv.append("ID,SKU,Nombre,CodigoBarras,Costo,PrecioPublico,PrecioMayorista,Activo\n");
+            csv.append("ID,SKU,Nombre,Costo,PrecioPublico,PrecioMayorista,Activo\n");
 
             for (Producto p : productos) {
 
                 csv.append(p.getId()).append(",")
                         .append(p.getSku()).append(",")
                         .append(p.getNombre()).append(",")
-                        .append(p.getCodigoBarras()).append(",")
                         .append(p.getCosto()).append(",")
                         .append(p.getPrecioVentaPublico()).append(",")
                         .append(p.getPrecioVentaMayorista()).append(",")
@@ -228,7 +217,6 @@ public class ProductoServiceImpl implements ProductoService {
                 p.getId(),
                 p.getSku(),
                 p.getNombre(),
-                p.getCodigoBarras(),
                 p.getCosto(),
                 p.getPrecioVentaPublico(),
                 p.getPrecioVentaMayorista(),
@@ -239,35 +227,9 @@ public class ProductoServiceImpl implements ProductoService {
         );
     }
 
-    public void generarImagenCodigoBarras(String codigo, String sku) {
-        try {
-            // Generamos el BitMatrix con el código de barras
-            Code128Writer barcodeWriter = new Code128Writer();
-            BitMatrix bitMatrix = barcodeWriter.encode(codigo, BarcodeFormat.CODE_128, 300, 100);
-
-            // Nos aseguramos de que exista la carpeta /barcodes
-            Path directorio = Paths.get("barcodes");
-            if (!Files.exists(directorio)) {
-                Files.createDirectories(directorio);
-            }
-
-            // Definimos el path completo del archivo de salida
-            Path rutaArchivo = directorio.resolve(sku + ".png");
-
-            // Escribimos la imagen en disco
-            MatrixToImageWriter.writeToPath(bitMatrix, "PNG", rutaArchivo);
-
-        } catch (IOException e) {
-            throw new RuntimeException("Error generando código de barras", e);
-        }
-    }
-
     @Override
     public boolean existeSku(String sku) {
         return repository.existsBySku(sku);
     }
 
-    private String generarCodigoBarrasParaProducto(String sku) {
-        return "BRK-" + sku + "-" + System.currentTimeMillis();
-    }
 }

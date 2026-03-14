@@ -12,4 +12,5 @@ public interface ClienteRepository extends JpaRepository<Cliente, Integer> {
     boolean existsByDocumento(String documento);
     List<Cliente> findByTipoCliente(TipoCliente tipoCliente);
     List<Cliente> findByActivoTrue();
+    List<Cliente> findByTipoClienteAndActivoTrue(TipoCliente tipoCliente);
 }

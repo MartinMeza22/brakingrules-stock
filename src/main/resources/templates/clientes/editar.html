@@ -11,6 +11,8 @@
               th:object="${cliente}"
               method="post">
 
+            <input type="hidden" th:field="*{tipoCliente}" value="MAYORISTA"/>
+
             <input type="hidden" th:field="*{id}"/>
 
             <input th:field="*{nombre}" placeholder="Nombre"/>

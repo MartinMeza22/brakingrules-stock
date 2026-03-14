@@ -49,10 +49,16 @@ public class VarianteProductoServiceImpl implements VarianteProductoService {
                 .orElseThrow(() -> new IllegalArgumentException("Producto no encontrado"));
 
         VarianteProducto variante = new VarianteProducto();
+
         variante.setProducto(producto);
-        variante.setTalle(Talle.valueOf(String.valueOf(talle)));
+        variante.setTalle(talle);
         variante.setColor(color);
         variante.setStock(stockInicial != null ? stockInicial : 0);
+
+        // Generamos código de barras automáticamente
+        variante.setCodigoBarras(
+                generarCodigoBarras(producto.getSku(), color, talle)
+        );
 
         return varianteRepository.save(variante);
     }
@@ -63,7 +69,9 @@ public class VarianteProductoServiceImpl implements VarianteProductoService {
         VarianteProducto variante = varianteRepository.findById(varianteId)
                 .orElseThrow(() -> new RuntimeException("Variante no encontrada"));
 
-        variante.setStock(variante.getStock() + cantidad);
+        int stockActual = variante.getStock() != null ? variante.getStock() : 0;
+
+        variante.setStock(stockActual + cantidad);
 
         varianteRepository.save(variante);
     }
@@ -78,8 +86,10 @@ public class VarianteProductoServiceImpl implements VarianteProductoService {
         VarianteProducto variante = varianteRepository.findById(varianteId)
                 .orElseThrow(() -> new IllegalArgumentException("Variante no encontrada"));
 
+        int stockActual = variante.getStock() != null ? variante.getStock() : 0;
+
         // Permitimos stock negativo como pidió el cliente
-        variante.setStock(variante.getStock() - cantidad);
+        variante.setStock(stockActual - cantidad);
     }
 
     @Override
@@ -89,11 +99,7 @@ public class VarianteProductoServiceImpl implements VarianteProductoService {
             limite = 5;
         }
 
-        Integer finalLimite = limite;
-        return varianteRepository.findAll()
-                .stream()
-                .filter(v -> v.getStock() <= finalLimite)
-                .toList();
+        return varianteRepository.findByStockLessThanEqual(limite);
     }
 
     @Override
@@ -101,7 +107,7 @@ public class VarianteProductoServiceImpl implements VarianteProductoService {
 
         return varianteRepository.findAll()
                 .stream()
-                .mapToInt(VarianteProducto::getStock)
+                .mapToInt(v -> v.getStock() != null ? v.getStock() : 0)
                 .sum();
     }
 
@@ -121,8 +127,16 @@ public class VarianteProductoServiceImpl implements VarianteProductoService {
 
         varianteRepository.save(variante);
     }
+
     @Override
     public void eliminar(Integer id) {
         varianteRepository.deleteById(id);
+    }
+
+    /**
+     * Genera un código de barras único para la variante
+     */
+    private String generarCodigoBarras(String sku, Color color, Talle talle) {
+        return sku + "-" + color.name() + "-" + talle.name();
     }
 }

@@ -69,7 +69,7 @@ public class ClienteServiceImpl implements ClienteService {
     @Override
     public Cliente obtenerClientePublico() {
 
-        return repository.findByTipoCliente(TipoCliente.PUBLICO)
+        return repository.findByTipoClienteAndActivoTrue(TipoCliente.PUBLICO)
                 .stream()
                 .findFirst()
                 .orElseThrow(() -> new RuntimeException("Cliente público no encontrado"));
@@ -78,6 +78,6 @@ public class ClienteServiceImpl implements ClienteService {
     @Override
     public List<Cliente> obtenerMayoristas() {
 
-        return repository.findByTipoCliente(TipoCliente.MAYORISTA);
+        return repository.findByTipoClienteAndActivoTrue(TipoCliente.MAYORISTA);
     }
 }

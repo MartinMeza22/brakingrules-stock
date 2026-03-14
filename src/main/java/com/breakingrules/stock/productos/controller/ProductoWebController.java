@@ -2,15 +2,27 @@ package com.breakingrules.stock.productos.controller;
 
 import com.breakingrules.stock.productos.entity.Producto;
 import com.breakingrules.stock.productos.entity.Talle;
+import com.breakingrules.stock.productos.entity.VarianteProducto;
+import com.breakingrules.stock.productos.service.EtiquetaService;
 import com.breakingrules.stock.productos.service.ProductoService;
 import com.breakingrules.stock.productos.service.ProductoServiceImpl;
+import com.breakingrules.stock.productos.service.VarianteProductoService;
 import com.breakingrules.stock.proveedores.service.ProveedorService;
+import com.google.zxing.BarcodeFormat;
+import com.google.zxing.client.j2se.MatrixToImageWriter;
+import com.google.zxing.common.BitMatrix;
+import com.google.zxing.oned.Code128Writer;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import java.io.ByteArrayOutputStream;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
+import java.util.List;
+
 
 @Controller
 @RequestMapping("/web/productos")
@@ -19,6 +31,8 @@ public class ProductoWebController {
 
     private final ProductoService service;
     private final ProveedorService proveedorService;
+    private final VarianteProductoService varianteProductoService;
+    private final EtiquetaService etiquetaService;
 
     @GetMapping
     public String listar(Model model) {
@@ -80,7 +94,6 @@ public class ProductoWebController {
         Producto existente = service.obtenerEntidadPorId(id);
 
         existente.setNombre(producto.getNombre());
-        existente.setCodigoBarras(producto.getCodigoBarras());
         existente.setPrecioVentaPublico(producto.getPrecioVentaPublico());
         existente.setPrecioVentaMayorista(producto.getPrecioVentaMayorista());
 
@@ -101,4 +114,44 @@ public class ProductoWebController {
         return "redirect:/web/productos";
     }
 
+    @GetMapping(value = "/barcode/{codigo}", produces = MediaType.IMAGE_PNG_VALUE)
+    @ResponseBody
+    public byte[] generarCodigoBarras(@PathVariable String codigo) throws Exception {
+
+        Code128Writer writer = new Code128Writer();
+        BitMatrix bitMatrix = writer.encode(codigo, BarcodeFormat.CODE_128, 300, 100);
+
+        ByteArrayOutputStream pngOutputStream = new ByteArrayOutputStream();
+        MatrixToImageWriter.writeToStream(bitMatrix, "PNG", pngOutputStream);
+
+        return pngOutputStream.toByteArray();
+    }
+    @PostMapping("/guardar/{productoId}")
+    public String guardarVariante(@PathVariable Integer productoId,
+                                  @ModelAttribute VarianteProducto varianteNueva) {
+
+        varianteProductoService.crearVariante(
+                productoId,
+                varianteNueva.getTalle(),
+                varianteNueva.getColor(),
+                varianteNueva.getStock()
+        );
+
+        return "redirect:/web/variantes/" + productoId;
+    }
+
+    @GetMapping("/etiqueta/{id}")
+    public ResponseEntity<byte[]> imprimirEtiqueta(@PathVariable Integer id) throws Exception {
+
+        VarianteProducto variante = varianteProductoService.obtenerPorId(id);
+
+        List<VarianteProducto> lista = List.of(variante);
+
+        byte[] pdf = etiquetaService.generarEtiquetas(lista);
+
+        return ResponseEntity.ok()
+                .header("Content-Disposition", "inline; filename=etiqueta.pdf")
+                .contentType(MediaType.APPLICATION_PDF)
+                .body(pdf);
+    }
 }

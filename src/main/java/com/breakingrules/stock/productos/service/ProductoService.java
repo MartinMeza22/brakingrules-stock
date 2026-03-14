@@ -25,7 +25,6 @@ public interface ProductoService {
 
     Page<ProductoDTO> listarPaginado(int page, int size);
 
-    void generarImagenCodigoBarras(String codigo, String sku);
 
     boolean existeSku(String sku);
 }

@@ -10,7 +10,7 @@
 
         <form th:action="@{/web/ventas/crear}" method="post">
 
-            <select name="clienteId">
+            <select name="clienteId" id="clienteSelect">
 
                 <option th:value="${clientePublico.id}" selected>
                     Consumidor Final
@@ -29,11 +29,40 @@
                 Crear Venta
             </button>
 
-            <a th:href="@{/web/ventas/historial}" style="margin-right:15px;color:#9ca3af;text-decoration:none;">Ir al historial</a>
+            <a th:href="@{/web/ventas/historial}"
+               style="margin-right:15px;color:#9ca3af;text-decoration:none;">
+                Ir al historial
+            </a>
 
         </form>
 
     </div>
+
+    <style>
+        #clienteSelect{
+            display:none;
+        }
+        .item{
+            padding:8px 10px;
+        }
+    </style>
+
+    <script src="https://cdn.jsdelivr.net/npm/tom-select/dist/js/tom-select.complete.min.js"></script>
+
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+
+            new TomSelect("#clienteSelect",{
+                create:false,
+                sortField:{
+                    field:"text",
+                    direction:"asc"
+                },
+                openOnFocus:true
+            });
+
+        });
+    </script>
 
 </section>
 

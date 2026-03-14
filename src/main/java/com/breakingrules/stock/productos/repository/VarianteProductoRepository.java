@@ -25,6 +25,8 @@ public interface VarianteProductoRepository extends JpaRepository<VarianteProduc
             Integer id
     );
 
+    List<VarianteProducto> findByStockLessThanEqual(Integer limite);
+
     List<VarianteProducto> findByActivoTrue();
 
     @Query("SELECT COUNT(v) FROM VarianteProducto v WHERE v.stock <= :umbral AND v.activo = true")

@@ -27,7 +27,8 @@ public class VarianteProducto {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "producto_id")
     private Producto producto;
 
     @Enumerated(EnumType.STRING)
@@ -35,6 +36,9 @@ public class VarianteProducto {
 
     @Enumerated(EnumType.STRING)
     private Talle talle;
+
+    @Column(name = "codigo_barras", unique = true, nullable = false)
+    private String codigoBarras;
 
     private Integer stock;
 
