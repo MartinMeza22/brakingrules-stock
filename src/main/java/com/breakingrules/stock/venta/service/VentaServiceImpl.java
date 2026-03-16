@@ -75,9 +75,9 @@ public class VentaServiceImpl implements VentaService {
         BigDecimal precio;
 
         if(cliente.getTipoCliente() == TipoCliente.MAYORISTA){
-            precio = producto.getPrecioVentaMayorista();
+            precio = producto.getPrecioBaseMayorista();
         }else{
-            precio = producto.getPrecioVentaPublico();
+            precio = producto.getPrecioBasePublico();
         }
         VentaDetalle detalle = new VentaDetalle();
         detalle.setVenta(venta);

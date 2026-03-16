@@ -38,13 +38,29 @@ public class Producto {
     @Positive(message = "El costo debe ser mayor a 0")
     private BigDecimal costo;
 
-    @NotNull(message = "El precio público es obligatorio")
-    @DecimalMin(value = "0.01", message = "El precio público debe ser mayor a 0")
-    private BigDecimal precioVentaPublico;
+    @Column(nullable = false)
+    private BigDecimal precioBasePublico;
 
-    @NotNull(message = "El precio mayorista es obligatorio")
-    @DecimalMin(value = "0.01", message = "El precio mayorista debe ser mayor a 0")
-    private BigDecimal precioVentaMayorista;
+    @Column(nullable = false)
+    private BigDecimal precioBaseMayorista;
+
+    @Column
+    private BigDecimal precioEspecial1Publico; // XXL y XXXL
+
+    @Column
+    private BigDecimal precioEspecial1Mayorista;
+
+    @Column
+    private BigDecimal precioEspecial2Publico; // XXXXL
+
+    @Column
+    private BigDecimal precioEspecial2Mayorista;
+
+    @Column
+    private BigDecimal precioEspecial3Publico; // XXXXXL y XXXXXXL
+
+    @Column
+    private BigDecimal precioEspecial3Mayorista;
 
     private Boolean activo = true;
 
@@ -53,4 +69,16 @@ public class Producto {
 
     @OneToMany(mappedBy = "producto", cascade = CascadeType.ALL)
     private List<VarianteProducto> variantes;
+
+    @Transient
+    public Integer getStockTotal() {
+
+        if (variantes == null) {
+            return 0;
+        }
+
+        return variantes.stream()
+                .mapToInt(v -> v.getStock() != null ? v.getStock() : 0)
+                .sum();
+    }
 }

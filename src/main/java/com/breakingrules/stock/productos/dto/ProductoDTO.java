@@ -1,7 +1,5 @@
 package com.breakingrules.stock.productos.dto;
 
-import com.breakingrules.stock.productos.entity.Talle;
-
 import java.math.BigDecimal;
 
 public class ProductoDTO {
@@ -11,8 +9,8 @@ public class ProductoDTO {
     private String nombre;
 
     private BigDecimal costo;
-    private BigDecimal precioVentaPublico;
-    private BigDecimal precioVentaMayorista;
+    private BigDecimal precioBasePublico;
+    private BigDecimal precioBaseMayorista;
 
 
     private Boolean activo;
@@ -20,13 +18,13 @@ public class ProductoDTO {
     public ProductoDTO() {}
 
     public ProductoDTO(Integer id, String sku, String nombre,
-                       BigDecimal costo, BigDecimal precioVentaPublico, BigDecimal precioVentaMayorista, Boolean activo, String proveedorNombre) {
+                       BigDecimal costo, BigDecimal precioBasePublico, BigDecimal precioBaseMayorista, Boolean activo, String proveedorNombre) {
         this.id = id;
         this.sku = sku;
         this.nombre = nombre;
         this.costo = costo;
-        this.precioVentaPublico = precioVentaPublico;
-        this.precioVentaMayorista = precioVentaMayorista;
+        this.precioBasePublico = precioBasePublico;
+        this.precioBaseMayorista = precioBaseMayorista;
         this.activo = activo;
         this.proveedorNombre = proveedorNombre;
     }
@@ -63,20 +61,20 @@ public class ProductoDTO {
         this.costo = costo;
     }
 
-    public BigDecimal getPrecioVentaPublico() {
-        return precioVentaPublico;
+    public BigDecimal getPrecioBasePublico() {
+        return precioBasePublico;
     }
 
-    public void setPrecioVentaPublico(BigDecimal precioVentaPublico) {
-        this.precioVentaPublico = precioVentaPublico;
+    public void setPrecioBasePublico(BigDecimal precioBasePublico) {
+        this.precioBasePublico = precioBasePublico;
     }
 
-    public BigDecimal getPrecioVentaMayorista() {
-        return precioVentaMayorista;
+    public BigDecimal getPrecioBaseMayorista() {
+        return precioBaseMayorista;
     }
 
-    public void setPrecioVentaMayorista(BigDecimal precioVentaMayorista) {
-        this.precioVentaMayorista = precioVentaMayorista;
+    public void setPrecioBaseMayorista(BigDecimal precioBaseMayorista) {
+        this.precioBaseMayorista = precioBaseMayorista;
     }
 
     public Boolean getActivo() {

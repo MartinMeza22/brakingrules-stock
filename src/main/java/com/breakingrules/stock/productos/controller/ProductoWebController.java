@@ -94,8 +94,20 @@ public class ProductoWebController {
         Producto existente = service.obtenerEntidadPorId(id);
 
         existente.setNombre(producto.getNombre());
-        existente.setPrecioVentaPublico(producto.getPrecioVentaPublico());
-        existente.setPrecioVentaMayorista(producto.getPrecioVentaMayorista());
+        existente.setSku(producto.getSku());
+        existente.setCosto(producto.getCosto());
+
+        existente.setPrecioBasePublico(producto.getPrecioBasePublico());
+        existente.setPrecioBaseMayorista(producto.getPrecioBaseMayorista());
+
+        existente.setPrecioEspecial1Publico(producto.getPrecioEspecial1Publico());
+        existente.setPrecioEspecial1Mayorista(producto.getPrecioEspecial1Mayorista());
+
+        existente.setPrecioEspecial2Publico(producto.getPrecioEspecial2Publico());
+        existente.setPrecioEspecial2Mayorista(producto.getPrecioEspecial2Mayorista());
+
+        existente.setPrecioEspecial3Publico(producto.getPrecioEspecial3Publico());
+        existente.setPrecioEspecial3Mayorista(producto.getPrecioEspecial3Mayorista());
 
         if (proveedorId != null) {
             existente.setProveedor(proveedorService.obtenerPorId(proveedorId));
@@ -126,6 +138,7 @@ public class ProductoWebController {
 
         return pngOutputStream.toByteArray();
     }
+
     @PostMapping("/guardar/{productoId}")
     public String guardarVariante(@PathVariable Integer productoId,
                                   @ModelAttribute VarianteProducto varianteNueva) {

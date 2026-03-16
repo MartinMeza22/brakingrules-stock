@@ -21,6 +21,17 @@
                 </option>
             </select>
 
+            <input type="number"
+                   step="0.01"
+                   th:field="*{precioPublicoFinal}"
+                   placeholder="Precio Público"/>
+
+            <input type="number"
+                   step="0.01"
+                   th:field="*{precioMayoristaFinal}"
+                   placeholder="Precio Mayorista"/>
+
+
             <button type="submit">Guardar</button>
 
         </form>

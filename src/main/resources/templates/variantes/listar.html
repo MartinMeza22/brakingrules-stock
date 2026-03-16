@@ -1,36 +1,61 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org"
-      th:replace="layout/base :: layout(~{::section}, 'Variantes')">
+      th:replace="~{layout/base :: layout(~{::section}, 'Variantes')}">
 
 <section>
 
     <div class="card">
         <h3 th:text="'➕ Nueva variante para: ' + ${producto.nombre}"></h3>
 
-        <form th:action="@{'/web/productos/guardar/' + ${producto.id}}"
-              th:object="${varianteNueva}"
+        <form th:action="@{'/web/variantes/guardar-multiple/' + ${producto.id}}"
               method="post">
 
-            <select th:field="*{color}">
+            <select name="color" id="colorSelect">
+
                 <option value="">Color</option>
-                <option th:each="c : ${colores}"
+
+                <option th:each="c : ${T(com.breakingrules.stock.productos.entity.Color).values()}"
                         th:value="${c}"
                         th:text="${c}">
                 </option>
+
             </select>
 
-            <select th:field="*{talle}">
-                <option value="">Talle</option>
-                <option th:each="t : ${talles}"
-                        th:value="${t}"
-                        th:text="${t}">
-                </option>
-            </select>
+            <div id="tallesContainer" style="display:none">
 
-            <input type="number" th:field="*{stock}" placeholder="Stock"/>
+                <table>
+                    <tr>
+                        <th>Talle</th>
+                        <th>Crear/Agregar</th>
+                        <th>Stock</th>
+                    </tr>
 
-            <button type="submit">Guardar</button>
+                    <tr th:each="t : ${talles}">
+
+                        <td th:text="${t}"></td>
+
+                        <td>
+                            <input type="checkbox"
+                                   name="tallesSeleccionados"
+                                   th:value="${t}">
+                        </td>
+
+                        <td>
+                            <input type="number"
+                                   th:name="'stock[' + ${t} + ']'"
+                                   placeholder="Stock">
+                        </td>
+
+                    </tr>
+
+                </table>
+
+            </div>
+
+            <button type="submit">Guardar variantes</button>
+
         </form>
+
     </div>
 
 
@@ -38,11 +63,15 @@
         <h3>Variantes</h3>
 
         <input class="buscador-tabla" placeholder="Buscar...">
+
         <table class="tabla-buscable" th:if="${!variantes.isEmpty()}">
+
             <thead>
             <tr>
                 <th>Color</th>
                 <th>Talle</th>
+                <th>Precio Público</th>
+                <th>Precio Mayorista</th>
                 <th>Stock</th>
                 <th>Código</th>
                 <th style="text-align:center">Barcode</th>
@@ -51,14 +80,33 @@
             </thead>
 
             <tbody>
+
             <tr th:each="v : ${variantes}">
 
                 <td th:text="${v.color}"></td>
 
                 <td th:text="${v.talle}"></td>
 
+                <td>
+                    <div th:text="${v.precioPublicoFinal}"></div>
+
+                    <small style="color:orange"
+                           th:if="${v.usaPrecioHeredado}">
+                        ⚠ Usa precio del talle anterior
+                    </small>
+                </td>
+
+                <td>
+                    <div th:text="${v.precioMayoristaFinal}"></div>
+
+                    <small style="color:orange"
+                           th:if="${v.usaPrecioHeredado}">
+                        ⚠ Usa precio del talle anterior
+                    </small>
+                </td>
+
                 <td th:classappend="${v.stock <= 5} ? 'stock-bajo'"
-                    th:text="${v.stock}">
+                    th:text="${v.stock}" min="0">
                 </td>
 
                 <td>
@@ -74,10 +122,13 @@
 
                     </div>
                 </td>
+
                 <td>
+
                     <div th:if="${error}" style="color:red">
                         <p th:text="${error}"></p>
                     </div>
+
                     <form th:action="@{/web/variantes/ingresar-stock}" method="post" style="display:inline">
 
                         <input type="hidden" name="varianteId" th:value="${v.id}" />
@@ -85,11 +136,13 @@
                         <input type="number" name="cantidad" placeholder="+ stock" style="width:80px"/>
 
                         <button type="submit" class="btn-mas">➕</button>
+
                     </form>
 
                 </td>
 
                 <td>
+
                     <a th:href="@{'/web/productos/etiqueta/' + ${v.id}}">
                         Imprimir etiqueta
                     </a>
@@ -105,13 +158,40 @@
                 </td>
 
             </tr>
+
             </tbody>
+
         </table>
 
         <a th:href="@{/web/productos}">
             ← Volver a productos
         </a>
+
     </div>
 
+    <script>
+
+        document.addEventListener("DOMContentLoaded", function(){
+
+            const colorSelect = document.getElementById("colorSelect");
+            const talles = document.getElementById("tallesContainer");
+
+            if(!colorSelect) return;
+
+            colorSelect.addEventListener("change", function(){
+
+                if(this.value){
+                    talles.style.display = "block";
+                }else{
+                    talles.style.display = "none";
+                }
+
+            });
+
+        });
+
+    </script>
+
 </section>
+
 </html>

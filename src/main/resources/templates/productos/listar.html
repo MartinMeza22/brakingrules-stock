@@ -36,25 +36,51 @@
                  th:errors="*{nombre}">
             </div>
 
+            <h4>Precios Base (S a XL)</h4>
 
             <input type="number" step="0.01"
-                   th:field="*{precioVentaPublico}"
+                   th:field="*{precioBasePublico}"
                    placeholder="Precio Público"/>
 
-            <div class="error"
-                 th:if="${#fields.hasErrors('precioVentaPublico')}"
-                 th:errors="*{precioVentaPublico}">
-            </div>
-
-
             <input type="number" step="0.01"
-                   th:field="*{precioVentaMayorista}"
+                   th:field="*{precioBaseMayorista}"
                    placeholder="Precio Mayorista"/>
 
-            <div class="error"
-                 th:if="${#fields.hasErrors('precioVentaMayorista')}"
-                 th:errors="*{precioVentaMayorista}">
-            </div>
+
+            <h4>Precios Especiales</h4>
+
+            <label>XXL / XXXL</label>
+
+            <input type="number" step="0.01"
+                   th:field="*{precioEspecial1Publico}"
+                   placeholder="Precio Público"/>
+
+            <input type="number" step="0.01"
+                   th:field="*{precioEspecial1Mayorista}"
+                   placeholder="Precio Mayorista"/>
+
+
+            <label>XXXXL</label>
+
+            <input type="number" step="0.01"
+                   th:field="*{precioEspecial2Publico}"
+                   placeholder="Precio Público"/>
+
+            <input type="number" step="0.01"
+                   th:field="*{precioEspecial2Mayorista}"
+                   placeholder="Precio Mayorista"/>
+
+
+            <label>XXXXXL / XXXXXXL</label>
+
+            <input type="number" step="0.01"
+                   th:field="*{precioEspecial3Publico}"
+                   placeholder="Precio Público"/>
+
+            <input type="number" step="0.01"
+                   th:field="*{precioEspecial3Mayorista}"
+                   placeholder="Precio Mayorista"/>
+
 
             <select name="proveedorId">
                 <option value="">Sin proveedor</option>
@@ -64,7 +90,9 @@
                         th:text="${prov.nombre}">
                 </option>
             </select>
+
             <button type="submit">Guardar</button>
+
         </form>
 
     </div>
@@ -79,6 +107,7 @@
                 <th>Nombre</th>
                 <th>Precio Publico</th>
                 <th>Precio Mayorista</th>
+                <th>Stock</th>
                 <th>Acciones</th>
             </tr>
             </thead>
@@ -87,8 +116,9 @@
             <tr th:each="p : ${productos}">
                 <td th:text="${p.sku}"></td>
                 <td th:text="${p.nombre}"></td>
-                <td th:text="${p.precioVentaPublico}"></td>
-                <td th:text="${p.precioVentaMayorista}"></td>
+                <td th:text="${p.precioBasePublico}"></td>
+                <td th:text="${p.precioBaseMayorista}"></td>
+<!--                <td th:text="${p.stockTotal}"></td>-->
                 <td>
                     <a th:href="@{'/web/variantes/' + ${p.id}}">Ver variantes</a>
                     <a th:href="@{'/web/productos/editar/' + ${p.id}}">Editar</a>

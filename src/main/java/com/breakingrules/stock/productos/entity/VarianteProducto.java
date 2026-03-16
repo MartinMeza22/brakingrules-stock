@@ -2,8 +2,12 @@ package com.breakingrules.stock.productos.entity;
 
 
 import jakarta.persistence.*;
+import jakarta.validation.constraints.DecimalMin;
+import jakarta.validation.constraints.NotNull;
 import lombok.*;
 import org.hibernate.annotations.Where;
+
+import java.math.BigDecimal;
 
 @Entity
 @Table(
@@ -17,7 +21,6 @@ import org.hibernate.annotations.Where;
 )
 @Getter
 @Setter
-@Where(clause = "activo = true")
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
@@ -42,6 +45,117 @@ public class VarianteProducto {
 
     private Integer stock;
 
+
     @Column(nullable = false)
     private boolean activo = true;
+
+
+    @Transient
+    public BigDecimal getPrecioPublicoFinal() {
+
+        if (producto == null || talle == null) {
+            return BigDecimal.ZERO;
+        }
+
+        switch (talle) {
+
+            case XXL:
+            case XXXL:
+                return producto.getPrecioEspecial1Publico() != null
+                        ? producto.getPrecioEspecial1Publico()
+                        : producto.getPrecioBasePublico();
+
+            case XXXXL:
+                if (producto.getPrecioEspecial2Publico() != null) {
+                    return producto.getPrecioEspecial2Publico();
+                }
+                if (producto.getPrecioEspecial1Publico() != null) {
+                    return producto.getPrecioEspecial1Publico();
+                }
+                return producto.getPrecioBasePublico();
+
+            case XXXXXL:
+            case XXXXXXL:
+                if (producto.getPrecioEspecial3Publico() != null) {
+                    return producto.getPrecioEspecial3Publico();
+                }
+                if (producto.getPrecioEspecial2Publico() != null) {
+                    return producto.getPrecioEspecial2Publico();
+                }
+                if (producto.getPrecioEspecial1Publico() != null) {
+                    return producto.getPrecioEspecial1Publico();
+                }
+                return producto.getPrecioBasePublico();
+
+            default:
+                return producto.getPrecioBasePublico();
+        }
+    }
+
+    @Transient
+    public BigDecimal getPrecioMayoristaFinal() {
+
+        if (producto == null || talle == null) {
+            return BigDecimal.ZERO;
+        }
+
+        switch (talle) {
+
+            case XXL:
+            case XXXL:
+                return producto.getPrecioEspecial1Mayorista() != null
+                        ? producto.getPrecioEspecial1Mayorista()
+                        : producto.getPrecioBaseMayorista();
+
+            case XXXXL:
+                if (producto.getPrecioEspecial2Mayorista() != null) {
+                    return producto.getPrecioEspecial2Mayorista();
+                }
+                if (producto.getPrecioEspecial1Mayorista() != null) {
+                    return producto.getPrecioEspecial1Mayorista();
+                }
+                return producto.getPrecioBaseMayorista();
+
+            case XXXXXL:
+            case XXXXXXL:
+                if (producto.getPrecioEspecial3Mayorista() != null) {
+                    return producto.getPrecioEspecial3Mayorista();
+                }
+                if (producto.getPrecioEspecial2Mayorista() != null) {
+                    return producto.getPrecioEspecial2Mayorista();
+                }
+                if (producto.getPrecioEspecial1Mayorista() != null) {
+                    return producto.getPrecioEspecial1Mayorista();
+                }
+                return producto.getPrecioBaseMayorista();
+
+            default:
+                return producto.getPrecioBaseMayorista();
+        }
+    }
+
+    @Transient
+    public boolean usaPrecioHeredado() {
+
+        if (this.talle == null || this.producto == null) {
+            return false;
+        }
+
+        switch (this.talle) {
+
+            case XXL:
+            case XXXL:
+                return producto.getPrecioEspecial1Publico() == null;
+
+            case XXXXL:
+                return producto.getPrecioEspecial2Publico() == null;
+
+            case XXXXXL:
+            case XXXXXXL:
+                return producto.getPrecioEspecial3Publico() == null;
+
+            default:
+                return false;
+        }
+    }
 }

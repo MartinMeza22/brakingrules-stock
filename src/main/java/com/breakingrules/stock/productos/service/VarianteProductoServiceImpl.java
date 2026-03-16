@@ -9,6 +9,7 @@ import com.breakingrules.stock.productos.repository.VarianteProductoRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.math.BigDecimal;
 import java.util.List;
 
 @Service
@@ -48,21 +49,37 @@ public class VarianteProductoServiceImpl implements VarianteProductoService {
         Producto producto = productoRepository.findById(productoId)
                 .orElseThrow(() -> new IllegalArgumentException("Producto no encontrado"));
 
+        VarianteProducto existente = varianteRepository
+                .findByProductoIdAndColorAndTalle(productoId, color, talle)
+                .orElse(null);
+
+        if (existente != null) {
+
+            int stockActual = existente.getStock() != null ? existente.getStock() : 0;
+
+            existente.setStock(stockActual + (stockInicial != null ? stockInicial : 0));
+
+            return varianteRepository.save(existente);
+        }
+
         VarianteProducto variante = new VarianteProducto();
 
         variante.setProducto(producto);
         variante.setTalle(talle);
         variante.setColor(color);
-        variante.setStock(stockInicial != null ? stockInicial : 0);
 
-        // Generamos código de barras automáticamente
+        if (stockInicial == null || stockInicial <= 0) {
+            stockInicial = 0;
+        }
+
+        variante.setStock(stockInicial);
+
         variante.setCodigoBarras(
                 generarCodigoBarras(producto.getSku(), color, talle)
         );
 
         return varianteRepository.save(variante);
     }
-
     @Override
     public void ingresarStock(Integer varianteId, Integer cantidad) {
 
@@ -125,6 +142,16 @@ public class VarianteProductoServiceImpl implements VarianteProductoService {
             throw new RuntimeException("Ya existe una variante con ese color y talle");
         }
 
+        if (variante.getPrecioPublicoFinal() == null ||
+                variante.getPrecioPublicoFinal().compareTo(BigDecimal.ZERO) <= 0) {
+            throw new RuntimeException("Precio público inválido");
+        }
+
+        if (variante.getPrecioMayoristaFinal() == null ||
+                variante.getPrecioMayoristaFinal().compareTo(BigDecimal.ZERO) <= 0) {
+            throw new RuntimeException("Precio mayorista inválido");
+        }
+
         varianteRepository.save(variante);
     }
 
@@ -139,4 +166,5 @@ public class VarianteProductoServiceImpl implements VarianteProductoService {
     private String generarCodigoBarras(String sku, Color color, Talle talle) {
         return sku + "-" + color.name() + "-" + talle.name();
     }
+
 }

@@ -4,6 +4,7 @@ import com.breakingrules.stock.productos.entity.Color;
 import com.breakingrules.stock.productos.entity.Talle;
 import com.breakingrules.stock.productos.entity.VarianteProducto;
 
+import java.math.BigDecimal;
 import java.util.List;
 
 public interface VarianteProductoService {

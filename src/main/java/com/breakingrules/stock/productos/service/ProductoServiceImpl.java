@@ -111,16 +111,15 @@ public class ProductoServiceImpl implements ProductoService {
             throw new IllegalArgumentException("El nombre es obligatorio");
         }
 
-        if (producto.getPrecioVentaPublico() == null ||
-                producto.getPrecioVentaPublico().compareTo(BigDecimal.ZERO) <= 0) {
-            throw new IllegalArgumentException("El precio de venta publico debe ser mayor a 0");
+        if (producto.getPrecioBasePublico() == null ||
+                producto.getPrecioBasePublico().compareTo(BigDecimal.ZERO) <= 0) {
+            throw new IllegalArgumentException("El precio público base debe ser mayor a 0");
         }
 
-        if (producto.getPrecioVentaMayorista() == null ||
-                producto.getPrecioVentaMayorista().compareTo(BigDecimal.ZERO) <= 0) {
-            throw new IllegalArgumentException("El precio de venta Mayorista debe ser mayor a 0");
+        if (producto.getPrecioBaseMayorista() == null ||
+                producto.getPrecioBaseMayorista().compareTo(BigDecimal.ZERO) <= 0) {
+            throw new IllegalArgumentException("El precio mayorista base debe ser mayor a 0");
         }
-
 
         if (producto.getCosto() != null &&
                 producto.getCosto().compareTo(BigDecimal.ZERO) < 0) {
@@ -176,7 +175,7 @@ public class ProductoServiceImpl implements ProductoService {
 
             StringBuilder csv = new StringBuilder();
 
-            csv.append("ID,SKU,Nombre,Costo,PrecioPublico,PrecioMayorista,Activo\n");
+            csv.append("ID,SKU,Nombre,Costo,PrecioBasePublico,PrecioBaseMayorista,Activo\n");
 
             for (Producto p : productos) {
 
@@ -184,8 +183,8 @@ public class ProductoServiceImpl implements ProductoService {
                         .append(p.getSku()).append(",")
                         .append(p.getNombre()).append(",")
                         .append(p.getCosto()).append(",")
-                        .append(p.getPrecioVentaPublico()).append(",")
-                        .append(p.getPrecioVentaMayorista()).append(",")
+                        .append(p.getPrecioBasePublico()).append(",")
+                        .append(p.getPrecioBaseMayorista()).append(",")
                         .append(p.getActivo())
                         .append("\n");
             }
@@ -218,8 +217,8 @@ public class ProductoServiceImpl implements ProductoService {
                 p.getSku(),
                 p.getNombre(),
                 p.getCosto(),
-                p.getPrecioVentaPublico(),
-                p.getPrecioVentaMayorista(),
+                p.getPrecioBasePublico(),
+                p.getPrecioBaseMayorista(),
                 p.getActivo(),
                 p.getProveedor() != null
                         ? p.getProveedor().getNombre()

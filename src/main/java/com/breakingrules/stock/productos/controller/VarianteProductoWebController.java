@@ -12,6 +12,10 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
+import java.math.BigDecimal;
+import java.util.List;
+import java.util.Map;
+
 @Controller
 @RequestMapping("/web/variantes")
 @RequiredArgsConstructor
@@ -27,7 +31,14 @@ public class VarianteProductoWebController {
             @RequestParam Talle talle,
             @RequestParam Integer stockInicial
     ) {
-        varianteService.crearVariante(productoId, talle, color, stockInicial);
+
+        varianteService.crearVariante(
+                productoId,
+                talle,
+                color,
+                stockInicial
+        );
+
         return "redirect:/web/variantes/" + productoId;
     }
 
@@ -111,10 +122,42 @@ public class VarianteProductoWebController {
 
         existente.setColor(variante.getColor());
         existente.setTalle(variante.getTalle());
-
         varianteService.guardar(existente);
 
         Integer productoId = existente.getProducto().getId();
+
+        return "redirect:/web/variantes/" + productoId;
+    }
+
+
+    @PostMapping("/guardar-multiple/{productoId}")
+    public String guardarMultiples(
+            @PathVariable Integer productoId,
+            @RequestParam Color color,
+            @RequestParam(required = false) List<Talle> tallesSeleccionados,
+            @RequestParam Map<String, String> stock
+    ) {
+
+        if (tallesSeleccionados != null) {
+
+            for (Talle talle : tallesSeleccionados) {
+
+                String valor = stock.get("stock[" + talle.name() + "]");
+
+                Integer cantidad = 0;
+
+                if (valor != null && !valor.isBlank()) {
+                    cantidad = Integer.parseInt(valor);
+                }
+
+                varianteService.crearVariante(
+                        productoId,
+                        talle,
+                        color,
+                        cantidad
+                );
+            }
+        }
 
         return "redirect:/web/variantes/" + productoId;
     }

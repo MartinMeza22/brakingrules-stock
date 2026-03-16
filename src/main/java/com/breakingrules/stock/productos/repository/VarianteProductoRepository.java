@@ -9,6 +9,7 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
+import java.util.Optional;
 
 @Repository
 public interface VarianteProductoRepository extends JpaRepository<VarianteProducto, Integer> {
@@ -39,4 +40,10 @@ public interface VarianteProductoRepository extends JpaRepository<VarianteProduc
     ORDER BY v.stock ASC
     """)
         List<VarianteProducto> productosStockBajo(@Param("limite") Integer limite);
+
+    Optional<VarianteProducto> findByProductoIdAndColorAndTalle(
+            Integer productoId,
+            Color color,
+            Talle talle
+    );
 }

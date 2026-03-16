@@ -9,12 +9,12 @@ public class PrecioValidoValidator implements ConstraintValidator<PrecioValido, 
     @Override
     public boolean isValid(Producto producto, ConstraintValidatorContext context) {
 
-        if (producto.getPrecioVentaPublico() == null ||
-                producto.getPrecioVentaMayorista() == null) {
+        if (producto.getPrecioBasePublico() == null ||
+                producto.getPrecioBaseMayorista() == null) {
             return true;
         }
 
-        return producto.getPrecioVentaPublico()
-                .compareTo(producto.getPrecioVentaMayorista()) >= 0;
+        return producto.getPrecioBasePublico()
+                .compareTo(producto.getPrecioBaseMayorista()) >= 0;
     }
 }
