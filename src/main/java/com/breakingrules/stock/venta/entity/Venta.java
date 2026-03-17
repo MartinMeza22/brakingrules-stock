@@ -35,6 +35,9 @@ public class Venta {
         @JoinColumn(name = "cliente_id", nullable = false)
         private Cliente cliente;
 
+        @Column
+        private String nombreClienteMostrador;
+
         @PrePersist
         public void prePersist() {
 
@@ -51,5 +54,19 @@ public class Venta {
                 if (this.descuento == null) {
                         this.descuento = BigDecimal.ZERO;
                 }
+        }
+
+        public String getNombreClienteMostrar() {
+
+                if(cliente.getTipoCliente().name().equals("PUBLICO")){
+
+                        if(nombreClienteMostrador != null && !nombreClienteMostrador.isBlank()){
+                                return nombreClienteMostrador;
+                        }
+
+                        return "Varios";
+                }
+
+                return cliente.getNombre() + " " + cliente.getApellido();
         }
 }

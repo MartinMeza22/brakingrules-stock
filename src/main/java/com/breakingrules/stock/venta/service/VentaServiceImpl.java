@@ -45,8 +45,10 @@ public class VentaServiceImpl implements VentaService {
         this.varianteService = varianteService;
         this.cuentaCorrienteService = cuentaCorrienteService;
     }
+
+
     @Override
-    public Venta crearVenta(Integer clienteId) {
+    public Venta crearVenta(Integer clienteId, String nombreCliente) {
 
         Cliente cliente = clienteRepository.findById(clienteId)
                 .orElseThrow(() -> new RuntimeException("Cliente no encontrado"));
@@ -57,8 +59,19 @@ public class VentaServiceImpl implements VentaService {
         venta.setEstado(EstadoVenta.ABIERTA);
         venta.setTotal(BigDecimal.ZERO);
 
+        // si es cliente público
+        if(cliente.getTipoCliente() == TipoCliente.PUBLICO){
+
+            if(nombreCliente == null || nombreCliente.isBlank()){
+                nombreCliente = "Varios";
+            }
+
+            venta.setNombreClienteMostrador(nombreCliente);
+        }
+
         return ventaRepository.save(venta);
     }
+
 
     @Override
     public void agregarProducto(Integer ventaId, Integer varianteId, Integer cantidad) {

@@ -39,12 +39,16 @@ public class VentaWebController {
     }
 
     @PostMapping("/crear")
-    public String crearVenta(@RequestParam Integer clienteId) {
+    public String crearVenta(
+            @RequestParam Integer clienteId,
+            @RequestParam(required = false) String nombreCliente
+    ) {
 
-        Venta venta = ventaService.crearVenta(clienteId);
+        Venta venta = ventaService.crearVenta(clienteId, nombreCliente);
 
         return "redirect:/web/ventas/" + venta.getId();
     }
+
 
     @GetMapping("/{ventaId}")
     public String verVenta(@PathVariable Integer ventaId, Model model) {

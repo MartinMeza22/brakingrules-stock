@@ -10,20 +10,50 @@
 
         <form th:action="@{/web/ventas/crear}" method="post">
 
-            <select name="clienteId" id="clienteSelect">
+            <div class="campo">
 
-                <option th:value="${clientePublico.id}" selected>
-                    Consumidor Final
-                </option>
+                <label>Buscar cliente</label>
 
-                <option disabled>------------------------</option>
+                <input type="text"
+                       id="buscarCliente"
+                       placeholder="Buscar cliente...">
 
-                <option th:each="c : ${mayoristas}"
-                        th:value="${c.id}"
-                        th:text="${c.nombre + ' ' + c.apellido}">
-                </option>
+                <label style="margin-top:10px;">Cliente</label>
 
-            </select>
+                <select name="clienteId" id="clienteSelect" size="6">
+
+                    <option th:value="${clientePublico.id}">
+                        Varios
+                    </option>
+
+                    <option th:each="c : ${mayoristas}"
+                            th:value="${c.id}"
+                            th:text="${c.nombre + ' ' + c.apellido}">
+                    </option>
+
+                </select>
+
+                <div class="cliente-preview-box">
+                    <span class="cliente-preview-label">El cliente seleccionado es:</span>
+                    <div id="clientePreview" class="cliente-preview varios">
+                        Varios
+                    </div>
+                </div>
+            </div>
+
+
+            <div id="nombreClienteContainer">
+
+                <label>Nombre cliente (opcional)</label>
+
+                <input type="text"
+                       name="nombreCliente"
+                       placeholder="Ej: Juan">
+
+                <small>Si queda vacío se registrará como "Varios"</small>
+
+            </div>
+
 
             <button class="btn-accion" type="submit">
                 Crear Venta
@@ -38,30 +68,110 @@
 
     </div>
 
+
     <style>
+
+        #buscarCliente{
+        width:100%;
+        padding:8px;
+        margin-bottom:8px;
+        }
+
         #clienteSelect{
-            display:none;
+        width:100%;
         }
-        .item{
-            padding:8px 10px;
+
+        #nombreClienteContainer{
+        margin-top:10px;
         }
+
+        #nombreClienteContainer input{
+        width:100%;
+        padding:8px;
+        }
+
     </style>
 
-    <script src="https://cdn.jsdelivr.net/npm/tom-select/dist/js/tom-select.complete.min.js"></script>
 
     <script>
-        document.addEventListener("DOMContentLoaded", function () {
 
-            new TomSelect("#clienteSelect",{
-                create:false,
-                sortField:{
-                    field:"text",
-                    direction:"asc"
-                },
-                openOnFocus:true
-            });
+        document.addEventListener("DOMContentLoaded", function(){
+
+        const buscar = document.getElementById("buscarCliente");
+        const select = document.getElementById("clienteSelect");
+        const preview = document.getElementById("clientePreview");
+        const nombreInput = document.querySelector("input[name='nombreCliente']");
+        const nombreClienteContainer = document.getElementById("nombreClienteContainer");
+
+        function toggleNombreCliente(){
+
+        const texto = select.options[select.selectedIndex].text;
+
+        if(texto === "Varios"){
+        nombreClienteContainer.style.display="block";
+        }else{
+        nombreClienteContainer.style.display="none";
+        }
+
+        }
+
+        function actualizarPreview(){
+
+        const texto = select.options[select.selectedIndex].text;
+        const nombreExtra = nombreInput.value.trim();
+
+        preview.classList.remove("mayorista","varios","personalizado");
+
+        if(texto === "Varios"){
+
+        if(nombreExtra){
+        preview.textContent = nombreExtra;
+        preview.classList.add("personalizado");
+        }else{
+        preview.textContent = "Varios";
+        preview.classList.add("varios");
+        }
+
+        }else{
+
+        preview.textContent = texto;
+        preview.classList.add("mayorista");
+
+        }
+
+        }
+
+        buscar.addEventListener("input", function(){
+
+        const filtro = buscar.value.toLowerCase();
+
+        Array.from(select.options).forEach(option => {
+
+        const texto = option.text.toLowerCase();
+
+        option.style.display =
+        texto.includes(filtro)
+        ? "block"
+        : "none";
 
         });
+
+        });
+
+        select.addEventListener("change", function(){
+
+        toggleNombreCliente();
+        actualizarPreview();
+
+        });
+
+        nombreInput.addEventListener("input", actualizarPreview);
+
+        toggleNombreCliente();
+        actualizarPreview();
+
+        });
+
     </script>
 
 </section>

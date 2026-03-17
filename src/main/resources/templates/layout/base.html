@@ -37,10 +37,11 @@
         color: var(--primary);
     }
 
-    .container {
-        max-width: 1100px;
-        margin: 40px auto;
-        padding: 0 20px;
+    .container{
+        max-width:1100px;
+        margin:40px auto;
+        padding:0 20px;
+        box-sizing:border-box;
     }
 
     .card {
@@ -447,22 +448,6 @@
         font-weight:bold;
     }
 
-    .ts-wrapper .ts-control{
-
-    background:#020617;
-
-    border:1px solid var(--border);
-
-    border-radius:8px;
-
-    color:white;
-
-    padding:6px 10px;
-
-    font-size:13px;
-
-    }
-
     .ts-wrapper .ts-control input{
 
         color:white;
@@ -489,14 +474,10 @@
 
     }
 
-    #clienteSelect {
-        display: none;
-    }
-
     .ts-wrapper{
-    width:100%;
-    margin-bottom:12px;
-}
+        width:100%;
+        margin-bottom:12px;
+    }
 
 .ts-control{
 
@@ -554,6 +535,246 @@
 
         background:rgba(59,130,246,0.25);
 
+    }
+
+    .form-venta{
+        display:flex;
+        flex-direction:column;
+        gap:20px;
+        width:100%;
+    }
+
+    .campo{
+        display:flex;
+        flex-direction:column;
+        gap:6px;
+        width:100%;
+    }
+
+    .campo label{
+        font-weight:600;
+    }
+
+    .campo input{
+        padding:8px 10px;
+        border-radius:6px;
+        border:1px solid #d1d5db;
+    }
+
+    .campo small{
+        color:#6b7280;
+        font-size:12px;
+    }
+
+    .acciones{
+        display:flex;
+        align-items:center;
+        gap:15px;
+        margin-top:5px;
+    }
+
+
+    .cliente-preview.mayorista{
+        background:#e5e7eb;
+        color:#111827;
+    }
+
+    .cliente-preview.varios{
+        background:#f3f4f6;
+        color:#6b7280;
+    }
+
+    .cliente-preview.personalizado{
+        background:#d1fae5;
+        color:#065f46;
+    }
+
+    .ts-control{
+        width:100%;
+    }
+
+    .ts-wrapper{
+        max-width:100%;
+    }
+
+    .ts-dropdown{
+        max-width:100%;
+    }
+
+    .ts-wrapper.single .ts-control{
+        padding:8px 10px;
+    }
+
+    .cliente-preview{
+
+        margin-top:8px;
+
+        padding:10px 14px;
+
+        font-size:16px;
+
+        font-weight:700;
+
+        border-radius:8px;
+
+        width:100%;
+
+    }
+
+    .form-venta input,
+    .form-venta .ts-wrapper,
+    .form-venta .cliente-preview{
+        width:100%;
+    }
+
+    .campo{
+        width:100%;
+    }
+
+    .ts-wrapper,
+    .ts-control{
+        width:100% !important;
+    }
+
+    .container{
+        overflow-x:hidden;
+    }
+
+    .container{
+        overflow-x:hidden;
+    }
+
+    .cliente-preview{
+        margin-top:8px;
+        padding:10px 14px;
+
+        font-size:16px;
+        font-weight:700;
+
+        border-radius:8px;
+
+        width:fit-content;
+    }
+
+    .ts-control{
+
+        width:100%;
+
+        padding:10px 10px;
+
+        box-sizing:border-box;
+
+        background:#020617;
+
+        border:1px solid var(--border);
+
+        border-radius:6px;
+
+        color:white;
+
+        font-size:13px;
+
+        min-height:auto;
+
+    }
+
+    .ts-control input{
+
+        background:transparent;
+
+        border:none;
+
+        padding:0;
+
+        margin:0;
+
+        color:white;
+
+        font-size:13px;
+
+    }
+
+    .ts-wrapper{
+    width:100%;
+}
+
+    .ts-control{
+
+        width:100%;
+
+        padding:10px 10px;
+
+        background:#020617;
+
+        border:1px solid var(--border);
+
+        border-radius:6px;
+
+        color:white;
+
+        font-size:13px;
+
+        box-sizing:border-box;
+
+    }
+
+    .ts-control input{
+
+        color:white;
+
+    }
+
+    #nombreClienteContainer input{
+        width:100%;
+    }
+
+    .cliente-preview-box{
+        margin-top:18px;
+        padding:10px 12px;
+        border-radius:6px;
+        background:#020617;
+        border:1px solid #1f2937;
+        margin-bottom:10px;
+    }
+
+        .cliente-preview-label{
+            display:block;
+            font-size:12px;
+            color:#9ca3af;
+            margin-bottom:4px;
+        }
+
+        .cliente-preview-nombre{
+            font-weight:600;
+            font-size:14px;
+            color:#e5e7eb;
+        }
+
+    .venta-card{
+        position:relative;
+    }
+
+    .badge-precio{
+        position:absolute;
+        top:12px;
+        right:12px;
+
+        font-weight:700;
+        font-size:14px;
+
+        padding:4px 8px;
+        border-radius:6px;
+
+        background:#1f2937;
+        color:#e5e7eb;
+    }
+
+    .badge-precio.publico{
+        background:#334155;
+    }
+
+    .badge-precio.mayorista{
+        background:#065f46;
     }
 </style>
 

@@ -13,7 +13,7 @@ import java.util.Optional;
 
 public interface VentaService {
 
-    Venta crearVenta(Integer clienteId);
+    Venta crearVenta(Integer clienteId, String nombreCliente);
 
     void agregarProducto(Integer ventaId, Integer varianteId, Integer cantidad);
 
@@ -24,4 +24,5 @@ public interface VentaService {
     List<VentaDetalle> obtenerDetalles(Integer ventaId);
 
     List<Venta> listarVentas();
+
 }
