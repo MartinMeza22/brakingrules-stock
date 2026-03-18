@@ -38,9 +38,13 @@ public class Producto {
     @Positive(message = "El costo debe ser mayor a 0")
     private BigDecimal costo;
 
+    @NotNull(message = "El precio público es obligatorio")
+    @Positive(message = "El precio público debe ser mayor a 0")
     @Column(nullable = false)
     private BigDecimal precioBasePublico;
 
+    @NotNull(message = "El precio mayorista es obligatorio")
+    @Positive(message = "El precio mayorista debe ser mayor a 0")
     @Column(nullable = false)
     private BigDecimal precioBaseMayorista;
 
@@ -80,5 +84,17 @@ public class Producto {
         return variantes.stream()
                 .mapToInt(v -> v.getStock() != null ? v.getStock() : 0)
                 .sum();
+    }
+
+    public boolean isTienePreciosEspecialesPublico() {
+        return precioEspecial1Publico != null
+                || precioEspecial2Publico != null
+                || precioEspecial3Publico != null;
+    }
+
+    public boolean isTienePreciosEspecialesMayorista() {
+        return precioEspecial1Mayorista != null
+                || precioEspecial2Mayorista != null
+                || precioEspecial3Mayorista != null;
     }
 }

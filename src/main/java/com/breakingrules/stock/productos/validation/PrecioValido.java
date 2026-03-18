@@ -5,8 +5,9 @@ import jakarta.validation.Payload;
 
 import java.lang.annotation.*;
 
+@Documented
 @Constraint(validatedBy = PrecioValidoValidator.class)
-@Target(ElementType.TYPE)
+@Target({ElementType.TYPE, ElementType.ANNOTATION_TYPE})
 @Retention(RetentionPolicy.RUNTIME)
 public @interface PrecioValido {
 

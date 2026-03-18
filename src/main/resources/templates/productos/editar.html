@@ -23,8 +23,10 @@
 
             <input type="hidden" th:field="*{id}"/>
 
+            <label>Artículo</label>
             <input th:field="*{sku}" readonly/>
 
+            <label>Nombre</label>
             <input th:field="*{nombre}" placeholder="Nombre"/>
             <div class="error"
                  th:if="${#fields.hasErrors('nombre')}"
@@ -32,8 +34,9 @@
             </div>
 
 
-            <h4>Precios base (S a XL)</h4>
+            <h4>Precios Base (S a XL)</h4>
 
+            <label>Precio Público</label>
             <input type="number" step="0.01"
                    th:field="*{precioBasePublico}"
                    placeholder="Precio Público"/>
@@ -43,6 +46,7 @@
                  th:errors="*{precioBasePublico}">
             </div>
 
+            <label>Precio Mayorista</label>
             <input type="number" step="0.01"
                    th:field="*{precioBaseMayorista}"
                    placeholder="Precio Mayorista"/>
@@ -55,10 +59,12 @@
 
             <h4>Precios XXL / XXXL</h4>
 
+            <label>Precio Público</label>
             <input type="number" step="0.01"
                    th:field="*{precioEspecial1Publico}"
                    placeholder="Precio Público XXL"/>
 
+            <label>Precio Mayorista</label>
             <input type="number" step="0.01"
                    th:field="*{precioEspecial1Mayorista}"
                    placeholder="Precio Mayorista XXL"/>
@@ -66,28 +72,31 @@
 
             <h4>Precio XXXXL</h4>
 
+            <label>Precio Público</label>
             <input type="number" step="0.01"
                    th:field="*{precioEspecial2Publico}"
                    placeholder="Precio Público XXXXL"/>
 
+            <label>Precio Mayorista</label>
             <input type="number" step="0.01"
                    th:field="*{precioEspecial2Mayorista}"
                    placeholder="Precio Mayorista XXXXL"/>
 
 
-
             <h4>Precios XXXXXL / XXXXXXL</h4>
 
+            <label>Precio Público</label>
             <input type="number" step="0.01"
                    th:field="*{precioEspecial3Publico}"
                    placeholder="Precio Público XXXXXL"/>
 
+            <label>Precio Mayorista</label>
             <input type="number" step="0.01"
                    th:field="*{precioEspecial3Mayorista}"
                    placeholder="Precio Mayorista XXXXXL"/>
 
 
-
+            <label>Proveedor</label>
             <select th:field="*{proveedor}">
                 <option value="">Proveedor</option>
                 <option th:each="prov : ${proveedores}"

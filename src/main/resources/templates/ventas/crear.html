@@ -8,29 +8,22 @@
 
         <h3>🧾 Nueva Venta</h3>
 
-        <form th:action="@{/web/ventas/crear}" method="post">
+        <form id="ventaForm" th:action="@{/web/ventas/crear}" method="post">
 
             <div class="campo">
 
                 <label>Buscar cliente</label>
-
-                <input type="text"
-                       id="buscarCliente"
-                       placeholder="Buscar cliente...">
+                <input type="text" id="buscarCliente" placeholder="Buscar cliente...">
 
                 <label style="margin-top:10px;">Cliente</label>
-
                 <select name="clienteId" id="clienteSelect" size="6">
-
                     <option th:value="${clientePublico.id}">
                         Varios
                     </option>
-
                     <option th:each="c : ${mayoristas}"
                             th:value="${c.id}"
                             th:text="${c.nombre + ' ' + c.apellido}">
                     </option>
-
                 </select>
 
                 <div class="cliente-preview-box">
@@ -39,21 +32,19 @@
                         Varios
                     </div>
                 </div>
-            </div>
 
+                <!-- Alerta de validación -->
+                <div id="clienteAlert" class="alert-error" style="display:none; margin-top:8px;">
+                    Por favor seleccioná un cliente antes de crear la venta.
+                </div>
+
+            </div>
 
             <div id="nombreClienteContainer">
-
                 <label>Nombre cliente (opcional)</label>
-
-                <input type="text"
-                       name="nombreCliente"
-                       placeholder="Ej: Juan">
-
+                <input type="text" name="nombreCliente" placeholder="Ej: Juan">
                 <small>Si queda vacío se registrará como "Varios"</small>
-
             </div>
-
 
             <button class="btn-accion" type="submit">
                 Crear Venta
@@ -68,112 +59,101 @@
 
     </div>
 
-
     <style>
-
         #buscarCliente{
-        width:100%;
-        padding:8px;
-        margin-bottom:8px;
+            width:100%;
+            padding:8px;
+            margin-bottom:8px;
         }
-
         #clienteSelect{
-        width:100%;
+            width:100%;
         }
-
         #nombreClienteContainer{
-        margin-top:10px;
+            margin-top:10px;
         }
-
         #nombreClienteContainer input{
-        width:100%;
-        padding:8px;
+            width:100%;
+            padding:8px;
         }
-
+        .alert-error{
+            color:#b91c1c;
+            background-color:#fee2e2;
+            border:1px solid #fca5a5;
+            padding:6px 8px;
+            border-radius:4px;
+        }
     </style>
 
-
     <script>
-
         document.addEventListener("DOMContentLoaded", function(){
 
-        const buscar = document.getElementById("buscarCliente");
-        const select = document.getElementById("clienteSelect");
-        const preview = document.getElementById("clientePreview");
-        const nombreInput = document.querySelector("input[name='nombreCliente']");
-        const nombreClienteContainer = document.getElementById("nombreClienteContainer");
+            const buscar = document.getElementById("buscarCliente");
+            const select = document.getElementById("clienteSelect");
+            const preview = document.getElementById("clientePreview");
+            const nombreInput = document.querySelector("input[name='nombreCliente']");
+            const nombreClienteContainer = document.getElementById("nombreClienteContainer");
+            const form = document.getElementById("ventaForm");
+            const alertBox = document.getElementById("clienteAlert");
 
-        function toggleNombreCliente(){
+            function toggleNombreCliente(){
+                const texto = select.options[select.selectedIndex]?.text || "";
+                nombreClienteContainer.style.display = (texto === "Varios") ? "block" : "none";
+            }
 
-        const texto = select.options[select.selectedIndex].text;
+            function actualizarPreview(){
+                const selectedOption = select.options[select.selectedIndex];
+                const texto = selectedOption ? selectedOption.text : "";
+                const nombreExtra = nombreInput.value.trim();
 
-        if(texto === "Varios"){
-        nombreClienteContainer.style.display="block";
-        }else{
-        nombreClienteContainer.style.display="none";
-        }
+                preview.classList.remove("mayorista","varios","personalizado");
 
-        }
+                if(texto === "Varios"){
+                    if(nombreExtra){
+                        preview.textContent = nombreExtra;
+                        preview.classList.add("personalizado");
+                    } else {
+                        preview.textContent = "Varios";
+                        preview.classList.add("varios");
+                    }
+                } else {
+                    preview.textContent = texto;
+                    preview.classList.add("mayorista");
+                }
 
-        function actualizarPreview(){
 
-        const texto = select.options[select.selectedIndex].text;
-        const nombreExtra = nombreInput.value.trim();
+                if(select.value){
+                    alertBox.style.display = "none";
+                }
+            }
 
-        preview.classList.remove("mayorista","varios","personalizado");
+            buscar.addEventListener("input", function(){
+                const filtro = buscar.value.toLowerCase();
+                Array.from(select.options).forEach(option => {
+                    const texto = option.text.toLowerCase();
+                    option.style.display = texto.includes(filtro) ? "block" : "none";
+                });
+            });
 
-        if(texto === "Varios"){
+            select.addEventListener("change", function(){
+                toggleNombreCliente();
+                actualizarPreview();
+            });
 
-        if(nombreExtra){
-        preview.textContent = nombreExtra;
-        preview.classList.add("personalizado");
-        }else{
-        preview.textContent = "Varios";
-        preview.classList.add("varios");
-        }
+            nombreInput.addEventListener("input", actualizarPreview);
 
-        }else{
+            toggleNombreCliente();
+            actualizarPreview();
 
-        preview.textContent = texto;
-        preview.classList.add("mayorista");
-
-        }
-
-        }
-
-        buscar.addEventListener("input", function(){
-
-        const filtro = buscar.value.toLowerCase();
-
-        Array.from(select.options).forEach(option => {
-
-        const texto = option.text.toLowerCase();
-
-        option.style.display =
-        texto.includes(filtro)
-        ? "block"
-        : "none";
-
-        });
-
-        });
-
-        select.addEventListener("change", function(){
-
-        toggleNombreCliente();
-        actualizarPreview();
-
-        });
-
-        nombreInput.addEventListener("input", actualizarPreview);
-
-        toggleNombreCliente();
-        actualizarPreview();
+            form.addEventListener("submit", function(event){
+                if(!select.value){
+                    event.preventDefault();
+                    alertBox.style.display = "block";
+                    select.focus();
+                }
+            });
 
         });
-
     </script>
 
 </section>
-
 </html>

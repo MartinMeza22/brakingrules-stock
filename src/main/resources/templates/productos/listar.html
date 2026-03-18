@@ -1,129 +1,285 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org"
-      th:replace="layout/base :: layout(~{::section}, 'Productos')">
+      th:replace="layout/base :: layout(~{::section}, 'Producto')">
 
 <section>
 
+    <style>
+        .input-error {
+            border: 2px solid #e74c3c;
+            background-color: #fdecea;
+            color: #2c3e50;
+        }
+
+        .input-error::placeholder {
+            color: #7f8c8d;
+        }
+
+        .error-text {
+            color: #e74c3c;
+            font-size: 12px;
+            margin-bottom: 8px;
+        }
+
+        .tooltip {
+            position: relative;
+            cursor: pointer;
+            font-weight: bold;
+        }
+
+        .tooltip .tooltiptext {
+            visibility: hidden;
+            width: 220px;
+            background-color: #222;
+            color: #fff;
+            text-align: left;
+            border-radius: 8px;
+            padding: 10px;
+
+            position: absolute;
+            z-index: 1;
+            bottom: 125%;
+            left: 50%;
+            transform: translateX(-50%);
+
+            font-size: 14px;
+            line-height: 1.5;
+        }
+
+        .tooltip:hover .tooltiptext {
+            visibility: visible;
+        }
+
+        .btn {
+            padding: 6px 10px;
+            border-radius: 6px;
+            text-decoration: none;
+            font-size: 13px;
+            font-weight: bold;
+            margin-right: 4px;
+            display: inline-block;
+            cursor: pointer;
+        }
+
+        .btn-variantes {
+            background-color: #3498db;
+            color: white;
+        }
+
+        .btn-editar {
+            background-color: #f1c40f;
+            color: black;
+        }
+
+        .btn-eliminar {
+            background-color: #e74c3c;
+            color: white;
+        }
+
+        .btn:hover {
+            opacity: 0.85;
+        }
+    </style>
+
     <div class="card">
         <h3>➕ Nuevo producto</h3>
-
 
         <form th:action="@{/web/productos/guardar}"
               th:object="${productoNuevo}"
               method="post">
 
-            <div th:if="${#fields.hasErrors('*')}" class="alert-error">
-                Hay errores en el formulario. Revisá los campos.
-            </div>
+            <label>Artículo</label>
+            <input th:field="*{sku}" placeholder="Articulo"
+                   th:classappend="${#fields.hasErrors('sku')} ? 'input-error'"/>
+            <div th:if="${#fields.hasErrors('sku')}"
+                 th:errors="*{sku}"
+                 class="error-text"></div>
 
-            <div class="error"
-                 th:if="${#fields.hasGlobalErrors()}"
-                 th:each="err : ${#fields.globalErrors()}"
-                 th:text="${err}">
-            </div>
-
-            <input th:field="*{sku}" placeholder="Articulo"/>
-
-            <div class="error"
-                 th:if="${#fields.hasErrors('sku')}"
-                 th:errors="*{sku}">
-            </div>
-
-            <input th:field="*{nombre}" placeholder="Nombre"/>
-
-            <div class="error"
-                 th:if="${#fields.hasErrors('nombre')}"
-                 th:errors="*{nombre}">
-            </div>
+            <label>Nombre</label>
+            <input th:field="*{nombre}" placeholder="Nombre"
+                   th:classappend="${#fields.hasErrors('nombre')} ? 'input-error'"/>
+            <div th:if="${#fields.hasErrors('nombre')}"
+                 th:errors="*{nombre}"
+                 class="error-text"></div>
 
             <h4>Precios Base (S a XL)</h4>
+            <div style="display:flex; gap:12px; flex-wrap:wrap;">
 
-            <input type="number" step="0.01"
-                   th:field="*{precioBasePublico}"
-                   placeholder="Precio Público"/>
+                <div style="flex:1">
+                    <label>Precio Público</label>
+                    <input type="number" step="0.01"
+                           th:field="*{precioBasePublico}"
+                           th:classappend="${#fields.hasErrors('precioBasePublico')} ? 'input-error'"/>
+                    <div th:if="${#fields.hasErrors('precioBasePublico')}"
+                         th:errors="*{precioBasePublico}"
+                         class="error-text"></div>
+                </div>
 
-            <input type="number" step="0.01"
-                   th:field="*{precioBaseMayorista}"
-                   placeholder="Precio Mayorista"/>
-
+                <div style="flex:1">
+                    <label>Precio Mayorista</label>
+                    <input type="number" step="0.01"
+                           th:field="*{precioBaseMayorista}"
+                           th:classappend="${#fields.hasErrors('precioBaseMayorista')} ? 'input-error'"/>
+                    <div th:if="${#fields.hasErrors('precioBaseMayorista')}"
+                         th:errors="*{precioBaseMayorista}"
+                         class="error-text"></div>
+                </div>
+            </div>
 
             <h4>Precios Especiales</h4>
 
-            <label>XXL / XXXL</label>
+            <div style="display:flex; gap:12px; flex-wrap:wrap;">
+                <div style="flex:1">
+                    <label>XXL / XXXL Público</label>
+                    <input type="number" step="0.01"
+                           th:field="*{precioEspecial1Publico}"
+                           th:classappend="${#fields.hasErrors('precioEspecial1Publico') or #fields.hasErrors('precioEspecial1Mayorista')} ? 'input-error'"/>
+                </div>
 
-            <input type="number" step="0.01"
-                   th:field="*{precioEspecial1Publico}"
-                   placeholder="Precio Público"/>
+                <div style="flex:1">
+                    <label>XXL / XXXL Mayorista</label>
+                    <input type="number" step="0.01"
+                           th:field="*{precioEspecial1Mayorista}"
+                           th:classappend="${#fields.hasErrors('precioEspecial1Publico') or #fields.hasErrors('precioEspecial1Mayorista')} ? 'input-error'"/>
+                </div>
+            </div>
 
-            <input type="number" step="0.01"
-                   th:field="*{precioEspecial1Mayorista}"
-                   placeholder="Precio Mayorista"/>
+            <div th:if="${#fields.hasErrors('precioEspecial1Publico') or #fields.hasErrors('precioEspecial1Mayorista')}"
+                 class="error-text">
+                Revisar precios XXL / XXXL - El precio público no puede ser menor al mayorista
+            </div>
 
+            <div style="display:flex; gap:12px; flex-wrap:wrap;">
+                <div style="flex:1">
+                    <label>XXXXL Público</label>
+                    <input type="number" step="0.01"
+                           th:field="*{precioEspecial2Publico}"
+                           th:classappend="${#fields.hasErrors('precioEspecial2Publico') or #fields.hasErrors('precioEspecial2Mayorista')} ? 'input-error'"/>
+                </div>
 
-            <label>XXXXL</label>
+                <div style="flex:1">
+                    <label>XXXXL Mayorista</label>
+                    <input type="number" step="0.01"
+                           th:field="*{precioEspecial2Mayorista}"
+                           th:classappend="${#fields.hasErrors('precioEspecial2Publico') or #fields.hasErrors('precioEspecial2Mayorista')} ? 'input-error'"/>
+                </div>
+            </div>
 
-            <input type="number" step="0.01"
-                   th:field="*{precioEspecial2Publico}"
-                   placeholder="Precio Público"/>
+            <div th:if="${#fields.hasErrors('precioEspecial2Publico') or #fields.hasErrors('precioEspecial2Mayorista')}"
+                 class="error-text">
+                Revisar precios XXXXL - El precio público no puede ser menor al mayorista
+            </div>
 
-            <input type="number" step="0.01"
-                   th:field="*{precioEspecial2Mayorista}"
-                   placeholder="Precio Mayorista"/>
+            <div style="display:flex; gap:12px; flex-wrap:wrap;">
+                <div style="flex:1">
+                    <label>XXXXXL / XXXXXXL Público</label>
+                    <input type="number" step="0.01"
+                           th:field="*{precioEspecial3Publico}"
+                           th:classappend="${#fields.hasErrors('precioEspecial3Publico') or #fields.hasErrors('precioEspecial3Mayorista')} ? 'input-error'"/>
+                </div>
 
+                <div style="flex:1">
+                    <label>XXXXXL / XXXXXXL Mayorista</label>
+                    <input type="number" step="0.01"
+                           th:field="*{precioEspecial3Mayorista}"
+                           th:classappend="${#fields.hasErrors('precioEspecial3Publico') or #fields.hasErrors('precioEspecial3Mayorista')} ? 'input-error'"/>
+                </div>
+            </div>
 
-            <label>XXXXXL / XXXXXXL</label>
+            <div th:if="${#fields.hasErrors('precioEspecial3Publico') or #fields.hasErrors('precioEspecial3Mayorista')}"
+                 class="error-text">
+                Revisar precios XXXXXL / XXXXXXL - El precio público no puede ser menor al mayorista
+            </div>
 
-            <input type="number" step="0.01"
-                   th:field="*{precioEspecial3Publico}"
-                   placeholder="Precio Público"/>
-
-            <input type="number" step="0.01"
-                   th:field="*{precioEspecial3Mayorista}"
-                   placeholder="Precio Mayorista"/>
-
-
+            <label>Proveedor</label>
             <select name="proveedorId">
                 <option value="">Sin proveedor</option>
-
                 <option th:each="prov : ${proveedores}"
                         th:value="${prov.id}"
                         th:text="${prov.nombre}">
                 </option>
             </select>
 
+            <br><br>
             <button type="submit">Guardar</button>
 
         </form>
-
     </div>
 
     <div class="card">
         <h3>Productos</h3>
         <input class="buscador-tabla" placeholder="Buscar...">
-        <table class="tabla-buscable" th:if="${!productos.isEmpty()}">
+        <table class="tabla-buscable" style="width:100%; border-collapse: collapse; font-family: Arial;">
+
             <thead>
-            <tr>
-                <th>Articulo</th>
-                <th>Nombre</th>
-                <th>Precio Publico</th>
-                <th>Precio Mayorista</th>
-                <th>Stock</th>
-                <th>Acciones</th>
+            <tr style="background:#111; color:white;">
+                <th style="padding:8px;">Articulo</th>
+                <th style="padding:8px;">Nombre</th>
+                <th style="padding:8px;">Precio Público</th>
+                <th style="padding:8px;">Precio Mayorista</th>
+                <th style="padding:8px;">Stock</th>
+                <th style="padding:8px;">Acciones</th>
             </tr>
             </thead>
 
             <tbody>
-            <tr th:each="p : ${productos}">
-                <td th:text="${p.sku}"></td>
-                <td th:text="${p.nombre}"></td>
-                <td th:text="${p.precioBasePublico}"></td>
-                <td th:text="${p.precioBaseMayorista}"></td>
-<!--                <td th:text="${p.stockTotal}"></td>-->
-                <td>
-                    <a th:href="@{'/web/variantes/' + ${p.id}}">Ver variantes</a>
-                    <a th:href="@{'/web/productos/editar/' + ${p.id}}">Editar</a>
-                    <a th:href="@{'/web/productos/eliminar/' + ${p.id}}">Eliminar</a>
+            <tr th:each="p : ${productos}" style="border-bottom:1px solid #ddd;">
+
+                <td style="padding:8px;" th:text="${p.sku}"></td>
+                <td style="padding:8px;" th:text="${p.nombre}"></td>
+
+                <td style="padding:8px;">
+                    <span th:text="${p.precioBasePublico}"></span>
+
+                    <span th:if="${p.precioEspecial1Publico != null or p.precioEspecial2Publico != null or p.precioEspecial3Publico != null}"
+                          class="tooltip"
+                          style="margin-left:6px; color:#3498db;">
+                        Ver talles
+                        <span class="tooltiptext">
+                            <b>Talles Especiales</b><br><br>
+                            XXL/XXXL:
+                            <span th:text="${p.precioEspecial1Publico != null ? p.precioEspecial1Publico : '-'}"></span><br>
+                            XXXXL:
+                            <span th:text="${p.precioEspecial2Publico != null ? p.precioEspecial2Publico : '-'}"></span><br>
+                            XXXXXL+:
+                            <span th:text="${p.precioEspecial3Publico != null ? p.precioEspecial3Publico : '-'}"></span>
+                        </span>
+                    </span>
                 </td>
+
+                <td style="padding:8px;">
+                    <span th:text="${p.precioBaseMayorista}"></span>
+
+                    <span th:if="${p.precioEspecial1Mayorista != null or p.precioEspecial2Mayorista != null or p.precioEspecial3Mayorista != null}"
+                          class="tooltip"
+                          style="margin-left:6px; color:#27ae60;">
+                        Ver talles
+                        <span class="tooltiptext">
+                            <b>Talles Especiales</b><br><br>
+                            XXL/XXXL:
+                            <span th:text="${p.precioEspecial1Mayorista != null ? p.precioEspecial1Mayorista : '-'}"></span><br>
+                            XXXXL:
+                            <span th:text="${p.precioEspecial2Mayorista != null ? p.precioEspecial2Mayorista : '-'}"></span><br>
+                            XXXXXL+:
+                            <span th:text="${p.precioEspecial3Mayorista != null ? p.precioEspecial3Mayorista : '-'}"></span>
+                        </span>
+                    </span>
+                </td>
+
+                <td style="padding:8px;" th:text="${p.stockTotal}"></td>
+
+                <td style="padding:8px;">
+                    <a th:href="@{'/web/variantes/' + ${p.id}}"
+                       class="btn btn-variantes">Variantes</a>
+
+                    <a th:href="@{'/web/productos/editar/' + ${p.id}}"
+                       class="btn btn-editar">Editar</a>
+
+                    <a th:href="@{'/web/productos/eliminar/' + ${p.id}}"
+                       class="btn btn-eliminar"
+                       onclick="return confirm('¿Seguro?')">Eliminar</a>
+                </td>
+
             </tr>
             </tbody>
         </table>

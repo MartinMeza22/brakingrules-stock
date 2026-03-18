@@ -32,7 +32,6 @@
             <input th:field="*{direccion}" placeholder="Dirección"/>
             <div th:if="${#fields.hasErrors('direccion')}" th:errors="*{direccion}"></div>
 
-
             <button type="submit">Guardar</button>
         </form>
     </div>
@@ -48,7 +47,7 @@
                 <th>Documento</th>
                 <th>Email</th>
                 <th>Teléfono</th>
-                <th></th>
+                <th>Acciones</th>
             </tr>
             </thead>
 
@@ -59,9 +58,18 @@
                 <td th:text="${c.documento}"></td>
                 <td th:text="${c.email}"></td>
                 <td th:text="${c.telefono}"></td>
-                <td th:if="${c.id != 1}">
-                    <a th:href="@{'/web/clientes/editar/' + ${c.id}}">Editar</a>
-                    <a th:href="@{'/web/clientes/eliminar/' + ${c.id}}">Eliminar</a>
+
+                <td th:if="${c.id != 1}" class="acciones">
+                    <a class="btn btn-editar"
+                       th:href="@{'/web/clientes/editar/' + ${c.id}}">
+                        Editar
+                    </a>
+
+                    <a class="btn btn-eliminar"
+                       th:href="@{'/web/clientes/eliminar/' + ${c.id}}"
+                       onclick="return confirm('¿Seguro que querés eliminar este cliente?')">
+                        Eliminar
+                    </a>
                 </td>
 
                 <td th:if="${c.id == 1}">

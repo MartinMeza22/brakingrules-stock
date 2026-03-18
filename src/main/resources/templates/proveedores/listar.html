@@ -58,9 +58,17 @@
                 <td th:text="${p.email}"></td>
                 <td th:text="${p.telefono}"></td>
                 <td th:text="${p.direccion}"></td>
-                <td>
-                    <a th:href="@{'/web/proveedores/editar/' + ${p.id}}">Editar</a>
-                    <a th:href="@{'/web/proveedores/eliminar/' + ${p.id}}">Eliminar</a>
+                <td class="acciones">
+                    <a class="btn btn-editar"
+                       th:href="@{'/web/proveedores/editar/' + ${p.id}}">
+                        Editar
+                    </a>
+
+                    <a class="btn btn-eliminar"
+                       th:href="@{'/web/proveedores/eliminar/' + ${p.id}}"
+                       onclick="return confirm('¿Seguro que querés eliminar este proveedor?')">
+                        Eliminar
+                    </a>
                 </td>
             </tr>
             </tbody>

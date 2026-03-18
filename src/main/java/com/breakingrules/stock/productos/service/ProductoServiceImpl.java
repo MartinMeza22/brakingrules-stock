@@ -219,7 +219,14 @@ public class ProductoServiceImpl implements ProductoService {
                 p.getCosto(),
                 p.getPrecioBasePublico(),
                 p.getPrecioBaseMayorista(),
+                p.getPrecioEspecial1Publico(),
+                p.getPrecioEspecial2Publico(),
+                p.getPrecioEspecial3Publico(),
+                p.getPrecioEspecial1Mayorista(),
+                p.getPrecioEspecial2Mayorista(),
+                p.getPrecioEspecial3Mayorista(),
                 p.getActivo(),
+                p.getStockTotal(),
                 p.getProveedor() != null
                         ? p.getProveedor().getNombre()
                         : "Sin proveedor"

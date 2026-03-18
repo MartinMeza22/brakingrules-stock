@@ -64,6 +64,9 @@
 
         <input class="buscador-tabla" placeholder="Buscar...">
 
+        <div th:if="${variantes.?[stock <= 3].size() > 0}" class="alert-stock">
+            ⚠ Variantes con stock crítico
+        </div>
         <table class="tabla-buscable" th:if="${!variantes.isEmpty()}">
 
             <thead>
@@ -105,8 +108,16 @@
                     </small>
                 </td>
 
-                <td th:classappend="${v.stock <= 5} ? 'stock-bajo'"
-                    th:text="${v.stock}" min="0">
+                <td>
+
+                <span class="stock-indicador"
+                      th:classappend="
+                        ${v.stock <= 3} ? 'critico' :
+                        (${v.stock <= 10} ? 'bajo' : 'ok')">
+                </span>
+
+                <span th:text="${v.stock}"></span>
+
                 </td>
 
                 <td>

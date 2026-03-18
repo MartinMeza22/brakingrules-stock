@@ -7,6 +7,7 @@
               th:object="${variante}"
               method="post">
 
+            <label>Color</label>
             <select th:field="*{color}">
                 <option th:each="c : ${colores}"
                         th:value="${c}"
@@ -14,6 +15,7 @@
                 </option>
             </select>
 
+            <label>Talle</label>
             <select th:field="*{talle}">
                 <option th:each="t : ${talles}"
                         th:value="${t}"
@@ -21,20 +23,16 @@
                 </option>
             </select>
 
+            <label>Stock</label>
             <input type="number"
-                   step="0.01"
-                   th:field="*{precioPublicoFinal}"
-                   placeholder="Precio Público"/>
-
-            <input type="number"
-                   step="0.01"
-                   th:field="*{precioMayoristaFinal}"
-                   placeholder="Precio Mayorista"/>
-
+                   min="0"
+                   th:field="*{stock}"
+                   placeholder="Stock"/>
 
             <button type="submit">Guardar</button>
 
         </form>
+
     </section>
 
 </html>
