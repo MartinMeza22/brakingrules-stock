@@ -17,7 +17,7 @@
 
         .error-text {
             color: #e74c3c;
-            font-size: 12px;
+            font-size: 18px;
             margin-bottom: 8px;
         }
 
@@ -88,26 +88,19 @@
               th:object="${productoNuevo}"
               method="post">
 
-            <label>Artículo</label>
+            <label>Artículo *</label>
             <input th:field="*{sku}" placeholder="Articulo"
                    th:classappend="${#fields.hasErrors('sku')} ? 'input-error'"/>
             <div th:if="${#fields.hasErrors('sku')}"
                  th:errors="*{sku}"
                  class="error-text"></div>
 
-            <label>Nombre</label>
-            <input th:field="*{nombre}" placeholder="Nombre"
-                   th:classappend="${#fields.hasErrors('nombre')} ? 'input-error'"/>
-            <div th:if="${#fields.hasErrors('nombre')}"
-                 th:errors="*{nombre}"
-                 class="error-text"></div>
-
-            <h4>Precios Base (S a XL)</h4>
+            <h4>Precios Base (S a XL) *</h4>
             <div style="display:flex; gap:12px; flex-wrap:wrap;">
 
                 <div style="flex:1">
-                    <label>Precio Público</label>
-                    <input type="number" step="0.01"
+                    <label>Precio Público *</label>
+                    <input type="number" step="0.01" placeholder="Precio público del S al XL"
                            th:field="*{precioBasePublico}"
                            th:classappend="${#fields.hasErrors('precioBasePublico')} ? 'input-error'"/>
                     <div th:if="${#fields.hasErrors('precioBasePublico')}"
@@ -116,8 +109,8 @@
                 </div>
 
                 <div style="flex:1">
-                    <label>Precio Mayorista</label>
-                    <input type="number" step="0.01"
+                    <label>Precio Mayorista *</label>
+                    <input type="number" step="0.01" placeholder="Precio mayorista del S al XL"
                            th:field="*{precioBaseMayorista}"
                            th:classappend="${#fields.hasErrors('precioBaseMayorista')} ? 'input-error'"/>
                     <div th:if="${#fields.hasErrors('precioBaseMayorista')}"
@@ -131,14 +124,14 @@
             <div style="display:flex; gap:12px; flex-wrap:wrap;">
                 <div style="flex:1">
                     <label>XXL / XXXL Público</label>
-                    <input type="number" step="0.01"
+                    <input type="number" step="0.01" placeholder="Precio público del XXL al XXXL"
                            th:field="*{precioEspecial1Publico}"
                            th:classappend="${#fields.hasErrors('precioEspecial1Publico') or #fields.hasErrors('precioEspecial1Mayorista')} ? 'input-error'"/>
                 </div>
 
                 <div style="flex:1">
                     <label>XXL / XXXL Mayorista</label>
-                    <input type="number" step="0.01"
+                    <input type="number" step="0.01" placeholder="Precio mayorista del XXL al XXXL"
                            th:field="*{precioEspecial1Mayorista}"
                            th:classappend="${#fields.hasErrors('precioEspecial1Publico') or #fields.hasErrors('precioEspecial1Mayorista')} ? 'input-error'"/>
                 </div>
@@ -152,14 +145,14 @@
             <div style="display:flex; gap:12px; flex-wrap:wrap;">
                 <div style="flex:1">
                     <label>XXXXL Público</label>
-                    <input type="number" step="0.01"
+                    <input type="number" step="0.01" placeholder="Precio público del XXXXL"
                            th:field="*{precioEspecial2Publico}"
                            th:classappend="${#fields.hasErrors('precioEspecial2Publico') or #fields.hasErrors('precioEspecial2Mayorista')} ? 'input-error'"/>
                 </div>
 
                 <div style="flex:1">
                     <label>XXXXL Mayorista</label>
-                    <input type="number" step="0.01"
+                    <input type="number" step="0.01" placeholder="Precio mayorista del XXXXL"
                            th:field="*{precioEspecial2Mayorista}"
                            th:classappend="${#fields.hasErrors('precioEspecial2Publico') or #fields.hasErrors('precioEspecial2Mayorista')} ? 'input-error'"/>
                 </div>
@@ -173,14 +166,14 @@
             <div style="display:flex; gap:12px; flex-wrap:wrap;">
                 <div style="flex:1">
                     <label>XXXXXL / XXXXXXL Público</label>
-                    <input type="number" step="0.01"
+                    <input type="number" step="0.01" placeholder="Precio público del XXXXXL al XXXXXXL"
                            th:field="*{precioEspecial3Publico}"
                            th:classappend="${#fields.hasErrors('precioEspecial3Publico') or #fields.hasErrors('precioEspecial3Mayorista')} ? 'input-error'"/>
                 </div>
 
                 <div style="flex:1">
                     <label>XXXXXL / XXXXXXL Mayorista</label>
-                    <input type="number" step="0.01"
+                    <input type="number" step="0.01" placeholder="Precio mayorista del XXXXXL al XXXXXXL"
                            th:field="*{precioEspecial3Mayorista}"
                            th:classappend="${#fields.hasErrors('precioEspecial3Publico') or #fields.hasErrors('precioEspecial3Mayorista')} ? 'input-error'"/>
                 </div>
@@ -201,7 +194,7 @@
             </select>
 
             <br><br>
-            <button type="submit">Guardar</button>
+            <button class="button-e" type="submit">Guardar</button>
 
         </form>
     </div>
@@ -212,13 +205,13 @@
         <table class="tabla-buscable" style="width:100%; border-collapse: collapse; font-family: Arial;">
 
             <thead>
-            <tr style="background:#111; color:white;">
-                <th style="padding:8px;">Articulo</th>
-                <th style="padding:8px;">Nombre</th>
-                <th style="padding:8px;">Precio Público</th>
-                <th style="padding:8px;">Precio Mayorista</th>
-                <th style="padding:8px;">Stock</th>
-                <th style="padding:8px;">Acciones</th>
+            <tr style="background:#020617; border:1px solid var(--border); color:white;">
+                <th style="padding:8px; font-size:16px">Articulo</th>
+                <th style="padding:8px; font-size:16px">Nombre</th>
+                <th style="padding:8px; font-size:16px">Precio Público</th>
+                <th style="padding:8px; font-size:16px">Precio Mayorista</th>
+                <th style="padding:8px; font-size:16px">Stock</th>
+                <th style="padding:8px font-size:16px">Acciones</th>
             </tr>
             </thead>
 

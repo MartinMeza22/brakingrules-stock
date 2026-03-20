@@ -39,4 +39,14 @@ public class VentaDetalle {
 
     private String nombreProducto;
     private String skuProducto;
+
+    @Transient
+    public BigDecimal getTotalLinea() {
+
+        if(precioUnitario == null || cantidad == null){
+            return BigDecimal.ZERO;
+        }
+
+        return precioUnitario.multiply(BigDecimal.valueOf(cantidad));
+    }
 }

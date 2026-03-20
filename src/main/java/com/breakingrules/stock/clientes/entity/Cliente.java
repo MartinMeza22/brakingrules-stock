@@ -32,7 +32,7 @@ public class Cliente {
     private String documento;
 
     @Size(max = 11)
-    @Pattern(regexp = "^$|^\\d{11}$", message = "CUIL inválido")
+    @Pattern(regexp = "^$|^(\\d{8}|\\d{11})$", message = "CUIL/CUIT o DNI inválido")
     private String cuil;
 
     @Email(message = "Email inválido")

@@ -46,4 +46,8 @@ public interface VarianteProductoRepository extends JpaRepository<VarianteProduc
             Color color,
             Talle talle
     );
+
+    List<VarianteProducto> findByProductoIdAndColor(Integer productoId, Color color);
+
+    boolean existsByCodigoBarrasAndIdNot(String codigo, Integer id);
 }

@@ -106,6 +106,11 @@ public class VentaWebController {
     @GetMapping("/remito/{id}")
     public String generarRemito(@PathVariable Integer id, Model model) {
         Venta venta = ventaService.obtenerVenta(id); List<VentaDetalle> detalles = ventaService.obtenerDetalles(id);
+        BigDecimal subtotal = detalles.stream()
+                .map(d -> d.getPrecioUnitario().multiply(BigDecimal.valueOf(d.getCantidad())))
+                .reduce(BigDecimal.ZERO, BigDecimal::add);
+
+        model.addAttribute("subtotal", subtotal);
         model.addAttribute("venta", venta);
         model.addAttribute("detalles", detalles);
         return "ventas/remito"; }

@@ -6,6 +6,8 @@ import lombok.*;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 
 @Getter
 @Setter
@@ -38,6 +40,9 @@ public class Venta {
         @Column
         private String nombreClienteMostrador;
 
+        @OneToMany(mappedBy = "venta", cascade = CascadeType.ALL, orphanRemoval = true)
+        private List<VentaDetalle> detalles = new ArrayList<>();
+
         @PrePersist
         public void prePersist() {
 
@@ -68,5 +73,17 @@ public class Venta {
                 }
 
                 return cliente.getNombre() + " " + cliente.getApellido();
+        }
+        @Transient
+        public BigDecimal getSubtotal() {
+
+                if(detalles == null || detalles.isEmpty()){
+                        return BigDecimal.ZERO;
+                }
+
+                return detalles.stream()
+                        .map(d -> d.getPrecioUnitario()
+                                .multiply(BigDecimal.valueOf(d.getCantidad())))
+                        .reduce(BigDecimal.ZERO, BigDecimal::add);
         }
 }

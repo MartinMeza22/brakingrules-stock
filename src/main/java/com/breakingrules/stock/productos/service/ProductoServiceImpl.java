@@ -107,10 +107,6 @@ public class ProductoServiceImpl implements ProductoService {
 
         log.info("Validando producto ID: {}", producto.getId());
 
-        if (producto.getNombre() == null || producto.getNombre().isBlank()) {
-            throw new IllegalArgumentException("El nombre es obligatorio");
-        }
-
         if (producto.getPrecioBasePublico() == null ||
                 producto.getPrecioBasePublico().compareTo(BigDecimal.ZERO) <= 0) {
             throw new IllegalArgumentException("El precio público base debe ser mayor a 0");

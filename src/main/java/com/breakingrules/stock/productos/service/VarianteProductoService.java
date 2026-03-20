@@ -32,4 +32,7 @@ public interface VarianteProductoService {
 
     void eliminar(Integer id);
 
+    void validarDuplicado(Integer productoId, Color color, Talle talle, Integer idActual);
+
+    List<Talle> obtenerTallesOcupados(Integer productoId, Color color, Integer varianteId);
 }

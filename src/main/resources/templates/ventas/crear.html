@@ -15,8 +15,8 @@
                 <label>Buscar cliente</label>
                 <input type="text" id="buscarCliente" placeholder="Buscar cliente...">
 
-                <label style="margin-top:10px;">Cliente</label>
-                <select name="clienteId" id="clienteSelect" size="6">
+                <label style="margin-top:10px;">Cliente *</label>
+                <select name="clienteId" id="clienteSelect" size="8" class="select-cliente">
                     <option th:value="${clientePublico.id}">
                         Varios
                     </option>
@@ -42,18 +42,19 @@
 
             <div id="nombreClienteContainer">
                 <label>Nombre cliente (opcional)</label>
-                <input type="text" name="nombreCliente" placeholder="Ej: Juan">
-                <small>Si queda vacío se registrará como "Varios"</small>
+                <input type="text" name="nombreCliente" placeholder="Ej: Juan" class="nombre-cliente">
+                <p>Si el nombre del cliente queda vacío se registrará como "Varios"</p>
             </div>
 
-            <button class="btn-accion" type="submit">
-                Crear Venta
-            </button>
+            <div class="acciones-venta" style="display:flex; justify-content:space-between; align-items:center; margin-top:15px;">
+                    <a th:href="@{/web/ventas/historial}" class="btn-accion btn-ir-historial">
+                        Ir al historial
+                    </a>
 
-            <a th:href="@{/web/ventas/historial}"
-               style="margin-right:15px;color:#9ca3af;text-decoration:none;">
-                Ir al historial
-            </a>
+                    <button class="btn-accion" type="submit">
+                        Crear Venta
+                    </button>
+            </div>
 
         </form>
 

@@ -9,28 +9,68 @@
 
         <form th:action="@{/web/clientes/guardar}"
               th:object="${clienteNuevo}"
-              method="post">
+              method="post"
+              class="formulario">
 
-            <input th:field="*{nombre}" placeholder="Nombre"/>
-            <div th:if="${#fields.hasErrors('nombre')}" th:errors="*{nombre}"></div>
+            <label>Nombre *</label>
+            <div class="form-group">
+                <input th:field="*{nombre}" placeholder="Nombre"
+                       th:classappend="${#fields.hasErrors('nombre')} ? 'input-error'"/>
+                <small class="error"
+                       th:if="${#fields.hasErrors('nombre')}"
+                       th:errors="*{nombre}"></small>
+            </div>
 
-            <input th:field="*{apellido}" placeholder="Apellido"/>
-            <div th:if="${#fields.hasErrors('apellido')}" th:errors="*{apellido}"></div>
+            <label>Apellido *</label>
+            <div class="form-group">
+                <input th:field="*{apellido}" placeholder="Apellido"
+                       th:classappend="${#fields.hasErrors('apellido')} ? 'input-error'"/>
+                <small class="error"
+                       th:if="${#fields.hasErrors('apellido')}"
+                       th:errors="*{apellido}"></small>
+            </div>
 
-            <input th:field="*{descripcion}" placeholder="Descripcion"/>
-            <div th:if="${#fields.hasErrors('descripcion')}" th:errors="*{descripcion}"></div>
+            <label>Descripción</label>
+            <div class="form-group">
+                <input th:field="*{descripcion}" placeholder="Descripción"/>
+                <small class="error"
+                       th:if="${#fields.hasErrors('descripcion')}"
+                       th:errors="*{descripcion}"></small>
+            </div>
 
-            <input th:field="*{documento}" placeholder="DNI o CUIT"/>
-            <div th:if="${#fields.hasErrors('documento')}" th:errors="*{documento}"></div>
+            <label>DNI / CUIT *</label>
+            <div class="form-group">
+                <input th:field="*{documento}" placeholder="DNI / CUIT"
+                       th:classappend="${#fields.hasErrors('documento')} ? 'input-error'"/>
+                <small class="error"
+                       th:if="${#fields.hasErrors('documento')}"
+                       th:errors="*{documento}"></small>
+            </div>
 
-            <input type="email" th:field="*{email}" placeholder="Email"/>
-            <div th:if="${#fields.hasErrors('email')}" th:errors="*{email}"></div>
+            <label>Email *</label>
+            <div class="form-group">
+                <input type="email" th:field="*{email}" placeholder="Email"/>
+                <small class="error"
+                       th:if="${#fields.hasErrors('email')}"
+                       th:errors="*{email}"></small>
+            </div>
 
-            <input th:field="*{telefono}" placeholder="Teléfono"/>
-            <div th:if="${#fields.hasErrors('telefono')}" th:errors="*{telefono}"></div>
+            <label>Telefono *</label>
+            <div class="form-group">
+                <input th:field="*{telefono}" placeholder="Teléfono"
+                       th:classappend="${#fields.hasErrors('telefono')} ? 'input-error'"/>
+                <small class="error"
+                       th:if="${#fields.hasErrors('telefono')}"
+                       th:errors="*{telefono}"></small>
+            </div>
 
-            <input th:field="*{direccion}" placeholder="Dirección"/>
-            <div th:if="${#fields.hasErrors('direccion')}" th:errors="*{direccion}"></div>
+            <label>Dirección</label>
+            <div class="form-group">
+                <input th:field="*{direccion}" placeholder="Dirección"/>
+                <small class="error"
+                       th:if="${#fields.hasErrors('direccion')}"
+                       th:errors="*{direccion}"></small>
+            </div>
 
             <button type="submit">Guardar</button>
         </form>
@@ -38,26 +78,31 @@
 
     <div class="card">
         <h3>Clientes</h3>
+
         <input class="buscador-tabla" placeholder="Buscar...">
+
         <table class="tabla-buscable" th:if="${!clientes.isEmpty()}">
             <thead>
             <tr>
                 <th>Nombre</th>
-                <th>Descripcion</th>
+                <th>Descripción</th>
                 <th>Documento</th>
                 <th>Email</th>
                 <th>Teléfono</th>
+                <th>Dirección</th>
                 <th>Acciones</th>
             </tr>
             </thead>
 
             <tbody>
             <tr th:each="c : ${clientes}">
+
                 <td th:text="${c.nombre + ' ' + c.apellido}"></td>
                 <td th:text="${c.descripcion}"></td>
                 <td th:text="${c.documento}"></td>
                 <td th:text="${c.email}"></td>
                 <td th:text="${c.telefono}"></td>
+                <td th:text="${c.direccion}"></td>
 
                 <td th:if="${c.id != 1}" class="acciones">
                     <a class="btn btn-editar"
@@ -83,5 +128,7 @@
             No hay clientes cargados.
         </div>
     </div>
+
+
 </section>
 </html>

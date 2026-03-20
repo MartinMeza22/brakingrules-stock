@@ -8,7 +8,8 @@
         <h3 th:text="'➕ Nueva variante para: ' + ${producto.nombre}"></h3>
 
         <form th:action="@{'/web/variantes/guardar-multiple/' + ${producto.id}}"
-              method="post">
+              method="post"
+              onsubmit="return validarFormulario()">
 
             <select name="color" id="colorSelect">
 
@@ -21,6 +22,10 @@
 
             </select>
 
+            <div id="errorColor" style="color:red; display:none;">
+                Debes seleccionar un color
+            </div>
+
             <div id="tallesContainer" style="display:none">
 
                 <table>
@@ -30,18 +35,20 @@
                         <th>Stock</th>
                     </tr>
 
-                    <tr th:each="t : ${talles}">
+                    <tr th:each="t : ${talles}" class="fila-talle">
 
                         <td th:text="${t}"></td>
 
                         <td>
                             <input type="checkbox"
+                                   class="check-talle"
                                    name="tallesSeleccionados"
                                    th:value="${t}">
                         </td>
 
                         <td>
                             <input type="number"
+                                   class="input-stock"
                                    th:name="'stock[' + ${t} + ']'"
                                    placeholder="Stock">
                         </td>
@@ -77,7 +84,7 @@
                 <th>Precio Mayorista</th>
                 <th>Stock</th>
                 <th>Código</th>
-                <th style="text-align:center">Barcode</th>
+                <th style="text-align:center">Codigo de barras</th>
                 <th>Acciones</th>
             </tr>
             </thead>
@@ -93,19 +100,21 @@
                 <td>
                     <div th:text="${v.precioPublicoFinal}"></div>
 
-                    <small style="color:orange"
-                           th:if="${v.usaPrecioHeredado}">
-                        ⚠ Usa precio del talle anterior
-                    </small>
+                    <p class="precio-warning"
+                       th:if="${v.usaPrecioHeredado}"
+                       title="Usa precio del talle anterior">
+                        ⚠ Precio heredado
+                    </p>
                 </td>
 
                 <td>
                     <div th:text="${v.precioMayoristaFinal}"></div>
 
-                    <small style="color:orange"
-                           th:if="${v.usaPrecioHeredado}">
-                        ⚠ Usa precio del talle anterior
-                    </small>
+                    <p class="precio-warning"
+                       th:if="${v.usaPrecioHeredado}"
+                       title="Usa precio del talle anterior">
+                        ⚠ Precio heredado
+                    </p>
                 </td>
 
                 <td>
@@ -125,7 +134,7 @@
 
                         <img th:src="@{'/web/productos/barcode/' + ${v.codigoBarras}}"
                              alt="barcode"
-                             style="width:160px; height:auto;" />
+                             style="max-width:90px;">
 
                         <span style="font-size:12px;margin-top:4px;letter-spacing:2px;font-family:monospace;font-weight:bold;"
                               th:text="${v.codigoBarras}">
@@ -144,7 +153,7 @@
 
                         <input type="hidden" name="varianteId" th:value="${v.id}" />
 
-                        <input type="number" name="cantidad" placeholder="+ stock" style="width:80px"/>
+                        <input type="number" name="cantidad" placeholder="stock" style="width:80px"/>
 
                         <button type="submit" class="btn-mas">➕</button>
 
@@ -152,17 +161,17 @@
 
                 </td>
 
-                <td>
+                <td style="padding:8px;">
 
-                    <a th:href="@{'/web/productos/etiqueta/' + ${v.id}}">
+                    <a th:href="@{'/web/productos/etiqueta/' + ${v.id}}" class="btn btn-imprimir-etiqueta">
                         Imprimir etiqueta
                     </a>
 
-                    <a th:href="@{'/web/variantes/editar/' + ${v.id}}">
+                    <a th:href="@{'/web/variantes/editar/' + ${v.id}}" class="btn btn-editar">
                         Editar
                     </a>
 
-                    <a th:href="@{'/web/variantes/eliminar/' + ${v.id} + '/' + ${producto.id}}">
+                    <a th:href="@{'/web/variantes/eliminar/' + ${v.id} + '/' + ${producto.id}}"  class="btn btn-eliminar">
                         Eliminar
                     </a>
 
@@ -181,28 +190,165 @@
     </div>
 
     <script>
-
         document.addEventListener("DOMContentLoaded", function(){
 
             const colorSelect = document.getElementById("colorSelect");
-            const talles = document.getElementById("tallesContainer");
+            const tallesContainer = document.getElementById("tallesContainer");
 
-            if(!colorSelect) return;
+            if(colorSelect){
+                colorSelect.addEventListener("change", function(){
+                    tallesContainer.style.display = this.value ? "block" : "none";
+                });
+            }
 
-            colorSelect.addEventListener("change", function(){
+            // 👉 Click en fila = toggle checkbox
+            document.querySelectorAll(".fila-talle").forEach(fila => {
 
-                if(this.value){
-                    talles.style.display = "block";
-                }else{
-                    talles.style.display = "none";
-                }
+                fila.addEventListener("click", function(e){
 
+                    if(e.target.tagName === "INPUT") return;
+
+                    const checkbox = fila.querySelector(".check-talle");
+                    checkbox.checked = !checkbox.checked;
+                });
+            });
+
+            // 👉 Si escribe stock → marca checkbox automáticamente
+            document.querySelectorAll(".input-stock").forEach(input => {
+
+                input.addEventListener("input", function(){
+
+                    const fila = input.closest("tr");
+                    const checkbox = fila.querySelector(".check-talle");
+
+                    if(input.value && input.value > 0){
+                        checkbox.checked = true;
+                    }
+                });
             });
 
         });
 
+        function validarFormulario(){
+
+            const color = document.getElementById("colorSelect").value;
+            const errorColor = document.getElementById("errorColor");
+
+            if(!color){
+                errorColor.style.display = "block";
+                return false;
+            } else {
+                errorColor.style.display = "none";
+            }
+
+            const checkboxes = document.querySelectorAll("input[name='tallesSeleccionados']");
+            let algunoSeleccionado = false;
+
+            for(let cb of checkboxes){
+
+                if(cb.checked){
+
+                    algunoSeleccionado = true;
+
+                    const talle = cb.value;
+                    const stockInput = document.querySelector(`input[name="stock[${talle}]"]`);
+
+                    if(!stockInput.value || stockInput.value <= 0){
+
+                        stockInput.classList.add("input-error-stock");
+
+                        alert("Falta ingresar stock para el talle: " + talle);
+
+                        stockInput.focus();
+                        return false;
+
+                    } else {
+                        stockInput.classList.remove("input-error-stock");
+                    }
+                }
+            }
+
+            if(!algunoSeleccionado){
+                alert("Debes seleccionar al menos un talle");
+                return false;
+            }
+
+            return true;
+        }
     </script>
 
+    <style>
+        <style>
+    .tabla-buscable {
+        width: 100%;
+        border-collapse: collapse;
+        font-size: 16px; /* más grande que antes */
+    }
+
+    .tabla-buscable th,
+    .tabla-buscable td {
+        padding: 10px; /* un poco más de espacio */
+        text-align: center;
+        vertical-align: middle;
+    }
+
+    .tabla-buscable td {
+        white-space: nowrap;
+    }
+
+    .tabla-buscable img {
+        max-width: 120px; /* aumentar un poco el barcode */
+        height: auto;
+    }
+
+    .tabla-buscable td:nth-child(6) span {
+        font-size: 13px; /* más legible */
+    }
+
+    .tabla-buscable td:last-child {
+        display: flex;
+        flex-direction: column;
+        gap: 6px; /* separar los botones un poco más */
+        align-items: center;
+    }
+
+    .tabla-buscable .btn {
+        padding: 6px 10px; /* botones más grandes */
+        font-size: 14px;
+        border-radius: 4px;
+    }
+
+    .stock-indicador {
+        display: inline-block;
+        width: 10px;
+        height: 10px;
+        border-radius: 50%;
+        margin-right: 6px;
+    }
+
+    .stock-indicador.ok { background-color: #2ecc71; }
+    .stock-indicador.bajo { background-color: #f1c40f; }
+    .stock-indicador.critico { background-color: #e74c3c; }
+
+        .precio-warning{
+            font-size:12px;
+            color:orange;
+            margin:2px 0 0 0;
+        }
+
+        .fila-talle {
+            cursor: pointer;
+        }
+
+        .fila-talle:hover {
+            background-color: #009dcf;
+        }
+
+        .check-talle {
+            transform: scale(1.5); /* checkbox más grande */
+            cursor: pointer;
+        }
+    </style>
 </section>
 
 </html>

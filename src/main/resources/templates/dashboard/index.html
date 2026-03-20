@@ -83,7 +83,7 @@
             <tbody>
 
             <tr th:each="p : ${stats.productosStockBajoLista}">
-                <td th:text="${p.producto.nombre}"></td>
+                <td th:text="${p.producto.sku}"></td>
                 <td style="color:#ef4444;font-weight:bold"
                     th:text="${p.stock}">
                 </td>

@@ -30,10 +30,7 @@ public class Producto {
     @Column(length = 100)
     private String sku;
 
-    @NotBlank(message = "El nombre es obligatorio")
-    @Column(nullable = false)
     private String nombre;
-
 
     @Positive(message = "El costo debe ser mayor a 0")
     private BigDecimal costo;
@@ -96,5 +93,13 @@ public class Producto {
         return precioEspecial1Mayorista != null
                 || precioEspecial2Mayorista != null
                 || precioEspecial3Mayorista != null;
+    }
+
+    @PrePersist
+    @PreUpdate
+    public void syncNombre() {
+        if (nombre == null || nombre.isBlank()) {
+            nombre = sku;
+        }
     }
 }

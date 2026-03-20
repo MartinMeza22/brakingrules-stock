@@ -3,12 +3,17 @@
       th:replace="layout/base :: layout(~{::section}, 'Variante')">
 
     <section>
+
+        <div th:if="${error}" class="alert-error">
+            <p th:text="${error}"></p>
+        </div>
+
         <form th:action="@{'/web/variantes/actualizar/' + ${variante.id}}"
               th:object="${variante}"
               method="post">
 
             <label>Color</label>
-            <select th:field="*{color}">
+            <select id="colorSelect" th:field="*{color}">
                 <option th:each="c : ${colores}"
                         th:value="${c}"
                         th:text="${c}">
@@ -16,21 +21,52 @@
             </select>
 
             <label>Talle</label>
-            <select th:field="*{talle}">
+            <select id="talleSelect" th:field="*{talle}">
                 <option th:each="t : ${talles}"
                         th:value="${t}"
-                        th:text="${t}">
+                        th:text="${t}"
+                        th:disabled="${tallesBloqueados.contains(t)}">
                 </option>
             </select>
 
-            <label>Stock</label>
-            <input type="number"
-                   min="0"
-                   th:field="*{stock}"
-                   placeholder="Stock"/>
-
             <button type="submit">Guardar</button>
+            <script>
+                document.addEventListener("DOMContentLoaded", function () {
 
+                    const colorSelect = document.getElementById("colorSelect");
+                    const talleSelect = document.getElementById("talleSelect");
+
+                    const productoId = [[${variante.producto.id}]];
+                    const varianteId = [[${variante.id}]];
+
+                    colorSelect.addEventListener("change", function () {
+
+                        const color = this.value;
+
+                        fetch(`/web/variantes/talles-ocupados?productoId=${productoId}&color=${color}&varianteId=${varianteId}`)
+                            .then(res => res.json())
+                            .then(tallesOcupados => {
+
+                                const opciones = talleSelect.options;
+
+                                for (let i = 0; i < opciones.length; i++) {
+
+                                    const opcion = opciones[i];
+                                    const talle = opcion.value;
+
+                                    if (!talle) continue;
+
+                                    if (tallesOcupados.includes(talle)) {
+                                        opcion.disabled = true;
+                                    } else {
+                                        opcion.disabled = false;
+                                    }
+                                }
+                            });
+                    });
+
+                });
+            </script>
         </form>
 
     </section>

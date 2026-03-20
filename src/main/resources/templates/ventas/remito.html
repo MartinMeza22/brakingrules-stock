@@ -4,35 +4,127 @@
 
     <style>
 
+        @page {
+            size: A6 portrait;
+            margin: 0;
+        }
+
         body{
-        font-family: Arial;
+            font-family: Arial;
+            margin:0;
         }
 
         .remito{
+            width: 10.5cm;
+            height: 17cm;
 
-        width:17cm;
-        height:10.5cm;
+            box-sizing: border-box;
 
-        border:1px solid black;
+            padding-top: 4cm;
+            padding-bottom: 2cm;
+            padding-left: 12px;
+            padding-right: 12px;
+        }
 
-        padding:10px;
+        .header{
+            display:flex;
+            justify-content:space-between;
+            align-items:center;
+            border-bottom:1px solid black;
+            padding-bottom:6px;
+            margin-bottom:8px;
+        }
 
+        .titulo{
+            font-size:16px;
+            font-weight:bold;
+        }
+
+        .numero{
+            font-size:14px;
+            font-weight:bold;
+        }
+
+        .info{
+            margin-bottom:10px;
+            font-size:13px;
+        }
+
+        .info p{
+            margin:2px 0;
+        }
+
+        .label{
+            font-weight:bold;
         }
 
         table{
-
-        width:100%;
-        border-collapse: collapse;
-
+            width:100%;
+            border-collapse: collapse;
+            font-size:12px;
+            margin-top:5px;
         }
 
-        td,th{
-
-        border:1px solid black;
-        padding:4px;
-
+        thead{
+            border-bottom:2px solid black;
         }
 
+        th{
+            padding:6px 4px;
+            text-align:center;
+            font-weight:bold;
+        }
+
+        td{
+            padding:5px 4px;
+            text-align:center;
+        }
+
+        tbody tr{
+            border-bottom:1px dashed black;
+        }
+
+
+        .total{
+            margin-top:10px;
+            border-top:2px solid black;
+            padding-top:6px;
+
+            display:flex;
+            justify-content:space-between;
+            align-items:center;
+
+            font-size:15px;
+            font-weight:bold;
+        }
+
+
+        .right{
+            text-align:right;
+        }
+
+        .totales-box{
+            margin-top:10px;
+            border-top:2px solid black;
+            padding-top:6px;
+            font-size:13px;
+        }
+
+        .linea{
+            display:flex;
+            justify-content:space-between;
+            margin:2px 0;
+        }
+
+        .total-final{
+            display:flex;
+            justify-content:space-between;
+            margin-top:6px;
+            padding-top:4px;
+            border-top:1px solid black;
+            font-size:15px;
+            font-weight:bold;
+        }
     </style>
 
 </head>
@@ -41,17 +133,22 @@
 
 <div class="remito">
 
-    <h3>Remito Venta #<span th:text="${venta.id}"></span></h3>
+    <div class="header">
+        <div class="titulo">REMITO</div>
+        <div class="numero">#<span th:text="${venta.id}"></span></div>
+    </div>
 
-    <p>
-        Cliente:
-        <span th:text="${venta.cliente.nombre + ' ' + venta.cliente.apellido}"></span>
-    </p>
+    <div class="info">
+        <p>
+            <span class="label">Cliente:</span>
+            <span th:text="${venta.nombreClienteMostrar}"></span>
+        </p>
 
-    <p>
-        Fecha:
-        <span th:text="${#temporals.format(venta.fecha,'dd/MM/yyyy')}"></span>
-    </p>
+        <p>
+            <span class="label">Fecha:</span>
+            <span th:text="${#temporals.format(venta.fecha,'dd/MM/yyyy')}"></span>
+        </p>
+    </div>
 
     <table>
 
@@ -59,33 +156,47 @@
         <tr>
             <th>Producto</th>
             <th>Cant</th>
-            <th>Precio</th>
-            <th>Subtotal</th>
+            <th>Precio Unit.</th>
+            <th>Total</th>
         </tr>
         </thead>
 
         <tbody>
-
         <tr th:each="d : ${detalles}">
-
-            <td th:text="${d.nombreProducto}"></td>
+            <td th:text="${d.skuProducto}"></td>
 
             <td th:text="${d.cantidad}"></td>
 
-            <td th:text="${d.precioUnitario}"></td>
+            <td class="right" th:text="${d.precioUnitario}"></td>
 
-            <td th:text="${d.subtotal}"></td>
+            <td class="right" th:text="${d.totalLinea}"></td>
 
         </tr>
-
         </tbody>
 
     </table>
 
-    <h3>Total: $<span th:text="${venta.total}"></span></h3>
+    <div class="totales-box">
+
+        <div class="linea">
+            <span>Subtotal</span>
+            <span>$<span th:text="${venta.subtotal}"></span></span>
+        </div>
+
+        <div class="linea"
+             th:if="${venta.descuento != null and venta.descuento > 0}">
+            <span>Descuento</span>
+            <span>- $<span th:text="${venta.descuento}"></span></span>
+        </div>
+
+        <div class="total-final">
+            <span>TOTAL</span>
+            <span>$<span th:text="${venta.total}"></span></span>
+        </div>
+
+    </div>
 
 </div>
 
 </body>
-
 </html>

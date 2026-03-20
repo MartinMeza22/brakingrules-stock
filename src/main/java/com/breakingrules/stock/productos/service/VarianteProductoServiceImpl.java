@@ -11,6 +11,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
 import java.util.List;
+import java.util.Optional;
 
 @Service
 @Transactional
@@ -131,16 +132,12 @@ public class VarianteProductoServiceImpl implements VarianteProductoService {
     @Override
     public void guardar(VarianteProducto variante) {
 
-        boolean existe = varianteRepository.existsByProductoIdAndColorAndTalleAndIdNot(
+        validarDuplicado(
                 variante.getProducto().getId(),
                 variante.getColor(),
                 variante.getTalle(),
-                variante.getId() == null ? -1 : variante.getId()
+                variante.getId()
         );
-
-        if (existe) {
-            throw new RuntimeException("Ya existe una variante con ese color y talle");
-        }
 
         if (variante.getPrecioPublicoFinal() == null ||
                 variante.getPrecioPublicoFinal().compareTo(BigDecimal.ZERO) <= 0) {
@@ -152,6 +149,21 @@ public class VarianteProductoServiceImpl implements VarianteProductoService {
             throw new RuntimeException("Precio mayorista inválido");
         }
 
+        String nuevoCodigo = generarCodigoBarras(
+                variante.getProducto().getSku(),
+                variante.getColor(),
+                variante.getTalle()
+        );
+
+        boolean existeCodigo = varianteRepository
+                .existsByCodigoBarrasAndIdNot(nuevoCodigo, variante.getId());
+
+        if (existeCodigo) {
+            throw new RuntimeException("Ya existe una variante con ese código de barras");
+        }
+
+        variante.setCodigoBarras(nuevoCodigo);
+
         varianteRepository.save(variante);
     }
 
@@ -160,11 +172,29 @@ public class VarianteProductoServiceImpl implements VarianteProductoService {
         varianteRepository.deleteById(id);
     }
 
-    /**
-     * Genera un código de barras único para la variante
-     */
+
     private String generarCodigoBarras(String sku, Color color, Talle talle) {
         return sku + "-" + color.name() + "-" + talle.name();
+    }
+
+    public void validarDuplicado(Integer productoId, Color color, Talle talle, Integer idActual) {
+
+        VarianteProducto existente = varianteRepository
+                .findByProductoIdAndColorAndTalle(productoId, color, talle)
+                .orElse(null);
+
+        if (existente != null && !existente.getId().equals(idActual)) {
+            throw new RuntimeException("Ya existe una variante con ese color y talle");
+        }
+    }
+
+    public List<Talle> obtenerTallesOcupados(Integer productoId, Color color, Integer varianteId) {
+
+        return varianteRepository.findByProductoIdAndColor(productoId, color)
+                .stream()
+                .filter(v -> !v.getId().equals(varianteId)) // excluir actual
+                .map(VarianteProducto::getTalle)
+                .toList();
     }
 
 }

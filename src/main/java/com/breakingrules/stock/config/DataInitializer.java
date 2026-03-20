@@ -22,9 +22,10 @@ public class DataInitializer implements CommandLineRunner {
 
             Cliente cliente = new Cliente();
 
-            cliente.setNombre("Consumidor");
-            cliente.setApellido("Final");
+            cliente.setNombre("Clientes");
+            cliente.setApellido("Varios");
             cliente.setDocumento("0");
+            cliente.setDescripcion("-");
             cliente.setTipoCliente(TipoCliente.PUBLICO);
             cliente.setTieneCuentaCorriente(false);
             cliente.setActivo(true);

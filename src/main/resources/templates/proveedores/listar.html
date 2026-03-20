@@ -11,21 +11,27 @@
               th:object="${proveedorNuevo}"
               method="post">
 
+            <label>Nombre *</label>
             <input th:field="*{nombre}" placeholder="Nombre"/>
             <div th:if="${#fields.hasErrors('nombre')}" th:errors="*{nombre}"></div>
 
+            <label>Descripción</label>
             <input th:field="*{descripcion}" placeholder="Descripcion"/>
             <div th:if="${#fields.hasErrors('cuit')}" th:errors="*{descripcion}"></div>
 
+            <label>DNI / CUIT *</label>
             <input th:field="*{cuit}" placeholder="CUIT"/>
             <div th:if="${#fields.hasErrors('cuit')}" th:errors="*{cuit}"></div>
 
+            <label>Email *</label>
             <input th:field="*{email}" placeholder="Email"/>
             <div th:if="${#fields.hasErrors('email')}" th:errors="*{email}"></div>
 
+            <label>Telefono *</label>
             <input th:field="*{telefono}" placeholder="Teléfono"/>
             <div th:if="${#fields.hasErrors('telefono')}" th:errors="*{telefono}"></div>
 
+            <label>Dirección</label>
             <input th:field="*{direccion}" placeholder="Dirección"/>
             <div th:if="${#fields.hasErrors('direccion')}" th:errors="*{direccion}"></div>
 

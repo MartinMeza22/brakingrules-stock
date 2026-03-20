@@ -107,24 +107,40 @@ public class VarianteProductoWebController {
 
         VarianteProducto variante = varianteService.obtenerPorId(id);
 
+        List<Talle> tallesBloqueados = variante.getProducto().getVariantes().stream()
+                .filter(v -> v.getColor().equals(variante.getColor()))
+                .filter(v -> !v.getId().equals(variante.getId()))
+                .map(VarianteProducto::getTalle)
+                .toList();
+
         model.addAttribute("variante", variante);
         model.addAttribute("colores", Color.values());
         model.addAttribute("talles", Talle.values());
+        model.addAttribute("tallesBloqueados", tallesBloqueados);
 
         return "variantes/editar";
     }
 
     @PostMapping("/actualizar/{id}")
     public String actualizar(@PathVariable Integer id,
-                             @ModelAttribute VarianteProducto variante) {
+                             @ModelAttribute VarianteProducto variante,
+                             RedirectAttributes redirectAttributes) {
 
         VarianteProducto existente = varianteService.obtenerPorId(id);
 
         existente.setColor(variante.getColor());
         existente.setTalle(variante.getTalle());
-        varianteService.guardar(existente);
 
         Integer productoId = existente.getProducto().getId();
+
+        try {
+            varianteService.guardar(existente);
+        } catch (RuntimeException e) {
+
+            redirectAttributes.addFlashAttribute("error", e.getMessage());
+
+            return "redirect:/web/variantes/editar/" + id;
+        }
 
         return "redirect:/web/variantes/" + productoId;
     }
@@ -160,5 +176,16 @@ public class VarianteProductoWebController {
         }
 
         return "redirect:/web/variantes/" + productoId;
+    }
+
+    @GetMapping("/talles-ocupados")
+    @ResponseBody
+    public List<Talle> obtenerTallesOcupados(
+            @RequestParam Integer productoId,
+            @RequestParam Color color,
+            @RequestParam Integer varianteId
+    ) {
+
+        return varianteService.obtenerTallesOcupados(productoId, color, varianteId);
     }
 }
