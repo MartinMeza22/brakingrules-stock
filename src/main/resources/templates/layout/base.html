@@ -939,6 +939,100 @@
         max-width: 120px;
         white-space: normal;
     }
+
+    :root {
+        --bg: #0f172a;
+        --text: #e5e7eb;
+    }
+
+    .light-mode {
+        --bg: #ffffff;
+        --text: #111827;
+    }
+
+    body {
+        background: var(--bg);
+        color: var(--text);
+    }
+
+    .btn-theme {
+        margin-left: auto;
+        font-size: 18px;
+        padding: 6px 10px;
+        border-radius: 6px;
+        border: none;
+        cursor: pointer;
+        background: transparent;
+        color: var(--text);
+    }
+
+    .light-mode table thead tr {
+        background: #f3f4f6 !important;
+        color: #111827 !important;
+    }
+
+    .light-mode table tbody tr {
+        background: transparent !important;
+        color: #111827 !important;
+    }
+
+    .light-mode table tbody tr:hover {
+        background: rgba(0,0,0,0.05) !important;
+    }
+
+    .light-mode .tooltip .tooltiptext {
+        background: #e5e7eb !important;
+        color: #111827 !important;
+    }
+
+    .light-mode input,
+    .light-mode select,
+    .light-mode textarea {
+        background: #ffffff !important;
+        color: #111827 !important;
+        border: 1px solid #d1d5db !important;
+    }
+
+    .light-mode .buscador-tabla {
+        background: #ffffff !important;
+        color: #111827 !important;
+    }
+
+    .light-mode .card {
+        background: #ffffff !important;
+        color: #111827 !important;
+    }
+
+    .light-mode .btn-editar {
+        background-color: #facc15 !important;
+        color: #111827 !important;
+    }
+
+    .light-mode .btn-variantes {
+        background-color: #3b82f6 !important;
+    }
+
+    .light-mode .btn-eliminar {
+        background-color: #ef4444 !important;
+    }
+
+    .light-mode .cliente-preview-box {
+        background: #f9fafb !important;
+        border: 1px solid #d1d5db !important;
+    }
+
+    .light-mode .cliente-preview-label {
+        color: #6b7280 !important;
+    }
+
+    .light-mode .cliente-preview-nombre {
+        color: #111827 !important;
+    }
+
+    .light-mode .cliente-preview.varios {
+        background: #dbeafe !important; /* celeste */
+        color: #1e3a8a !important;
+    }
 </style>
 
 <body>
@@ -954,8 +1048,33 @@
 <div th:replace="fragments/footer :: footer"></div>
 
 <script>
-
     document.addEventListener("DOMContentLoaded", function () {
+
+        const toggleBtn = document.getElementById("toggleTheme");
+
+        const temaGuardado = localStorage.getItem("theme");
+
+        if (temaGuardado === "light") {
+            document.body.classList.add("light-mode");
+        }
+
+        if (toggleBtn) {
+            toggleBtn.textContent =
+                document.body.classList.contains("light-mode") ? "☀️" : "🌙";
+        }
+
+        if (toggleBtn) {
+            toggleBtn.addEventListener("click", () => {
+
+                document.body.classList.toggle("light-mode");
+
+                const esLight = document.body.classList.contains("light-mode");
+
+                localStorage.setItem("theme", esLight ? "light" : "dark");
+
+                toggleBtn.textContent = esLight ? "☀️" : "🌙";
+            });
+        }
 
         const tablas = document.querySelectorAll(".tabla-buscable");
 
@@ -977,7 +1096,6 @@
                     if (textoOriginal.includes(filtro)) {
 
                         fila.style.display = "";
-                        fila.style.transition = "all 0.2s ease";
 
                         if (filtro.length > 0) {
                             fila.classList.add("fila-encontrada");
@@ -986,9 +1104,7 @@
                         }
 
                     } else {
-
                         fila.style.display = "none";
-
                     }
 
                 });
@@ -998,7 +1114,7 @@
         });
 
     });
-
 </script>
+
 </body>
 </html>
