@@ -35,4 +35,6 @@ public interface VarianteProductoService {
     void validarDuplicado(Integer productoId, Color color, Talle talle, Integer idActual);
 
     List<Talle> obtenerTallesOcupados(Integer productoId, Color color, Integer varianteId);
+
+    void sumarStock(Integer varianteId, Integer cantidad);
 }

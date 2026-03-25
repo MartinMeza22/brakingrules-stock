@@ -48,10 +48,11 @@ public class VarianteProductoWebController {
         Producto producto = productoService.obtenerEntidadPorId(productoId);
 
         model.addAttribute("producto", producto);
-        model.addAttribute("variantes", producto.getVariantes());
+        model.addAttribute("variantes", productoService.obtenerVariantesOrdenadas(productoId));
         model.addAttribute("colores", Color.values());
         model.addAttribute("talles", Talle.values());
         model.addAttribute("varianteNueva", new VarianteProducto());
+        model.addAttribute("stockTotal", productoService.obtenerStockTotal(productoId));
 
         return "variantes/listar";
     }
@@ -89,8 +90,22 @@ public class VarianteProductoWebController {
     @PostMapping("/ingresar-stock")
     public String ingresarStock(
             @RequestParam Integer varianteId,
-            @RequestParam Integer cantidad
+            @RequestParam(required = false) Integer cantidad,
+            RedirectAttributes redirectAttributes
     ) {
+
+        if (cantidad == null || cantidad <= 0) {
+
+            redirectAttributes.addFlashAttribute("error", "Ingresá una cantidad válida");
+            redirectAttributes.addFlashAttribute("errorVarianteId", varianteId);
+
+            Integer productoId = varianteService
+                    .obtenerPorId(varianteId)
+                    .getProducto()
+                    .getId();
+
+            return "redirect:/web/variantes/" + productoId;
+        }
 
         varianteService.ingresarStock(varianteId, cantidad);
 

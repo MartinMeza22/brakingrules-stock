@@ -6,12 +6,15 @@ import com.breakingrules.stock.productos.service.VarianteProductoService;
 import com.breakingrules.stock.venta.entity.Venta;
 import com.breakingrules.stock.venta.entity.VentaDetalle;
 import com.breakingrules.stock.venta.service.VentaService;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import java.math.BigDecimal;
 import java.util.List;
+import java.util.Map;
 
 @Controller
 @RequestMapping("/web/ventas")
@@ -63,11 +66,26 @@ public class VentaWebController {
     @PostMapping("/agregar-producto")
     public String agregarProducto(
             @RequestParam Integer ventaId,
-            @RequestParam Integer varianteId,
-            @RequestParam Integer cantidad
+            @RequestParam(required = false) Integer varianteId,
+            @RequestParam(required = false) Integer cantidad,
+            RedirectAttributes redirectAttributes
     ) {
 
-        ventaService.agregarProducto(ventaId, varianteId, cantidad);
+        if (varianteId == null) {
+            redirectAttributes.addFlashAttribute("error", "Seleccioná un producto");
+            return "redirect:/web/ventas/" + ventaId;
+        }
+
+        if (cantidad == null || cantidad <= 0) {
+            redirectAttributes.addFlashAttribute("error", "Ingresá una cantidad válida");
+            return "redirect:/web/ventas/" + ventaId;
+        }
+
+        try {
+            ventaService.agregarProducto(ventaId, varianteId, cantidad);
+        } catch (Exception e) {
+            redirectAttributes.addFlashAttribute("error", "No se pudo agregar el producto");
+        }
 
         return "redirect:/web/ventas/" + ventaId;
     }
@@ -75,12 +93,32 @@ public class VentaWebController {
     @PostMapping("/finalizar")
     public String finalizarVenta(
             @RequestParam Integer ventaId,
-            @RequestParam(required = false) BigDecimal descuento
+            @RequestParam(required = false) BigDecimal descuento,
+            Model model
     ) {
 
-        ventaService.finalizarVenta(ventaId, descuento);
+        try {
+            ventaService.finalizarVenta(ventaId, descuento);
+            return "redirect:/web/ventas/historial";
+        } catch (RuntimeException e) {
 
-        return "redirect:/web/ventas/historial";
+            model.addAttribute("error", e.getMessage());
+
+            model.addAttribute("venta", ventaService.obtenerVenta(ventaId));
+            model.addAttribute("detalles", ventaService.obtenerDetalles(ventaId));
+            model.addAttribute("variantes", varianteProductoService.listarTodas()
+                    .stream()
+                    .map(v -> Map.of(
+                            "id", v.getId(),
+                            "nombre", v.getProducto().getNombre(),
+                            "color", v.getColor(),
+                            "talle", v.getTalle(),
+                            "stock", v.getStock()
+                    ))
+                    .toList());
+
+            return "ventas/detalle";
+        }
     }
 
     @GetMapping("/historial")
@@ -114,4 +152,35 @@ public class VentaWebController {
         model.addAttribute("venta", venta);
         model.addAttribute("detalles", detalles);
         return "ventas/remito"; }
+
+    @PostMapping("/eliminar-producto")
+    public String eliminarProducto(
+            @RequestParam Integer ventaId,
+            @RequestParam Integer detalleId
+    ) {
+        ventaService.eliminarProducto(detalleId);
+        return "redirect:/web/ventas/" + ventaId;
+    }
+
+    @PostMapping("/reabrir")
+    public String reabrirVenta(@RequestParam Integer ventaId) {
+
+        ventaService.reabrirVenta(ventaId);
+
+        return "redirect:/web/ventas/" + ventaId;
+    }
+
+    @PostMapping("/anular")
+    public String anularVenta(@RequestParam Integer ventaId) {
+
+        ventaService.anularVenta(ventaId);
+
+        return "redirect:/web/ventas/historial";
+    }
+
+    @PostMapping("/cancelar")
+    @ResponseStatus(HttpStatus.OK) //
+    public void cancelarVenta(@RequestParam Integer ventaId) {
+        ventaService.cancelarSiEstaVacia(ventaId);
+    }
 }

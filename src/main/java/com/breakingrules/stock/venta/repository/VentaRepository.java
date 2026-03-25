@@ -49,4 +49,6 @@ public interface VentaRepository extends JpaRepository<Venta, Integer> {
            """)
     List<Double> datosVentas(@Param("inicio") LocalDateTime inicio,
                              @Param("fin") LocalDateTime fin);
+
+    List<Venta> findAllByOrderByIdDesc();
 }

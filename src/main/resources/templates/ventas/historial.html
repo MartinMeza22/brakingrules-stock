@@ -1,12 +1,15 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org"
       th:replace="layout/base :: layout(~{::section}, 'Ventas')">
+
 <section>
 
     <div class="card">
 
         <h3>📄 Historial de Ventas</h3>
+
         <input class="buscador-tabla" placeholder="Buscar...">
+
         <table class="tabla-buscable" th:if="${!ventas.isEmpty()}">
 
             <thead>
@@ -16,7 +19,7 @@
                 <th>Cliente</th>
                 <th>Total</th>
                 <th>Estado</th>
-                <th></th>
+                <th>Acciones</th>
             </tr>
             </thead>
 
@@ -32,16 +35,52 @@
 
                 <td th:text="${v.total}"></td>
 
-                <td th:text="${v.estado}"></td>
+                <td>
+                    <span th:class="'badge-estado ' + ${v.estado.name().toLowerCase()}"
+                          th:text="${v.estado}">
+                    </span>
+                </td>
 
                 <td>
+                    <div class="acciones-venta">
 
-                    <a class="btn-remito"
-                       th:href="@{'/web/ventas/remito/' + ${v.id}}"
-                       target="_blank"
-                       rel="noopener noreferrer">
-                        Remito
-                    </a>
+                        <a class="btn-accion"
+                           th:if="${v.estado.name() == 'FINALIZADA' || v.estado.name() == 'ANULADA'}"
+                           th:href="@{'/web/ventas/remito/' + ${v.id}}"
+                           target="_blank">
+                            Remito
+                        </a>
+
+                        <form th:if="${v.estado.name() == 'ABIERTA'}"
+                              th:action="@{'/web/ventas/' + ${v.id}}"
+                              method="get">
+                            <button class="btn-accion">
+                                Editar
+                            </button>
+                        </form>
+
+                        <form th:if="${v.estado.name() == 'ABIERTA'}"
+                              th:action="@{/web/ventas/finalizar}"
+                              method="post">
+                            <input type="hidden" name="ventaId" th:value="${v.id}" />
+                            <button class="btn-finalizar">
+                                Cerrar
+                            </button>
+                        </form>
+
+                        <form th:if="${v.estado.name() != 'ANULADA'}"
+                              th:action="@{/web/ventas/anular}"
+                              method="post"
+                              onsubmit="return confirm('¿Seguro que querés anular la venta?')">
+
+                            <input type="hidden" name="ventaId" th:value="${v.id}" />
+
+                            <button class="btn-eliminar">
+                                ❌ Anular
+                            </button>
+                        </form>
+
+                    </div>
                 </td>
 
             </tr>
@@ -52,4 +91,54 @@
 
     </div>
 
+    <style>
+
+        .acciones-venta {
+            display: flex;
+            gap: 6px;
+            justify-content: flex-end;
+            flex-wrap: wrap;
+        }
+
+        .acciones-venta form {
+            margin: 0;
+        }
+
+        .acciones-venta .btn-accion,
+        .acciones-venta .btn-finalizar,
+        .acciones-venta .btn-eliminar {
+            padding: 6px 10px;
+            font-size: 14px;
+        }
+
+        td {
+            vertical-align: middle;
+        }
+
+        /* BADGES DE ESTADO */
+        .badge-estado {
+            padding: 4px 8px;
+            border-radius: 6px;
+            font-size: 12px;
+            font-weight: bold;
+        }
+
+        .badge-estado.abierta {
+            background: #facc15;
+            color: #111;
+        }
+
+        .badge-estado.finalizada {
+            background: #22c55e;
+            color: white;
+        }
+
+        .badge-estado.anulada {
+            background: #ef4444;
+            color: white;
+        }
+
+    </style>
+
 </section>
+</html>

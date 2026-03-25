@@ -1,5 +1,6 @@
 package com.breakingrules.stock.cuentaCorriente.service;
 
+import com.breakingrules.stock.caja.service.CajaService;
 import com.breakingrules.stock.clientes.entity.Cliente;
 import com.breakingrules.stock.clientes.repository.ClienteRepository;
 import com.breakingrules.stock.cuentaCorriente.entity.*;
@@ -21,6 +22,7 @@ public class CuentaCorrienteServiceImpl implements CuentaCorrienteService {
     private final CuentaCorrienteRepository cuentaCorrienteRepository;
     private final MovimientoCuentaRepository movimientoCuentaRepository;
     private final ClienteRepository clienteRepo;
+    private final CajaService cajaService;
 
     @Override
     public List<CuentaCorriente> listarTodas() {
@@ -54,6 +56,14 @@ public class CuentaCorrienteServiceImpl implements CuentaCorrienteService {
 
         movimientoCuentaRepository.save(movimiento);
         cuentaCorrienteRepository.save(cuenta);
+
+        String referencia = "Pago CC - " + cliente.getNombre();
+
+        if (descripcion != null && !descripcion.isBlank()) {
+            referencia += " | " + descripcion;
+        }
+
+        cajaService.registrarIngreso(monto, referencia);
     }
 
     private Cliente obtenerCliente(Integer id) {

@@ -43,6 +43,9 @@ public class CajaServiceImpl implements CajaService {
         mov.setTipo(tipo);
         mov.setMonto(monto);
         mov.setReferencia(referencia);
+        if (monto == null || monto.compareTo(BigDecimal.ZERO) <= 0) {
+            throw new RuntimeException("El monto debe ser mayor a cero");
+        }
 
         movimientoCajaRepository.save(mov);
     }
@@ -50,5 +53,17 @@ public class CajaServiceImpl implements CajaService {
     @Override
     public List<MovimientoCaja> listarMovimientos(){
         return movimientoCajaRepository.findAll();
+    }
+
+    @Override
+    @Transactional
+    public void registrarIngreso(BigDecimal monto, String referencia) {
+        registrarMovimiento(TipoMovimiento.INGRESO, monto, referencia);
+    }
+
+    @Override
+    @Transactional
+    public void registrarEgreso(BigDecimal monto, String referencia) {
+        registrarMovimiento(TipoMovimiento.EGRESO, monto, referencia);
     }
 }

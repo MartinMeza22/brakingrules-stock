@@ -15,7 +15,10 @@ import org.springframework.stereotype.Service;
 import java.io.IOException;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
+import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Stream;
 
 import org.slf4j.Logger;
@@ -234,4 +237,30 @@ public class ProductoServiceImpl implements ProductoService {
         return repository.existsBySku(sku);
     }
 
+
+    @Override
+    public List<VarianteProducto> obtenerVariantesOrdenadas(Integer productoId) {
+
+        Producto producto = obtenerEntidadPorId(productoId);
+
+        List<VarianteProducto> variantes = new ArrayList<>(producto.getVariantes());
+
+        variantes.sort(
+                Comparator
+                        .comparing((VarianteProducto v) -> v.getColor().ordinal())
+                        .thenComparing(v -> v.getTalle().ordinal())
+        );
+
+        return variantes;
+    }
+
+    public Integer obtenerStockTotal(Integer productoId) {
+
+        Producto producto = obtenerEntidadPorId(productoId);
+
+        return producto.getVariantes()
+                .stream()
+                .mapToInt(v -> v.getStock() != null ? v.getStock() : 0)
+                .sum();
+    }
 }

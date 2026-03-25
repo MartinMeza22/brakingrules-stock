@@ -145,6 +145,17 @@
             font-size:13px;
             font-weight:bold;
         }
+
+        .remito-anulado{
+            background:#ef4444;
+            color:white;
+            font-weight:bold;
+            text-align:center;
+            padding:10px;
+            margin-bottom:10px;
+            border-radius:6px;
+            font-size:18px;
+        }
     </style>
 </head>
 
@@ -156,7 +167,9 @@
         <div class="titulo">REMITO</div>
         <div class="numero">#<span th:text="${venta.id}"></span></div>
     </div>
-
+    <div th:if="${venta.estado.name() == 'ANULADA'}" class="remito-anulado">
+        ⚠️ REMITO ANULADO
+    </div>
     <div class="info-linea">
 
         <div class="cliente">

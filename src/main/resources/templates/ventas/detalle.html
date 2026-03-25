@@ -3,9 +3,9 @@
       th:replace="layout/base :: layout(~{::section}, 'Detalle Venta')">
 
 <section>
+    <div th:if="${error}" class="alert-error" th:text="${error}"></div>
 
     <div class="card venta-card">
-
         <div class="badge-precio"
              th:classappend="${venta.cliente.tipoCliente.name() == 'MAYORISTA'} ? ' mayorista' : ' publico'"
              th:text="${venta.cliente.tipoCliente.name() == 'MAYORISTA'} ? 'P.M' : 'P.P'">
@@ -17,126 +17,206 @@
             Cliente:
             <span th:text="${venta.nombreClienteMostrar}"></span>
         </p>
-
     </div>
 
     <div class="card">
-
         <h3>➕ Agregar Producto</h3>
 
-        <form th:action="@{/web/ventas/agregar-producto}" method="post">
+        <form th:action="@{/web/ventas/agregar-producto}" method="post" id="formAgregarProducto">
 
             <input type="hidden" name="ventaId" th:value="${venta.id}"/>
 
-            <select name="varianteId">
+            <div class="campo">
 
-                <option value="">Seleccionar producto</option>
+                <label>Buscar producto</label>
+                <input type="text" id="buscarProducto" placeholder="Buscar producto...">
 
-                <option th:each="v : ${variantes}"
-                        th:value="${v.id}"
-                        th:text="${v.producto.nombre
-                        + ' - ' + v.color
-                        + ' - ' + v.talle
-                        + ' (Stock: ' + v.stock + ')'}">
-                </option>
+                <label style="margin-top:10px;">Producto *</label>
+                <select name="varianteId" id="varianteSelect" size="8" class="select-cliente">
 
-            </select>
+                    <option value="">Seleccionar producto</option>
 
-            <input type="number" name="cantidad" placeholder="Cantidad"/>
+                    <option th:each="v : ${variantes}"
+                            th:value="${v.id}"
+                            th:text="${v.producto.nombre + ' - ' + v.color + ' - ' + v.talle + ' (Stock: ' + v.stock + ')'}">
+                    </option>
+
+                </select>
+
+                <div id="errorVariante" class="error-text"></div>
+
+            </div>
+
+            <input type="number"
+                   name="cantidad"
+                   id="cantidad"
+                   placeholder="Cantidad"
+                   min="1"/>
+
+            <div id="errorCantidad" class="error-text"></div>
 
             <button class="btn-accion" type="submit">
                 Agregar
             </button>
-
         </form>
 
+        <div class="card">
+            <h3>Productos en la venta</h3>
+
+            <table th:if="${!detalles.isEmpty()}">
+                <thead>
+                <tr>
+                    <th>Producto</th>
+                    <th>Cantidad</th>
+                    <th>Precio</th>
+                    <th>Subtotal</th>
+                    <th>Acción</th>
+                </tr>
+                </thead>
+
+                <tbody>
+                <tr th:each="d : ${detalles}">
+                    <td th:text="${d.variante.producto.nombre + ' ' + d.variante.color + ' ' + d.variante.talle}"></td>
+                    <td th:text="${d.cantidad}"></td>
+                    <td th:text="${d.precioUnitario}"></td>
+                    <td th:text="${d.subtotal}"></td>
+
+                    <td>
+                        <form th:action="@{/web/ventas/eliminar-producto}" method="post"
+                              onsubmit="return confirm('¿Eliminar producto de la venta?')">
+
+                            <input type="hidden" name="ventaId" th:value="${venta.id}" />
+                            <input type="hidden" name="detalleId" th:value="${d.id}" />
+
+                            <button type="submit" class="btn-eliminar icon-only">🗑</button>
+                        </form>
+                    </td>
+                </tr>
+                </tbody>
+            </table>
+
+            <p>
+                Total:
+                <span id="totalOriginal" th:text="${venta.total}"></span>
+            </p>
+
+            <p>
+                Total con descuento:
+                <span id="totalConDescuento">0</span>
+            </p>
+
+            <form th:action="@{/web/ventas/finalizar}" method="post">
+                <input type="hidden" name="ventaId" th:value="${venta.id}"/>
+
+                <label>Descuento (%)</label>
+
+                <input type="number"
+                       id="descuento"
+                       name="descuento"
+                       step="0.01"
+                       min="0"
+                       max="100"
+                       placeholder="0">
+
+                <button class="btn-finalizar"
+                        th:disabled="${detalles.isEmpty()}">
+                    Finalizar Venta
+                </button>
+            </form>
+        </div>
     </div>
 
+    <script th:inline="javascript">
+        document.addEventListener("DOMContentLoaded", function(){
 
-    <div class="card">
+            const buscar = document.getElementById("buscarProducto");
+            const select = document.getElementById("varianteSelect");
 
-        <h3>Productos en la venta</h3>
+            const cantidadInput = document.getElementById("cantidad");
+            const form = document.getElementById("formAgregarProducto");
 
-        <table th:if="${!detalles.isEmpty()}">
+            const errorVariante = document.getElementById("errorVariante");
+            const errorCantidad = document.getElementById("errorCantidad");
 
-            <thead>
-            <tr>
-                <th>Producto</th>
-                <th>Cantidad</th>
-                <th>Precio</th>
-                <th>Subtotal</th>
-            </tr>
-            </thead>
+            const descuentoInput = document.getElementById("descuento");
+            const totalOriginalEl = document.getElementById("totalOriginal");
+            const totalConDescuento = document.getElementById("totalConDescuento");
 
-            <tbody>
+            const ventaId = /*[[${venta.id}]]*/ 0;
 
-            <tr th:each="d : ${detalles}">
+            buscar.addEventListener("input", function(){
+                const filtro = buscar.value.toLowerCase();
 
-                <td th:text="${d.variante.producto.nombre + ' ' + d.variante.color + ' ' + d.variante.talle}"></td>
+                Array.from(select.options).forEach(option => {
+                    const texto = option.text.toLowerCase();
 
-                <td th:text="${d.cantidad}"></td>
+                    if (!option.value) return;
 
-                <td th:text="${d.precioUnitario}"></td>
+                    option.style.display = texto.includes(filtro) ? "block" : "none";
+                });
+            });
 
-                <td th:text="${d.subtotal}"></td>
+            if (totalOriginalEl && descuentoInput) {
+                const totalOriginal = parseFloat(totalOriginalEl.innerText);
 
-            </tr>
+                descuentoInput.addEventListener("input", function(){
+                    let descuento = parseFloat(this.value) || 0;
+                    let totalFinal = totalOriginal - (totalOriginal * (descuento / 100));
+                    totalConDescuento.innerText = totalFinal.toFixed(2);
+                });
+            }
 
-            </tbody>
+            form.addEventListener("submit", function(e){
 
-        </table>
+                let hayError = false;
 
-        <p>
-            Total:
-            <span id="totalOriginal" th:text="${venta.total}"></span>
-        </p>
+                errorVariante.innerText = "";
+                errorCantidad.innerText = "";
 
-        <p>
-            Total con descuento:
-            <span id="totalConDescuento">0</span>
-        </p>
+                if(!select.value){
+                    errorVariante.innerText = "Seleccioná un producto";
+                    hayError = true;
+                }
 
-        <form th:action="@{/web/ventas/finalizar}" method="post">
+                if(!cantidadInput.value || cantidadInput.value <= 0){
+                    errorCantidad.innerText = "Ingresá una cantidad válida";
+                    hayError = true;
+                }
 
-            <input type="hidden" name="ventaId" th:value="${venta.id}"/>
+                if(hayError){
+                    e.preventDefault();
+                }
+            });
 
-            <label>Descuento (%)</label>
+            let ventaFinalizada = false;
 
-            <input type="number"
-                   id="descuento"
-                   name="descuento"
-                   step="0.01"
-                   min="0"
-                   max="100"
-                   placeholder="0">
+            document.querySelector(".btn-finalizar")?.addEventListener("click", function () {
+                ventaFinalizada = true;
+            });
 
-            <button class="btn-finalizar">
-                Finalizar Venta
-            </button>
+            window.addEventListener("beforeunload", function () {
 
-        </form>
+                const tieneProductos = document.querySelectorAll("tbody tr").length > 0;
 
-    </div>
+                if (!tieneProductos && !ventaFinalizada) {
+                    navigator.sendBeacon("/web/ventas/cancelar?ventaId=" + ventaId);
+                }
+            });
 
-    <script>
-
-        const totalOriginal = parseFloat(document.getElementById("totalOriginal").innerText);
-        const descuentoInput = document.getElementById("descuento");
-        const totalConDescuento = document.getElementById("totalConDescuento");
-
-        function calcularTotal(){
-            let descuento = parseFloat(descuentoInput.value) || 0;
-
-            let montoDescuento = totalOriginal * (descuento / 100);
-            let totalFinal = totalOriginal - montoDescuento;
-
-            totalConDescuento.innerText = totalFinal.toFixed(2);
-        }
-
-        descuentoInput.addEventListener("input", calcularTotal);
-
+        });
     </script>
 
-</section>
+    <style>
+        #buscarProducto{
+            width:100%;
+            padding:8px;
+            margin-bottom:8px;
+        }
 
+        #varianteSelect{
+            width:100%;
+        }
+    </style>
+
+</section>
 </html>

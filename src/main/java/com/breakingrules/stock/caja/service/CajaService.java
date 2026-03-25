@@ -11,4 +11,6 @@ public interface CajaService {
     BigDecimal obtenerSaldoActual();
     void registrarMovimiento(TipoMovimiento tipo, BigDecimal monto, String referencia);
     List<MovimientoCaja> listarMovimientos();
+    void registrarIngreso(BigDecimal monto, String referencia);
+    void registrarEgreso(BigDecimal monto, String referencia);
 }

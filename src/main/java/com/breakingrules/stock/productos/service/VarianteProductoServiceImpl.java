@@ -197,4 +197,14 @@ public class VarianteProductoServiceImpl implements VarianteProductoService {
                 .toList();
     }
 
+    @Override
+    public void sumarStock(Integer varianteId, Integer cantidad) {
+
+        VarianteProducto variante = varianteRepository.findById(varianteId)
+                .orElseThrow(() -> new RuntimeException("Variante no encontrada"));
+
+        variante.setStock(variante.getStock() + cantidad);
+
+        varianteRepository.save(variante);
+    }
 }

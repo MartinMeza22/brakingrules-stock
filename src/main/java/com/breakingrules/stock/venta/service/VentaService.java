@@ -25,4 +25,11 @@ public interface VentaService {
 
     List<Venta> listarVentas();
 
+     void eliminarProducto(Integer detalleId);
+
+    void reabrirVenta(Integer ventaId);
+
+    void anularVenta(Integer ventaId);
+
+    void cancelarSiEstaVacia(Integer ventaId);
 }

@@ -25,6 +25,9 @@ public interface ProductoService {
 
     Page<ProductoDTO> listarPaginado(int page, int size);
 
-
     boolean existeSku(String sku);
+
+    List<VarianteProducto> obtenerVariantesOrdenadas(Integer productoId);
+
+    Integer obtenerStockTotal(Integer productoId);
 }

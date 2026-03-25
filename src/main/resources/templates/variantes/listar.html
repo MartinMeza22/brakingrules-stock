@@ -59,7 +59,7 @@
 
             </div>
 
-            <button type="submit">Guardar variantes</button>
+            <button class="button-e" type="submit">Guardar variantes</button>
 
         </form>
 
@@ -145,7 +145,7 @@
 
                 <td>
 
-                    <div th:if="${error}" style="color:red">
+                    <div th:if="${errorVarianteId == v.id}" style="color:red">
                         <p th:text="${error}"></p>
                     </div>
 
@@ -153,7 +153,11 @@
 
                         <input type="hidden" name="varianteId" th:value="${v.id}" />
 
-                        <input type="number" name="cantidad" placeholder="stock" style="width:80px"/>
+                        <input type="number"
+                               name="cantidad"
+                               placeholder="stock"
+                               min="1"
+                               style="width:80px"/>
 
                         <button type="submit" class="btn-mas">➕</button>
 
@@ -183,6 +187,10 @@
 
         </table>
 
+        <p class="stock-total">
+            Total stock: <span th:text="${stockTotal}"></span>
+        </p>
+
         <a th:href="@{/web/productos}">
             ← Volver a productos
         </a>
@@ -201,7 +209,6 @@
                 });
             }
 
-            // 👉 Click en fila = toggle checkbox
             document.querySelectorAll(".fila-talle").forEach(fila => {
 
                 fila.addEventListener("click", function(e){
@@ -213,7 +220,6 @@
                 });
             });
 
-            // 👉 Si escribe stock → marca checkbox automáticamente
             document.querySelectorAll(".input-stock").forEach(input => {
 
                 input.addEventListener("input", function(){
@@ -221,7 +227,7 @@
                     const fila = input.closest("tr");
                     const checkbox = fila.querySelector(".check-talle");
 
-                    if(input.value && input.value > 0){
+                    if(input.value !== ""){
                         checkbox.checked = true;
                     }
                 });
@@ -253,7 +259,7 @@
                     const talle = cb.value;
                     const stockInput = document.querySelector(`input[name="stock[${talle}]"]`);
 
-                    if(!stockInput.value || stockInput.value <= 0){
+                    if(stockInput.value === ""){
 
                         stockInput.classList.add("input-error-stock");
 
@@ -275,6 +281,23 @@
 
             return true;
         }
+
+        document.querySelectorAll("form[action='/web/variantes/ingresar-stock']")
+        .forEach(form => {
+
+            form.addEventListener("submit", function(e){
+
+                const input = form.querySelector("input[name='cantidad']");
+
+                if(!input.value || input.value <= 0){
+                    e.preventDefault();
+                    alert("Ingresá una cantidad válida");
+                    input.focus();
+                }
+
+            });
+
+        });
     </script>
 
     <style>
@@ -345,7 +368,7 @@
         }
 
         .check-talle {
-            transform: scale(1.5); /* checkbox más grande */
+            transform: scale(1);
             cursor: pointer;
         }
     </style>
