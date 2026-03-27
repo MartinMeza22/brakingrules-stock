@@ -71,6 +71,9 @@ public class Producto {
     @OneToMany(mappedBy = "producto", cascade = CascadeType.ALL)
     private List<VarianteProducto> variantes;
 
+    @Enumerated(EnumType.STRING)
+    private TipoTalle tipoTalle;
+
     @Transient
     public Integer getStockTotal() {
 
@@ -102,4 +105,5 @@ public class Producto {
             nombre = sku;
         }
     }
+
 }

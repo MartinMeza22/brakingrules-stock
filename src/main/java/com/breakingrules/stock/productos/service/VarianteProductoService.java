@@ -2,6 +2,7 @@ package com.breakingrules.stock.productos.service;
 
 import com.breakingrules.stock.productos.entity.Color;
 import com.breakingrules.stock.productos.entity.Talle;
+import com.breakingrules.stock.productos.entity.TipoTalle;
 import com.breakingrules.stock.productos.entity.VarianteProducto;
 
 import java.math.BigDecimal;
@@ -37,4 +38,6 @@ public interface VarianteProductoService {
     List<Talle> obtenerTallesOcupados(Integer productoId, Color color, Integer varianteId);
 
     void sumarStock(Integer varianteId, Integer cantidad);
+
+    List<Talle> obtenerTallesPorTipo(TipoTalle tipo);
 }

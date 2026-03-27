@@ -2,6 +2,7 @@ package com.breakingrules.stock.productos.controller;
 
 import com.breakingrules.stock.productos.entity.Producto;
 import com.breakingrules.stock.productos.entity.Talle;
+import com.breakingrules.stock.productos.entity.TipoTalle;
 import com.breakingrules.stock.productos.entity.VarianteProducto;
 import com.breakingrules.stock.productos.service.EtiquetaService;
 import com.breakingrules.stock.productos.service.ProductoService;
@@ -65,7 +66,9 @@ public class ProductoWebController {
         if (proveedorId != null) {
             producto.setProveedor(proveedorService.obtenerPorId(proveedorId));
         }
-
+        if (producto.getTipoTalle() == null) {
+            producto.setTipoTalle(TipoTalle.ALFABETICO);
+        }
         service.guardar(producto);
 
         return "redirect:/web/productos";
@@ -96,7 +99,7 @@ public class ProductoWebController {
         existente.setNombre(producto.getNombre());
         existente.setSku(producto.getSku());
         existente.setCosto(producto.getCosto());
-
+        existente.setTipoTalle(producto.getTipoTalle());
         existente.setPrecioBasePublico(producto.getPrecioBasePublico());
         existente.setPrecioBaseMayorista(producto.getPrecioBaseMayorista());
 

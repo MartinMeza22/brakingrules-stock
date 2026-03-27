@@ -1,15 +1,13 @@
 package com.breakingrules.stock.productos.service;
 
-import com.breakingrules.stock.productos.entity.Color;
-import com.breakingrules.stock.productos.entity.Producto;
-import com.breakingrules.stock.productos.entity.Talle;
-import com.breakingrules.stock.productos.entity.VarianteProducto;
+import com.breakingrules.stock.productos.entity.*;
 import com.breakingrules.stock.productos.repository.ProductoRepository;
 import com.breakingrules.stock.productos.repository.VarianteProductoRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 
@@ -206,5 +204,12 @@ public class VarianteProductoServiceImpl implements VarianteProductoService {
         variante.setStock(variante.getStock() + cantidad);
 
         varianteRepository.save(variante);
+    }
+
+    @Override
+    public List<Talle> obtenerTallesPorTipo(TipoTalle tipo) {
+        return Arrays.stream(Talle.values())
+                .filter(t -> tipo == TipoTalle.NUMERICO ? t.esNumerico() : t.esAlfabetico())
+                .toList();
     }
 }

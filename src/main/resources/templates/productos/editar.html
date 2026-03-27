@@ -26,13 +26,6 @@
             <label>Artículo</label>
             <input th:field="*{sku}" readonly/>
 
-            <label>Nombre</label>
-            <input th:field="*{nombre}" placeholder="Nombre"/>
-            <div class="error"
-                 th:if="${#fields.hasErrors('nombre')}"
-                 th:errors="*{nombre}">
-            </div>
-
 
             <h4>Precios Base (S a XL)</h4>
 
@@ -57,43 +50,43 @@
             </div>
 
 
-            <h4>Precios XXL / XXXL</h4>
+            <h4>Precios 2XL / 3XL</h4>
 
             <label>Precio Público</label>
             <input type="number" step="0.01"
                    th:field="*{precioEspecial1Publico}"
-                   placeholder="Precio Público XXL"/>
+                   placeholder="Precio Público 2XL - 3XL"/>
 
             <label>Precio Mayorista</label>
             <input type="number" step="0.01"
                    th:field="*{precioEspecial1Mayorista}"
-                   placeholder="Precio Mayorista XXL"/>
+                   placeholder="Precio Mayorista 2XL - 3XL"/>
 
 
-            <h4>Precio XXXXL</h4>
+            <h4>Precio 4XL</h4>
 
             <label>Precio Público</label>
             <input type="number" step="0.01"
                    th:field="*{precioEspecial2Publico}"
-                   placeholder="Precio Público XXXXL"/>
+                   placeholder="Precio Público 4XL"/>
 
             <label>Precio Mayorista</label>
             <input type="number" step="0.01"
                    th:field="*{precioEspecial2Mayorista}"
-                   placeholder="Precio Mayorista XXXXL"/>
+                   placeholder="Precio Mayorista 4XL"/>
 
 
-            <h4>Precios XXXXXL / XXXXXXL</h4>
+            <h4>Precios 5XL / 6XL</h4>
 
             <label>Precio Público</label>
             <input type="number" step="0.01"
                    th:field="*{precioEspecial3Publico}"
-                   placeholder="Precio Público XXXXXL"/>
+                   placeholder="Precio Público 5XL - 6XL"/>
 
             <label>Precio Mayorista</label>
             <input type="number" step="0.01"
                    th:field="*{precioEspecial3Mayorista}"
-                   placeholder="Precio Mayorista XXXXXL"/>
+                   placeholder="Precio Mayorista 5XL - 6XL"/>
 
 
             <label>Proveedor</label>

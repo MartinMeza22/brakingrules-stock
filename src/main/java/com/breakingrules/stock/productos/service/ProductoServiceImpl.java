@@ -4,6 +4,7 @@ import com.breakingrules.stock.productos.dto.ProductoDTO;
 import com.breakingrules.stock.productos.dto.ProductoStatsDTO;
 import com.breakingrules.stock.productos.entity.Producto;
 import com.breakingrules.stock.productos.entity.Talle;
+import com.breakingrules.stock.productos.entity.TipoTalle;
 import com.breakingrules.stock.productos.entity.VarianteProducto;
 import com.breakingrules.stock.productos.repository.ProductoRepository;
 import org.springframework.data.domain.Page;
@@ -58,11 +59,29 @@ public class ProductoServiceImpl implements ProductoService {
     }
 
     public Producto guardar(Producto producto) {
+
         log.info("Intentando guardar producto: {}", producto != null ? producto.getNombre() : "null");
 
         validarProducto(producto);
 
-        log.info("Producto ID antes de save: {}", producto.getId());
+        if (producto.getTipoTalle() == TipoTalle.NUMERICO) {
+
+            log.info("Producto NUMERICO detectado → limpiando precios especiales");
+
+            producto.setPrecioEspecial1Publico(null);
+            producto.setPrecioEspecial1Mayorista(null);
+            producto.setPrecioEspecial2Publico(null);
+            producto.setPrecioEspecial2Mayorista(null);
+            producto.setPrecioEspecial3Publico(null);
+            producto.setPrecioEspecial3Mayorista(null);
+
+        }
+
+        if (producto.getTipoTalle() == null) {
+            log.warn("TipoTalle null → default ALFABETICO");
+            producto.setTipoTalle(TipoTalle.ALFABETICO);
+        }
+
         Producto guardado = repository.save(producto);
 
         log.info("Producto guardado correctamente con ID: {}", guardado.getId());
@@ -108,8 +127,6 @@ public class ProductoServiceImpl implements ProductoService {
             throw new IllegalArgumentException("El producto no puede ser null");
         }
 
-        log.info("Validando producto ID: {}", producto.getId());
-
         if (producto.getPrecioBasePublico() == null ||
                 producto.getPrecioBasePublico().compareTo(BigDecimal.ZERO) <= 0) {
             throw new IllegalArgumentException("El precio público base debe ser mayor a 0");
@@ -120,9 +137,14 @@ public class ProductoServiceImpl implements ProductoService {
             throw new IllegalArgumentException("El precio mayorista base debe ser mayor a 0");
         }
 
-        if (producto.getCosto() != null &&
-                producto.getCosto().compareTo(BigDecimal.ZERO) < 0) {
-            throw new IllegalArgumentException("El costo no puede ser negativo");
+        if (producto.getTipoTalle() == TipoTalle.ALFABETICO) {
+
+            if (producto.getPrecioEspecial1Publico() != null &&
+                    producto.getPrecioEspecial1Mayorista() != null &&
+                    producto.getPrecioEspecial1Publico().compareTo(producto.getPrecioEspecial1Mayorista()) < 0) {
+                throw new IllegalArgumentException("Error en precios 2XL/3XL");
+            }
+
         }
 
         if (producto.getActivo() == null) {
@@ -224,6 +246,7 @@ public class ProductoServiceImpl implements ProductoService {
                 p.getPrecioEspecial1Mayorista(),
                 p.getPrecioEspecial2Mayorista(),
                 p.getPrecioEspecial3Mayorista(),
+                p.getTipoTalle(),
                 p.getActivo(),
                 p.getStockTotal(),
                 p.getProveedor() != null
@@ -263,4 +286,5 @@ public class ProductoServiceImpl implements ProductoService {
                 .mapToInt(v -> v.getStock() != null ? v.getStock() : 0)
                 .sum();
     }
+
 }

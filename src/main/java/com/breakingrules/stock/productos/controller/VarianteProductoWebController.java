@@ -1,9 +1,6 @@
 package com.breakingrules.stock.productos.controller;
 
-import com.breakingrules.stock.productos.entity.Color;
-import com.breakingrules.stock.productos.entity.Producto;
-import com.breakingrules.stock.productos.entity.Talle;
-import com.breakingrules.stock.productos.entity.VarianteProducto;
+import com.breakingrules.stock.productos.entity.*;
 import com.breakingrules.stock.productos.service.ProductoService;
 import com.breakingrules.stock.productos.service.VarianteProductoService;
 import lombok.RequiredArgsConstructor;
@@ -50,13 +47,33 @@ public class VarianteProductoWebController {
         model.addAttribute("producto", producto);
         model.addAttribute("variantes", productoService.obtenerVariantesOrdenadas(productoId));
         model.addAttribute("colores", Color.values());
-        model.addAttribute("talles", Talle.values());
+
+        List<Talle> tallesFiltrados;
+
+        if (producto.getTipoTalle() != null &&
+                producto.getTipoTalle().name().equals("ALFABETICO")) {
+
+            tallesFiltrados = List.of(
+                    Talle.S, Talle.M, Talle.L, Talle.XL,
+                    Talle.XXL, Talle.XXXL, Talle.XXXXL, Talle.XXXXXL, Talle.XXXXXXL
+            );
+
+        } else {
+
+            tallesFiltrados = List.of(
+                    Talle.T38, Talle.T40, Talle.T42, Talle.T44,
+                    Talle.T46, Talle.T48, Talle.T50,
+                    Talle.T52
+            );
+        }
+
+        model.addAttribute("talles", tallesFiltrados);
+
         model.addAttribute("varianteNueva", new VarianteProducto());
         model.addAttribute("stockTotal", productoService.obtenerStockTotal(productoId));
 
         return "variantes/listar";
     }
-
     @PostMapping("/guardar/{productoId}")
     public String guardar(@PathVariable Integer productoId,
                           @ModelAttribute VarianteProducto variante,
@@ -128,9 +145,27 @@ public class VarianteProductoWebController {
                 .map(VarianteProducto::getTalle)
                 .toList();
 
+        List<Talle> tallesFiltrados;
+
+        if (variante.getProducto().getTipoTalle() == TipoTalle.ALFABETICO) {
+
+            tallesFiltrados = List.of(
+                    Talle.S, Talle.M, Talle.L, Talle.XL,
+                    Talle.XXL, Talle.XXXL, Talle.XXXXL, Talle.XXXXXL, Talle.XXXXXXL
+            );
+
+        } else {
+
+            tallesFiltrados = List.of(
+                    Talle.T38, Talle.T40, Talle.T42, Talle.T44,
+                    Talle.T46, Talle.T48, Talle.T50,
+                    Talle.T52
+            );
+        }
+
         model.addAttribute("variante", variante);
         model.addAttribute("colores", Color.values());
-        model.addAttribute("talles", Talle.values());
+        model.addAttribute("talles", tallesFiltrados);
         model.addAttribute("tallesBloqueados", tallesBloqueados);
 
         return "variantes/editar";

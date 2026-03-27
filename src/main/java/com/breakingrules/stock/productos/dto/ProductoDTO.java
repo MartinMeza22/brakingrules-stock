@@ -1,5 +1,7 @@
 package com.breakingrules.stock.productos.dto;
 
+import com.breakingrules.stock.productos.entity.TipoTalle;
+
 import java.math.BigDecimal;
 
 public class ProductoDTO {
@@ -23,7 +25,7 @@ public class ProductoDTO {
 
     private Boolean activo;
     private String proveedorNombre;
-
+    private TipoTalle tipoTalle;
 
     private Integer stockTotal;
     public ProductoDTO() {}
@@ -38,6 +40,7 @@ public class ProductoDTO {
                        BigDecimal precioEspecial1Mayorista,
                        BigDecimal precioEspecial2Mayorista,
                        BigDecimal precioEspecial3Mayorista,
+                       TipoTalle tipoTalle,
                        Boolean activo,
                        Integer stockTotal,
                        String proveedorNombre) {
@@ -58,6 +61,7 @@ public class ProductoDTO {
         this.precioEspecial3Mayorista = precioEspecial3Mayorista;
 
         this.stockTotal = stockTotal;
+        this.tipoTalle = tipoTalle;
         this.activo = activo;
         this.proveedorNombre = proveedorNombre;
     }
@@ -101,6 +105,14 @@ public class ProductoDTO {
 
     public Boolean getActivo() { return activo; }
     public void setActivo(Boolean activo) { this.activo = activo; }
+
+    public TipoTalle getTipoTalle() {
+        return tipoTalle;
+    }
+
+    public void setTipoTalle(TipoTalle tipoTalle) {
+        this.tipoTalle = tipoTalle;
+    }
 
     public String getProveedorNombre() { return proveedorNombre; }
     public void setProveedorNombre(String proveedorNombre) { this.proveedorNombre = proveedorNombre; }
