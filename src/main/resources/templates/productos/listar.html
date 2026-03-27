@@ -1,6 +1,6 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org"
-      th:replace="layout/base :: layout(~{::section}, 'Producto')">
+      th:replace="~{layout/base :: layout(~{::section}, 'Producto')}">
 
 <section>
 
@@ -102,7 +102,7 @@
             </select>
 
             <div id="bloqueAlfabetico"
-                 th:style="${productoNuevo.tipoTalle != null and productoNuevo.tipoTalle.name() == 'NUMERICO'} ? 'display:none;' : ''">
+                 th:style="${productoNuevo.tipoTalle?.name() == 'NUMERICO' ? 'display: none' : 'display: block'}">
 
                 <h4>Precios Base (S a XL) *</h4>
 
@@ -177,29 +177,28 @@
             </div>
 
             <div id="bloqueNumerico"
-                 th:style="${productoNuevo.tipoTalle != null and productoNuevo.tipoTalle.name() == 'NUMERICO'} ? '' : 'display:none;'">
-
+                 th:style="${productoNuevo.tipoTalle?.name() == 'NUMERICO' ? 'display: block' : 'display: none'}">
                 <h4>Precio único (38 al 58)</h4>
 
-                    <div style="flex:1">
-                        <label>Precio Público *</label>
-                        <input type="number" step="0.01"
-                               th:field="*{precioBasePublico}"
-                               th:classappend="${#fields.hasErrors('precioBasePublico')} ? 'input-error'"/>
-                        <div th:if="${#fields.hasErrors('precioBasePublico')}"
-                             th:errors="*{precioBasePublico}"
-                             class="error-text"></div>
-                    </div>
+                <div style="flex:1">
+                    <label>Precio Público *</label>
+                    <input type="number" step="0.01"
+                           th:field="*{precioBasePublico}"
+                           th:classappend="${#fields.hasErrors('precioBasePublico')} ? 'input-error'"/>
+                    <div th:if="${#fields.hasErrors('precioBasePublico')}"
+                         th:errors="*{precioBasePublico}"
+                         class="error-text"></div>
+                </div>
 
-                    <div style="flex:1">
-                        <label>Precio Mayorista *</label>
-                        <input type="number" step="0.01"
-                               th:field="*{precioBaseMayorista}"
-                               th:classappend="${#fields.hasErrors('precioBaseMayorista')} ? 'input-error'"/>
-                        <div th:if="${#fields.hasErrors('precioBaseMayorista')}"
-                             th:errors="*{precioBaseMayorista}"
-                             class="error-text"></div>
-                    </div>
+                <div style="flex:1">
+                    <label>Precio Mayorista *</label>
+                    <input type="number" step="0.01"
+                           th:field="*{precioBaseMayorista}"
+                           th:classappend="${#fields.hasErrors('precioBaseMayorista')} ? 'input-error'"/>
+                    <div th:if="${#fields.hasErrors('precioBaseMayorista')}"
+                         th:errors="*{precioBaseMayorista}"
+                         class="error-text"></div>
+                </div>
 
             </div>
 
@@ -240,8 +239,8 @@
 
                 <td style="padding:8px;" th:text="${p.sku}"></td>
 
-                <td style="padding:8px;"
-                    th:text="${p.tipoTalle != null ? (p.tipoTalle == T(com.breakingrules.stock.productos.entity.TipoTalle).NUMERICO ? 'Numérico' : 'Alfabético') : 'Sin definir'}">
+                <td style="padding:8px;">
+                    <span th:text="${p.tipoTalle?.name() == 'NUMERICO' ? 'Numérico' : 'Alfabético'}"></span>
                 </td>
 
                 <td style="padding:8px;">
@@ -316,11 +315,15 @@
             function toggleBloques(){
                 const esNumerico = tipoTalle.value === "NUMERICO";
 
-                bloqueAlfabetico.style.display = esNumerico ? "none" : "block";
-                bloqueNumerico.style.display = esNumerico ? "block" : "none";
+                if(bloqueAlfabetico) bloqueAlfabetico.style.display = esNumerico ? "none" : "block";
+                if(bloqueNumerico) bloqueNumerico.style.display = esNumerico ? "block" : "none";
 
-                bloqueAlfabetico.querySelectorAll("input").forEach(i => i.disabled = esNumerico);
-                bloqueNumerico.querySelectorAll("input").forEach(i => i.disabled = !esNumerico);
+                if(bloqueAlfabetico) {
+                    bloqueAlfabetico.querySelectorAll("input").forEach(i => i.disabled = esNumerico);
+                }
+                if(bloqueNumerico) {
+                    bloqueNumerico.querySelectorAll("input").forEach(i => i.disabled = !esNumerico);
+                }
             }
 
             tipoTalle.addEventListener("change", toggleBloques);

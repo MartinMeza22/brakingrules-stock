@@ -31,12 +31,10 @@ import com.google.zxing.common.BitMatrix;
 import com.google.zxing.oned.Code128Writer;
 
 import java.nio.file.*;
-
 @Service
 public class ProductoServiceImpl implements ProductoService {
 
     private static final Logger log = LoggerFactory.getLogger(ProductoServiceImpl.class);
-
     private final ProductoRepository repository;
     private static final int STOCK_BAJO_LIMITE = 5;
 
@@ -44,214 +42,126 @@ public class ProductoServiceImpl implements ProductoService {
         this.repository = repository;
     }
 
+    @Override
     public List<ProductoDTO> listarTodosSinPaginacion() {
-
         log.info("Listando productos activos");
-
-        List<ProductoDTO> productos = repository.findByActivoTrue()
+        return repository.findByActivoTrue()
                 .stream()
                 .map(this::toDTO)
                 .toList();
-
-        log.info("Total productos obtenidos: {}", productos.size());
-
-        return productos;
     }
 
+    @Override
     public Producto guardar(Producto producto) {
+        log.info("Intentando guardar producto: {}", producto != null ? producto.getSku() : "null");
 
-        log.info("Intentando guardar producto: {}", producto != null ? producto.getNombre() : "null");
-
-        validarProducto(producto);
-
-        if (producto.getTipoTalle() == TipoTalle.NUMERICO) {
-
-            log.info("Producto NUMERICO detectado → limpiando precios especiales");
-
-            producto.setPrecioEspecial1Publico(null);
-            producto.setPrecioEspecial1Mayorista(null);
-            producto.setPrecioEspecial2Publico(null);
-            producto.setPrecioEspecial2Mayorista(null);
-            producto.setPrecioEspecial3Publico(null);
-            producto.setPrecioEspecial3Mayorista(null);
-
-        }
-
-        if (producto.getTipoTalle() == null) {
-            log.warn("TipoTalle null → default ALFABETICO");
-            producto.setTipoTalle(TipoTalle.ALFABETICO);
-        }
+        prepararYValidar(producto);
 
         Producto guardado = repository.save(producto);
-
         log.info("Producto guardado correctamente con ID: {}", guardado.getId());
-
         return guardado;
     }
 
+    @Override
     public Producto actualizar(Producto producto) {
         log.info("Actualizando producto ID: {}", producto.getId());
 
-        Producto guardado = repository.save(producto);
+        prepararYValidar(producto);
 
+        Producto guardado = repository.save(producto);
         log.info("Producto actualizado correctamente: {}", guardado.getId());
         return guardado;
     }
 
-    public void eliminar(Integer id) {
-
-        log.info("Intentando desactivar producto con ID: {}", id);
-
-        if (id == null) {
-            log.warn("Intento de eliminación con ID null");
-            throw new IllegalArgumentException("El ID no puede ser null");
+    private void prepararYValidar(Producto producto) {
+        if (producto.getTipoTalle() == null) {
+            producto.setTipoTalle(TipoTalle.ALFABETICO);
         }
 
-        Producto producto = repository.findById(id)
-                .orElseThrow(() -> new IllegalArgumentException("El producto no existe"));
-
-        producto.setActivo(false);
-
-        if (producto.getVariantes() != null) {
-            producto.getVariantes().forEach(variante -> variante.setActivo(false));
+        if (producto.getTipoTalle() == TipoTalle.NUMERICO) {
+            limpiarPreciosEspeciales(producto);
         }
 
-        repository.save(producto);
+        validarProducto(producto);
+    }
 
-        log.info("Producto y variantes desactivados correctamente. ID: {}", id);
+    private void limpiarPreciosEspeciales(Producto producto) {
+        log.info("Limpiando precios especiales para producto numérico");
+        producto.setPrecioEspecial1Publico(null);
+        producto.setPrecioEspecial1Mayorista(null);
+        producto.setPrecioEspecial2Publico(null);
+        producto.setPrecioEspecial2Mayorista(null);
+        producto.setPrecioEspecial3Publico(null);
+        producto.setPrecioEspecial3Mayorista(null);
     }
 
     private void validarProducto(Producto producto) {
+        if (producto == null) throw new IllegalArgumentException("El producto no puede ser null");
 
-        if (producto == null) {
-            throw new IllegalArgumentException("El producto no puede ser null");
-        }
-
-        if (producto.getPrecioBasePublico() == null ||
-                producto.getPrecioBasePublico().compareTo(BigDecimal.ZERO) <= 0) {
+        if (producto.getPrecioBasePublico() == null || producto.getPrecioBasePublico().compareTo(BigDecimal.ZERO) <= 0) {
             throw new IllegalArgumentException("El precio público base debe ser mayor a 0");
         }
 
-        if (producto.getPrecioBaseMayorista() == null ||
-                producto.getPrecioBaseMayorista().compareTo(BigDecimal.ZERO) <= 0) {
+        if (producto.getPrecioBaseMayorista() == null || producto.getPrecioBaseMayorista().compareTo(BigDecimal.ZERO) <= 0) {
             throw new IllegalArgumentException("El precio mayorista base debe ser mayor a 0");
         }
 
         if (producto.getTipoTalle() == TipoTalle.ALFABETICO) {
-
-            if (producto.getPrecioEspecial1Publico() != null &&
-                    producto.getPrecioEspecial1Mayorista() != null &&
-                    producto.getPrecioEspecial1Publico().compareTo(producto.getPrecioEspecial1Mayorista()) < 0) {
-                throw new IllegalArgumentException("Error en precios 2XL/3XL");
-            }
-
+            validarPreciosEspeciales(producto);
         }
 
-        if (producto.getActivo() == null) {
-            producto.setActivo(true);
-        }
+        if (producto.getActivo() == null) producto.setActivo(true);
     }
 
-    public List<ProductoDTO> buscarPorNombre(String nombre) {
-        log.info("Buscando productos por nombre: {}", nombre);
-
-        if (nombre == null || nombre.isBlank()) {
-            log.warn("Búsqueda fallida: nombre vacío");
-            throw new IllegalArgumentException("El nombre no puede estar vacío");
+    private void validarPreciosEspeciales(Producto producto) {
+        if (producto.getPrecioEspecial1Publico() != null && producto.getPrecioEspecial1Mayorista() != null) {
+            if (producto.getPrecioEspecial1Publico().compareTo(producto.getPrecioEspecial1Mayorista()) < 0) {
+                throw new IllegalArgumentException("El precio público 2XL/3XL no puede ser menor al mayorista");
+            }
         }
+        // Se pueden agregar más validaciones para Especial 2 y 3 aquí
+    }
 
-        List<ProductoDTO> resultados = repository.findByNombreContainingIgnoreCase(nombre)
+    @Override
+    public void eliminar(Integer id) {
+        log.info("Desactivando producto ID: {}", id);
+        Producto producto = obtenerEntidadPorId(id);
+        producto.setActivo(false);
+        if (producto.getVariantes() != null) {
+            producto.getVariantes().forEach(v -> v.setActivo(false));
+        }
+        repository.save(producto);
+    }
+
+    @Override
+    public List<ProductoDTO> buscarPorNombre(String nombre) {
+        if (nombre == null || nombre.isBlank()) throw new IllegalArgumentException("El nombre no puede estar vacío");
+        return repository.findByNombreContainingIgnoreCase(nombre)
                 .stream()
                 .map(this::toDTO)
                 .toList();
-
-        log.info("Resultados encontrados: {}", resultados.size());
-        return resultados;
     }
 
+    @Override
     public Producto obtenerEntidadPorId(Integer id) {
-        log.info("Buscando producto por ID: {}", id);
-
-        if (id == null) {
-            log.warn("Búsqueda fallida: ID null");
-            throw new IllegalArgumentException("El ID no puede ser null");
-        }
-
-        Producto producto = repository.findById(id)
-                .orElseThrow(() -> {
-                    log.warn("Producto no encontrado. ID: {}", id);
-                    return new IllegalArgumentException("Producto no encontrado");
-                });
-
-        log.info("Producto encontrado: {}", producto.getNombre());
-        return producto;
+        return repository.findById(id)
+                .orElseThrow(() -> new IllegalArgumentException("Producto no encontrado con ID: " + id));
     }
 
-    public String exportarCSV() {
-        log.info("Iniciando exportación de productos a CSV");
-
-        try {
-            List<Producto> productos = repository.findAll();
-            log.info("Cantidad de productos a exportar: {}", productos.size());
-
-            StringBuilder csv = new StringBuilder();
-
-            csv.append("ID,SKU,Nombre,Costo,PrecioBasePublico,PrecioBaseMayorista,Activo\n");
-
-            for (Producto p : productos) {
-
-                csv.append(p.getId()).append(",")
-                        .append(p.getSku()).append(",")
-                        .append(p.getNombre()).append(",")
-                        .append(p.getCosto()).append(",")
-                        .append(p.getPrecioBasePublico()).append(",")
-                        .append(p.getPrecioBaseMayorista()).append(",")
-                        .append(p.getActivo())
-                        .append("\n");
-            }
-
-            log.info("Exportación CSV completada correctamente");
-            return csv.toString();
-
-        } catch (Exception e) {
-            log.error("Error al exportar productos a CSV", e);
-            throw e;
-        }
-    }
-
+    @Override
     public Page<ProductoDTO> listarPaginado(int page, int size) {
-
-        log.info("Listando productos paginados - page: {}, size: {}", page, size);
-
         Pageable pageable = PageRequest.of(page, size);
-
-        Page<Producto> productos = repository.findAll(pageable);
-
-        log.info("Total elementos encontrados: {}", productos.getTotalElements());
-
-        return productos.map(this::toDTO);
+        return repository.findAll(pageable).map(this::toDTO);
     }
 
     private ProductoDTO toDTO(Producto p) {
         return new ProductoDTO(
-                p.getId(),
-                p.getSku(),
-                p.getNombre(),
-                p.getCosto(),
-                p.getPrecioBasePublico(),
-                p.getPrecioBaseMayorista(),
-                p.getPrecioEspecial1Publico(),
-                p.getPrecioEspecial2Publico(),
-                p.getPrecioEspecial3Publico(),
-                p.getPrecioEspecial1Mayorista(),
-                p.getPrecioEspecial2Mayorista(),
-                p.getPrecioEspecial3Mayorista(),
-                p.getTipoTalle(),
-                p.getActivo(),
-                p.getStockTotal(),
-                p.getProveedor() != null
-                        ? p.getProveedor().getNombre()
-                        : "Sin proveedor"
+                p.getId(), p.getSku(), p.getNombre(), p.getCosto(),
+                p.getPrecioBasePublico(), p.getPrecioBaseMayorista(),
+                p.getPrecioEspecial1Publico(), p.getPrecioEspecial2Publico(), p.getPrecioEspecial3Publico(),
+                p.getPrecioEspecial1Mayorista(), p.getPrecioEspecial2Mayorista(), p.getPrecioEspecial3Mayorista(), p.getTipoTalle(),
+                p.getActivo(), p.getStockTotal(),
+                p.getProveedor() != null ? p.getProveedor().getNombre() : "Sin proveedor"
         );
     }
 
@@ -260,31 +170,35 @@ public class ProductoServiceImpl implements ProductoService {
         return repository.existsBySku(sku);
     }
 
-
     @Override
     public List<VarianteProducto> obtenerVariantesOrdenadas(Integer productoId) {
-
         Producto producto = obtenerEntidadPorId(productoId);
-
         List<VarianteProducto> variantes = new ArrayList<>(producto.getVariantes());
-
-        variantes.sort(
-                Comparator
-                        .comparing((VarianteProducto v) -> v.getColor().ordinal())
-                        .thenComparing(v -> v.getTalle().ordinal())
-        );
-
+        variantes.sort(Comparator
+                .comparing((VarianteProducto v) -> v.getColor().ordinal())
+                .thenComparing(v -> v.getTalle().ordinal()));
         return variantes;
     }
 
-    public Integer obtenerStockTotal(Integer productoId) {
-
-        Producto producto = obtenerEntidadPorId(productoId);
-
-        return producto.getVariantes()
-                .stream()
-                .mapToInt(v -> v.getStock() != null ? v.getStock() : 0)
-                .sum();
+    @Override
+    public String exportarCSV() {
+        List<Producto> productos = repository.findAll();
+        StringBuilder csv = new StringBuilder("ID,SKU,Nombre,Costo,PrecioBasePublico,PrecioBaseMayorista,Activo\n");
+        for (Producto p : productos) {
+            csv.append(p.getId()).append(",")
+                    .append(p.getSku()).append(",")
+                    .append(p.getNombre()).append(",")
+                    .append(p.getCosto()).append(",")
+                    .append(p.getPrecioBasePublico()).append(",")
+                    .append(p.getPrecioBaseMayorista()).append(",")
+                    .append(p.getActivo()).append("\n");
+        }
+        return csv.toString();
     }
 
+    @Override
+    public Integer obtenerStockTotal(Integer productoId) {
+        Producto producto = obtenerEntidadPorId(productoId);
+            return producto.getVariantes() .stream() .mapToInt(v -> v.getStock() != null ? v.getStock() : 0) .sum();
+    }
 }

@@ -50,27 +50,25 @@ public class ProductoWebController {
                           Model model) {
 
         if(service.existeSku(producto.getSku())){
-            result.rejectValue("sku", "error.producto",
-                    "Ya existe un producto con ese articulo");
+            result.rejectValue("sku", "error.producto", "Ya existe un producto con ese articulo");
         }
 
         if (result.hasErrors()) {
-
             model.addAttribute("productos", service.listarTodosSinPaginacion());
             model.addAttribute("proveedores", proveedorService.listarTodos());
             model.addAttribute("productoNuevo", producto);
-
             return "productos/listar";
         }
 
         if (proveedorId != null) {
             producto.setProveedor(proveedorService.obtenerPorId(proveedorId));
         }
+
         if (producto.getTipoTalle() == null) {
             producto.setTipoTalle(TipoTalle.ALFABETICO);
         }
-        service.guardar(producto);
 
+        service.guardar(producto);
         return "redirect:/web/productos";
     }
 
@@ -95,20 +93,16 @@ public class ProductoWebController {
         }
 
         Producto existente = service.obtenerEntidadPorId(id);
-
         existente.setNombre(producto.getNombre());
         existente.setSku(producto.getSku());
         existente.setCosto(producto.getCosto());
         existente.setTipoTalle(producto.getTipoTalle());
         existente.setPrecioBasePublico(producto.getPrecioBasePublico());
         existente.setPrecioBaseMayorista(producto.getPrecioBaseMayorista());
-
         existente.setPrecioEspecial1Publico(producto.getPrecioEspecial1Publico());
         existente.setPrecioEspecial1Mayorista(producto.getPrecioEspecial1Mayorista());
-
         existente.setPrecioEspecial2Publico(producto.getPrecioEspecial2Publico());
         existente.setPrecioEspecial2Mayorista(producto.getPrecioEspecial2Mayorista());
-
         existente.setPrecioEspecial3Publico(producto.getPrecioEspecial3Publico());
         existente.setPrecioEspecial3Mayorista(producto.getPrecioEspecial3Mayorista());
 
@@ -119,7 +113,6 @@ public class ProductoWebController {
         }
 
         service.guardar(existente);
-
         return "redirect:/web/productos";
     }
 
@@ -132,13 +125,10 @@ public class ProductoWebController {
     @GetMapping(value = "/barcode/{codigo}", produces = MediaType.IMAGE_PNG_VALUE)
     @ResponseBody
     public byte[] generarCodigoBarras(@PathVariable String codigo) throws Exception {
-
         Code128Writer writer = new Code128Writer();
         BitMatrix bitMatrix = writer.encode(codigo, BarcodeFormat.CODE_128, 300, 100);
-
         ByteArrayOutputStream pngOutputStream = new ByteArrayOutputStream();
         MatrixToImageWriter.writeToStream(bitMatrix, "PNG", pngOutputStream);
-
         return pngOutputStream.toByteArray();
     }
 
@@ -158,11 +148,8 @@ public class ProductoWebController {
 
     @GetMapping("/etiqueta/{id}")
     public ResponseEntity<byte[]> imprimirEtiqueta(@PathVariable Integer id) throws Exception {
-
         VarianteProducto variante = varianteProductoService.obtenerPorId(id);
-
         List<VarianteProducto> lista = List.of(variante);
-
         byte[] pdf = etiquetaService.generarEtiquetas(lista);
 
         return ResponseEntity.ok()

@@ -29,5 +29,7 @@ public interface ProductoService {
 
     List<VarianteProducto> obtenerVariantesOrdenadas(Integer productoId);
 
+    String exportarCSV();
+
     Integer obtenerStockTotal(Integer productoId);
 }
